@@ -16,5 +16,5 @@ func NewServices(db *database.Database) *Services {
 }
 
 type Servicer interface {
-	AdminCreateService(admin *models.Admin) (*models.Admin, error)
+	AdminCreateService(admin models.Admin) (models.Admin, error)
 }

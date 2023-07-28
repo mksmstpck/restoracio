@@ -10,13 +10,13 @@ import (
 )
 
 func (h *Handlers) AdminCreate(c *gin.Context) {
-	var admin *models.Admin
-	if err := c.ShouldBindJSON(&admin); err != nil {
+	var a models.Admin
+	if err := c.ShouldBindJSON(&a); err != nil {
 		log.Info("AdminCreate: ", err)
 		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
 		return
 	}
-	admin, err := h.service.AdminCreateService(admin)
+	admin, err := h.service.AdminCreateService(a)
 	if err != nil {
 		log.Info("AdminCreate: ", err)
 		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
@@ -54,7 +54,7 @@ func (h *Handlers) AdminUpdate(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
 		return
 	}
-	if err := h.db.AdminUpdate(&admin); err != nil {
+	if err := h.db.AdminUpdate(admin); err != nil {
 		log.Info("AdminUpdate: ", err)
 		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
 		return

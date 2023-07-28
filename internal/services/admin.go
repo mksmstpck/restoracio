@@ -7,20 +7,22 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (s Services) AdminCreateService(admin *models.Admin) (*models.Admin, error) {
-	admin, err := s.db.AdminGetByEmail(admin.Email)
+func (s Services) AdminCreateService(admin models.Admin) (models.Admin, error) {
+	adminExists, err := s.db.AdminGetByEmail(admin.Email)
 	if err != nil {
-		log.Error("AdminCreate: ", err)
-		return nil, err
+		if err.Error() != "admin not found" {
+			log.Error("AdminCreate: ", err)
+			return models.Admin{}, err
+		}
 	}
-	if admin != nil {
-		log.Error("AdminCreate: admin with this email already exists")
-		return nil, errors.New("admin with this email already exists")
+	if adminExists.ID != "" {
+		log.Error("AdminCreate: admin already exists")
+		return models.Admin{}, errors.New("admin already exists")
 	}
 	admin, err = s.db.AdminCreate(admin)
 	if err != nil {
 		log.Error("AdminCreate: ", err)
-		return nil, err
+		return models.Admin{}, err
 	}
 	log.Info("admin created")
 	return admin, nil
