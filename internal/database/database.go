@@ -19,6 +19,7 @@ type Databases interface {
 	AdminCreate(user models.Admin) (models.Admin, error)
 	AdminGetByID(id uuid.UUID) (models.Admin, error)
 	AdminGetByEmail(email string) (models.Admin, error)
+	AdminGetPasswordById(id uuid.UUID) (string, error)
 	AdminUpdate(user models.Admin) error
 	AdminDelete(id uuid.UUID) error
 }

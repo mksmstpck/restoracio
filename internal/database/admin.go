@@ -67,6 +67,24 @@ func (d *Database) AdminGetByEmail(email string) (models.Admin, error) {
 	return admin, nil
 }
 
+func (d *Database) AdminGetPasswordById(id uuid.UUID) (string, error) {
+	var admin models.Admin
+	err := d.db.NewSelect().
+		Model(&admin).
+		Where("id = ?", id).
+		Scan(context.Background())
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Error("admin not found")
+			return "", errors.New("admin not found")
+		}
+		log.Error("database.AdminGetPasswordById: ", err)
+		return "", err
+	}
+	log.Info("admin found")
+	return admin.Password, nil
+}
+
 func (d *Database) AdminUpdate(admin models.Admin) error {
 	res, err := d.db.
 		NewUpdate().
