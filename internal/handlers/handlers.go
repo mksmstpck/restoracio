@@ -37,10 +37,18 @@ func NewHandlers(gin *gin.Engine,
 }
 
 func (h *Handlers) HandleAll() {
+	// groups
 	admin := h.gin.Group("/admin")
-	admin.POST("/create", h.AdminCreate)
-	admin.GET("/get/:id", h.AdminGetByID)
-	admin.GET("/getByEmail/:email", h.AdminGetByEmail)
-	admin.POST("/update", h.AdminUpdate)
-	admin.DELETE("/delete", h.AdminDelete)
+	admin.Use(h.DeserializeUser())
+
+	auth := h.gin.Group("/auth")
+	//admin
+	admin.POST("/create", h.adminCreate)
+	admin.GET("/get/:id", h.adminGetByID)
+	admin.GET("/getByEmail/:email", h.adminGetByEmail)
+	admin.POST("/update", h.adminUpdate)
+	admin.DELETE("/delete", h.adminDelete)
+	//auth
+	auth.POST("/login", h.login)
+	auth.POST("/refresh", h.login)
 }
