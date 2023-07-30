@@ -22,4 +22,10 @@ type Databases interface {
 	AdminGetPasswordById(id uuid.UUID) (string, error)
 	AdminUpdate(user models.Admin) error
 	AdminDelete(id uuid.UUID) error
+	// restaurant
+	RestaurantCreate(restaurant models.Restaurant) (models.Restaurant, error)
+	RestaurantGetByID(id uuid.UUID) (models.Restaurant, error)
+	RestaurantGetByAdminsID(id uuid.UUID) (models.Restaurant, error)
+	RestaurantUpdate(restaurant models.Restaurant) error
+	RestaurantDelete(id uuid.UUID) error
 }
