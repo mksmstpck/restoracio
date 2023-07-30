@@ -9,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (h *Handlers) AdminCreate(c *gin.Context) {
+func (h *Handlers) adminCreate(c *gin.Context) {
 	var a models.Admin
 	if err := c.ShouldBindJSON(&a); err != nil {
 		log.Info("AdminCreate: ", err)
@@ -25,7 +25,7 @@ func (h *Handlers) AdminCreate(c *gin.Context) {
 	c.JSON(http.StatusOK, admin)
 }
 
-func (h *Handlers) AdminGetByID(c *gin.Context) {
+func (h *Handlers) adminGetByID(c *gin.Context) {
 	id := uuid.Parse(c.Param("id"))
 	admin, err := h.db.AdminGetByID(id)
 	if err != nil {
@@ -36,7 +36,7 @@ func (h *Handlers) AdminGetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, admin)
 }
 
-func (h *Handlers) AdminGetByEmail(c *gin.Context) {
+func (h *Handlers) adminGetByEmail(c *gin.Context) {
 	email := c.Param("email")
 	admin, err := h.db.AdminGetByEmail(email)
 	if err != nil {
@@ -47,7 +47,7 @@ func (h *Handlers) AdminGetByEmail(c *gin.Context) {
 	c.JSON(http.StatusOK, admin)
 }
 
-func (h *Handlers) AdminUpdate(c *gin.Context) {
+func (h *Handlers) adminUpdate(c *gin.Context) {
 	var admin models.Admin
 	if err := c.ShouldBindJSON(&admin); err != nil {
 		log.Info("AdminUpdate: ", err)
@@ -62,7 +62,7 @@ func (h *Handlers) AdminUpdate(c *gin.Context) {
 	c.JSON(http.StatusOK, admin)
 }
 
-func (h *Handlers) AdminDelete(c *gin.Context) {
+func (h *Handlers) adminDelete(c *gin.Context) {
 	id := uuid.Parse(c.Param("id"))
 	if err := h.db.AdminDelete(id); err != nil {
 		log.Info("AdminDelete: ", err)
