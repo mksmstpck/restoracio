@@ -4,14 +4,12 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mksmstpck/restoracio/internal/database"
 	"github.com/mksmstpck/restoracio/internal/services"
 )
 
 type Handlers struct {
 	gin            *gin.Engine
 	service        services.Servicer
-	db             database.Databases
 	access_secret  []byte
 	refresh_secret []byte
 	access_exp     time.Duration
@@ -20,7 +18,6 @@ type Handlers struct {
 
 func NewHandlers(gin *gin.Engine,
 	service *services.Services,
-	db database.Databases,
 	access_secret []byte,
 	refresh_secret []byte,
 	access_exp time.Duration,
@@ -28,7 +25,6 @@ func NewHandlers(gin *gin.Engine,
 	return &Handlers{
 		gin:            gin,
 		service:        service,
-		db:             db,
 		access_secret:  access_secret,
 		refresh_secret: refresh_secret,
 		access_exp:     access_exp,
@@ -39,16 +35,29 @@ func NewHandlers(gin *gin.Engine,
 func (h *Handlers) HandleAll() {
 	// groups
 	admin := h.gin.Group("/admin")
-	admin.Use(h.DeserializeUser())
-
 	auth := h.gin.Group("/auth")
+	rest := h.gin.Group("/restaurant")
+
+	// middleware
+	rest.Use(h.DeserializeUser())
+
 	//admin
 	admin.POST("/create", h.adminCreate)
-	admin.GET("/get/:id", h.adminGetByID)
-	admin.GET("/getByEmail/:email", h.adminGetByEmail)
-	admin.POST("/update", h.adminUpdate)
-	admin.DELETE("/delete", h.adminDelete)
+	admin.GET("/get-by-id/:id", h.DeserializeUser(), h.adminGetByID)
+	admin.GET("/get-by-email/:email", h.DeserializeUser(), h.adminGetByEmail)
+	admin.GET("/get-me", h.DeserializeUser(), h.adminGetMe)
+	admin.POST("/update", h.DeserializeUser(), h.adminUpdate)
+	admin.DELETE("/delete", h.DeserializeUser(), h.adminDelete)
+
 	//auth
 	auth.POST("/login", h.login)
 	auth.POST("/refresh", h.login)
+
+	//restorant
+	rest.POST("/create", h.restaurantCreate)
+	rest.GET("/get-by-id/:id", h.restaurantCreate)
+	rest.GET("/get-by-admins-id/:id", h.restaurantCreate)
+	rest.GET("/get-by-email/:email", h.restaurantCreate)
+	rest.POST("/update", h.restaurantUpdate)
+	rest.DELETE("/delete", h.restaurantDelete)
 }
