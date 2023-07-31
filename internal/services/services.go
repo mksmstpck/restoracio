@@ -7,18 +7,25 @@ import (
 )
 
 type Services struct {
-	db database.Databases
+	admindb *database.AdminDatabase
+	restdb  *database.RestDatabase
 }
 
-func NewServices(db *database.Database) *Services {
+func NewServices(admindb *database.AdminDatabase, restdb *database.RestDatabase) *Services {
 	return &Services{
-		db: db,
+		admindb: admindb,
+		restdb:  restdb,
 	}
 }
 
 type Servicer interface {
 	// admin
 	AdminCreateService(admin models.Admin) (models.Admin, error)
+	AdminGetByIDService(id uuid.UUID) (models.Admin, error)
+	AdminGetByEmailService(email string) (models.Admin, error)
+	AdminGetPasswordByIdService(id uuid.UUID) (string, error)
+	AdminUpdateService(admin models.Admin) error
+	AdminDeleteService(id uuid.UUID) error
 	// restaurant
 	RestaurantCreateService(rest models.Restaurant, adminID uuid.UUID) (models.Restaurant, error)
 	RestaurantGetByIDService(id uuid.UUID) (models.Restaurant, error)
