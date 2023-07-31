@@ -43,16 +43,16 @@ func main() {
 	// cockroachdb
 	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(config.CockDKS)))
 	db := bun.NewDB(sqldb, pgdialect.New())
-	database := database.NewDatabase(db)
+	adminDB := database.NewAdminDatabase(db)
+	restDB := database.NewDRatabase(db)
 
 	// services
-	service := services.NewServices(database)
+	service := services.NewServices(adminDB, restDB)
 
 	// gin
 	router := gin.Default()
 	handlers.NewHandlers(router,
 		service,
-		database,
 		config.Access_secret,
 		config.Refresh_secret,
 		config.Access_exp,
