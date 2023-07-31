@@ -20,14 +20,14 @@ func (h *Handlers) login(c *gin.Context) {
 		return
 	}
 
-	admin, err := h.db.AdminGetByEmail(creds.Email)
+	admin, err := h.service.AdminGetByEmailService(creds.Email)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, models.Message{Message: err.Error()})
 		log.Error("handlers.LogInByEmail: ", err)
 		return
 	}
 
-	password, err := h.db.AdminGetPasswordById(uuid.Parse(admin.ID))
+	password, err := h.service.AdminGetPasswordByIdService(uuid.Parse(admin.ID))
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, models.Message{Message: err.Error()})
 		log.Error("handlers.LogInByUsername: ", err)
@@ -55,6 +55,7 @@ func (h *Handlers) login(c *gin.Context) {
 	}
 	c.Header("access", access)
 	c.Header("refresh", refresh)
+	c.Set("Admin", admin)
 
 	c.JSON(http.StatusNoContent, nil)
 	log.Info("handlers.LogInByEmail: user logged in")
@@ -67,7 +68,7 @@ func (h *Handlers) refresh(c *gin.Context) {
 		log.Error("handlers.Refresh: ", err)
 		return
 	}
-	admin, err := h.db.AdminGetByID(admin_id)
+	admin, err := h.service.AdminGetByIDService(admin_id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
 		log.Error("handlers.Refresh: ", err)
