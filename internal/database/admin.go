@@ -12,7 +12,7 @@ import (
 	"github.com/pborman/uuid"
 )
 
-func (d *Database) AdminCreate(admin models.Admin) (models.Admin, error) {
+func (d *AdminDatabase) AdminCreate(admin models.Admin) (models.Admin, error) {
 	admin.RestaurantID = uuid.NIL.String()
 	admin.Password = utils.PasswordHash(admin.Password)
 	admin.ID = uuid.NewUUID().String()
@@ -28,7 +28,7 @@ func (d *Database) AdminCreate(admin models.Admin) (models.Admin, error) {
 	return admin, nil
 }
 
-func (d *Database) AdminGetByID(id uuid.UUID) (models.Admin, error) {
+func (d *AdminDatabase) AdminGetByID(id uuid.UUID) (models.Admin, error) {
 	var admin models.Admin
 	err := d.db.
 		NewSelect().
@@ -48,7 +48,7 @@ func (d *Database) AdminGetByID(id uuid.UUID) (models.Admin, error) {
 	return admin, nil
 }
 
-func (d *Database) AdminGetByEmail(email string) (models.Admin, error) {
+func (d *AdminDatabase) AdminGetByEmail(email string) (models.Admin, error) {
 	var admin models.Admin
 	err := d.db.NewSelect().
 		Model(&admin).
@@ -67,7 +67,26 @@ func (d *Database) AdminGetByEmail(email string) (models.Admin, error) {
 	return admin, nil
 }
 
-func (d *Database) AdminGetPasswordById(id uuid.UUID) (string, error) {
+func (d *AdminDatabase) AdminGetByRestID(id uuid.UUID) (string, error) {
+	var admin models.Admin
+	err := d.db.NewSelect().
+		Model(&admin).
+		ExcludeColumn("password").
+		Where("restaurant_id = ?", id).
+		Scan(context.Background())
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Error("admin not found")
+			return "", errors.New("admin not found")
+		}
+		log.Error("database.AdminGetByRestID: ", err)
+		return "", err
+	}
+	log.Info("admin found")
+	return admin.Password, nil
+}
+
+func (d *AdminDatabase) AdminGetPasswordByID(id uuid.UUID) (string, error) {
 	var admin models.Admin
 	err := d.db.NewSelect().
 		Model(&admin).
@@ -85,7 +104,7 @@ func (d *Database) AdminGetPasswordById(id uuid.UUID) (string, error) {
 	return admin.Password, nil
 }
 
-func (d *Database) AdminUpdate(admin models.Admin) error {
+func (d *AdminDatabase) AdminUpdate(admin models.Admin) error {
 	res, err := d.db.
 		NewUpdate().
 		Model(&admin).
@@ -109,7 +128,7 @@ func (d *Database) AdminUpdate(admin models.Admin) error {
 	return nil
 }
 
-func (d *Database) AdminDelete(id uuid.UUID) error {
+func (d *AdminDatabase) AdminDelete(id uuid.UUID) error {
 	res, err := d.db.
 		NewDelete().
 		Model(&models.Admin{}).
