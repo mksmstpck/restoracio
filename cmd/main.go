@@ -7,10 +7,11 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mksmstpck/restoracio/config"
+	"github.com/mksmstpck/restoracio/internal/config"
 	"github.com/mksmstpck/restoracio/internal/database"
 	"github.com/mksmstpck/restoracio/internal/handlers"
 	"github.com/mksmstpck/restoracio/internal/services"
+	"github.com/patrickmn/go-cache"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"github.com/uptrace/bun"
@@ -41,22 +42,25 @@ func main() {
 	config := config.NewConfig()
 
 	// cockroachdb
-	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(config.CockDKS)))
+	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(config.CockDNS)))
 	db := bun.NewDB(sqldb, pgdialect.New())
 	adminDB := database.NewAdminDatabase(db)
 	restDB := database.NewDRatabase(db)
 
+	// cache
+	cache := cache.New(config.CacheExpire, config.CachePurge)
+
 	// services
-	service := services.NewServices(adminDB, restDB)
+	service := services.NewServices(adminDB, restDB, cache)
 
 	// gin
 	router := gin.Default()
 	handlers.NewHandlers(router,
 		service,
-		config.Access_secret,
-		config.Refresh_secret,
-		config.Access_exp,
-		config.Refresh_exp).HandleAll()
+		config.AccessSecret,
+		config.RefreshSecret,
+		config.AccessExp,
+		config.RefreshExp).HandleAll()
 
 	router.Run(config.GinUrl)
 }
