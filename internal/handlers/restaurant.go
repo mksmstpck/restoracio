@@ -22,7 +22,7 @@ func (h *Handlers) restaurantCreate(c *gin.Context) {
 		log.Info("RestaurantCreate: ", err)
 		return
 	}
-	r, err := h.service.RestaurantCreateService(r, uuid.Parse(admin.(models.Admin).ID))
+	r, err := h.service.RestaurantCreateService(r, admin.(models.Admin))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
 		log.Info("RestaurantCreate: ", err)
