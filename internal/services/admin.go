@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/mksmstpck/restoracio/pkg/models"
+	"github.com/patrickmn/go-cache"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -25,28 +26,41 @@ func (s Services) AdminCreateService(admin models.Admin) (models.Admin, error) {
 		log.Error("AdminCreate: ", err)
 		return models.Admin{}, err
 	}
+	s.cache.Set(admin.ID, admin, cache.DefaultExpiration)
 	log.Info("admin created")
 	return admin, nil
 }
 
 func (s Services) AdminGetByIDService(id uuid.UUID) (models.Admin, error) {
+	admin, exist := s.cache.Get(id.String())
+	if exist {
+		log.Info("admin found")
+		return admin.(models.Admin), nil
+	}
 	admin, err := s.admindb.AdminGetByID(id)
 	if err != nil {
 		log.Error("AdminGetByID: ", err)
 		return models.Admin{}, err
 	}
+	s.cache.Set(admin.(models.Admin).ID, admin, cache.DefaultExpiration)
 	log.Info("admin found")
-	return admin, nil
+	return admin.(models.Admin), nil
 }
 
 func (s Services) AdminGetByEmailService(email string) (models.Admin, error) {
+	admin, exist := s.cache.Get(email)
+	if exist {
+		log.Info("admin found")
+		return admin.(models.Admin), nil
+	}
 	admin, err := s.admindb.AdminGetByEmail(email)
 	if err != nil {
 		log.Error("AdminGetByEmail: ", err)
 		return models.Admin{}, err
 	}
+	s.cache.Set(admin.(models.Admin).ID, admin, cache.DefaultExpiration)
 	log.Info("admin found")
-	return admin, nil
+	return admin.(models.Admin), nil
 }
 
 func (s Services) AdminGetPasswordByIdService(id uuid.UUID) (string, error) {
@@ -60,6 +74,7 @@ func (s Services) AdminGetPasswordByIdService(id uuid.UUID) (string, error) {
 }
 
 func (s Services) AdminUpdateService(admin models.Admin) error {
+	s.cache.Set(admin.ID, admin, cache.DefaultExpiration)
 	err := s.admindb.AdminUpdate(admin)
 	if err != nil {
 		log.Error("AdminUpdate: ", err)
@@ -81,6 +96,14 @@ func (s Services) AdminDeleteService(id uuid.UUID) error {
 		return err
 	}
 	err = s.restdb.RestaurantDelete(uuid.Parse(admin.RestaurantID))
+	if err != nil {
+		log.Error("RestaurantDelete: ", err)
+		return err
+	}
+
+	s.cache.Delete(admin.ID)
+	s.cache.Delete(admin.RestaurantID)
+
 	log.Info("admin deleted")
 	return nil
 }
