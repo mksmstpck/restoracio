@@ -12,7 +12,7 @@ func (h *Handlers) DeserializeUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Request.Header.Get("Authorization")
 		if token == "" {
-			c.JSON(http.StatusUnauthorized, models.Message{Message: "Token not found"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, models.Message{Message: "Token not found"})
 			return
 		}
 		admin_id, err := utils.ValidateJWT(token, h.access_secret)
