@@ -73,7 +73,8 @@ func (s Services) AdminGetPasswordByIdService(id uuid.UUID) (string, error) {
 	return password, nil
 }
 
-func (s Services) AdminUpdateService(admin models.Admin) error {
+func (s Services) AdminUpdateService(admin models.Admin, adminID uuid.UUID) error {
+	admin.ID = adminID.String()
 	s.cache.Set(admin.ID, admin, cache.DefaultExpiration)
 	err := s.admindb.AdminUpdate(admin)
 	if err != nil {
@@ -95,14 +96,14 @@ func (s Services) AdminDeleteService(id uuid.UUID) error {
 		log.Error("AdminDelete: ", err)
 		return err
 	}
-	err = s.restdb.RestaurantDelete(uuid.Parse(admin.RestaurantID))
+	err = s.restdb.RestaurantDelete(uuid.Parse(admin.Restaurant.ID))
 	if err != nil {
 		log.Error("RestaurantDelete: ", err)
 		return err
 	}
 
 	s.cache.Delete(admin.ID)
-	s.cache.Delete(admin.RestaurantID)
+	s.cache.Delete(admin.Restaurant.ID)
 
 	log.Info("admin deleted")
 	return nil
