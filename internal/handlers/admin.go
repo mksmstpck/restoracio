@@ -22,12 +22,18 @@ func (h *Handlers) adminCreate(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
 		return
 	}
+	admin.Password = ""
 	c.JSON(http.StatusOK, admin)
+}
+
+func (h *Handlers) adminGetMe(c *gin.Context) {
+	admin := c.MustGet("Admin")
+	c.JSON(http.StatusOK, admin.(models.Admin))
 }
 
 func (h *Handlers) adminGetByID(c *gin.Context) {
 	id := uuid.Parse(c.Param("id"))
-	admin, err := h.db.AdminGetByID(id)
+	admin, err := h.service.AdminGetByIDService(id)
 	if err != nil {
 		log.Info("AdminGetByID: ", err)
 		c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
@@ -38,7 +44,7 @@ func (h *Handlers) adminGetByID(c *gin.Context) {
 
 func (h *Handlers) adminGetByEmail(c *gin.Context) {
 	email := c.Param("email")
-	admin, err := h.db.AdminGetByEmail(email)
+	admin, err := h.service.AdminGetByEmailService(email)
 	if err != nil {
 		log.Info("AdminGetByEmail: ", err)
 		c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
@@ -54,7 +60,8 @@ func (h *Handlers) adminUpdate(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
 		return
 	}
-	if err := h.db.AdminUpdate(admin); err != nil {
+	authAdmin := c.MustGet("Admin").(models.Admin)
+	if err := h.service.AdminUpdateService(admin, uuid.Parse(authAdmin.ID)); err != nil {
 		log.Info("AdminUpdate: ", err)
 		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
 		return
@@ -63,8 +70,8 @@ func (h *Handlers) adminUpdate(c *gin.Context) {
 }
 
 func (h *Handlers) adminDelete(c *gin.Context) {
-	id := uuid.Parse(c.Param("id"))
-	if err := h.db.AdminDelete(id); err != nil {
+	id := uuid.Parse(c.MustGet("Admin").(models.Admin).Restaurant.ID)
+	if err := h.service.AdminDeleteService(id); err != nil {
 		log.Info("AdminDelete: ", err)
 		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
 		return

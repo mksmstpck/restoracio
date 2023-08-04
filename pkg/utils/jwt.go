@@ -34,6 +34,6 @@ func ValidateJWT(token string, secret []byte) (uuid.UUID, error) {
 	if err != nil {
 		return nil, err
 	}
-	user_id := parsToken.Claims.(jwt.MapClaims)["user_id"]
+	user_id := parsToken.Claims.(jwt.MapClaims)["admin_id"]
 	return uuid.Parse(user_id.(string)), nil
 }

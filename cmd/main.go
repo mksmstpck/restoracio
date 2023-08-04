@@ -3,14 +3,17 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"net/http"
 	"runtime"
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mksmstpck/restoracio/config"
+	"github.com/mksmstpck/restoracio/internal/config"
 	"github.com/mksmstpck/restoracio/internal/database"
 	"github.com/mksmstpck/restoracio/internal/handlers"
 	"github.com/mksmstpck/restoracio/internal/services"
+	"github.com/mksmstpck/restoracio/pkg/models"
+	"github.com/patrickmn/go-cache"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"github.com/uptrace/bun"
@@ -25,7 +28,7 @@ func init() {
 		FullTimestamp:          true,
 		DisableLevelTruncation: true,
 		CallerPrettyfier: func(f *runtime.Frame) (string, string) {
-			return "", fmt.Sprintf("%s:%d", formatFilePath(f.File), f.Line)
+			return "", fmt.Sprintf("%s:%d", formatFilePath(f.Function), f.Line)
 		},
 	}
 	logrus.SetFormatter(formatter)
@@ -41,22 +44,32 @@ func main() {
 	config := config.NewConfig()
 
 	// cockroachdb
-	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(config.CockDKS)))
+	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(config.CockDNS)))
 	db := bun.NewDB(sqldb, pgdialect.New())
-	database := database.NewDatabase(db)
+	adminDB := database.NewAdminDatabase(db)
+	restDB := database.NewDRatabase(db)
+
+	// cache
+	cache := cache.New(config.CacheExpire, config.CachePurge)
 
 	// services
-	service := services.NewServices(database)
+	service := services.NewServices(adminDB, restDB, cache)
 
 	// gin
 	router := gin.Default()
 	handlers.NewHandlers(router,
 		service,
-		database,
-		config.Access_secret,
-		config.Refresh_secret,
-		config.Access_exp,
-		config.Refresh_exp).HandleAll()
+		config.AccessSecret,
+		config.RefreshSecret,
+		config.AccessExp,
+		config.RefreshExp).HandleAll()
+
+	router.NoMethod(func(c *gin.Context) {
+		c.AbortWithStatusJSON(http.StatusNotFound, models.Message{Message: "method not allowed"})
+	})
+	router.NoRoute(func(c *gin.Context) {
+		c.AbortWithStatusJSON(http.StatusNotFound, models.Message{Message: "route not found"})
+	})
 
 	router.Run(config.GinUrl)
 }

@@ -6,20 +6,35 @@ import (
 	"github.com/uptrace/bun"
 )
 
-type Database struct {
+type AdminDatabase struct {
 	db *bun.DB
 }
 
-func NewDatabase(db *bun.DB) *Database {
-	return &Database{db: db}
+func NewAdminDatabase(db *bun.DB) *AdminDatabase {
+	return &AdminDatabase{db: db}
 }
 
-type Databases interface {
-	// admin
+type RestDatabase struct {
+	db *bun.DB
+}
+
+func NewDRatabase(db *bun.DB) *RestDatabase {
+	return &RestDatabase{db: db}
+}
+
+type AdminDatabases interface {
 	AdminCreate(user models.Admin) (models.Admin, error)
 	AdminGetByID(id uuid.UUID) (models.Admin, error)
 	AdminGetByEmail(email string) (models.Admin, error)
-	AdminGetPasswordById(id uuid.UUID) (string, error)
+	AdminGetPasswordByID(id uuid.UUID) (string, error)
 	AdminUpdate(user models.Admin) error
 	AdminDelete(id uuid.UUID) error
+}
+
+type RestaurantDatabases interface {
+	RestaurantCreate(restaurant models.Restaurant) (models.Restaurant, error)
+	RestaurantGetByID(id uuid.UUID) (models.Restaurant, error)
+	RestaurantGetByAdminsID(id uuid.UUID) (models.Restaurant, error)
+	RestaurantUpdate(restaurant models.Restaurant) error
+	RestaurantDelete(id uuid.UUID) error
 }

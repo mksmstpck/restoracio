@@ -11,12 +11,15 @@ import (
 func (h *Handlers) DeserializeUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Request.Header.Get("Authorization")
-
+		if token == "" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, models.Message{Message: "Token not found"})
+			return
+		}
 		admin_id, err := utils.ValidateJWT(token, h.access_secret)
 
-		admin, err := h.db.AdminGetByID(admin_id)
+		admin, err := h.service.AdminGetByIDService(admin_id)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, models.Message{Message: err.Error()})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, models.Message{Message: err.Error()})
 			return
 		}
 		c.Set("Admin", admin)
