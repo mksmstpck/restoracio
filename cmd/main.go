@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"net/http"
 	"runtime"
 	"strings"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/mksmstpck/restoracio/internal/database"
 	"github.com/mksmstpck/restoracio/internal/handlers"
 	"github.com/mksmstpck/restoracio/internal/services"
+	"github.com/mksmstpck/restoracio/pkg/models"
 	"github.com/patrickmn/go-cache"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
@@ -26,7 +28,7 @@ func init() {
 		FullTimestamp:          true,
 		DisableLevelTruncation: true,
 		CallerPrettyfier: func(f *runtime.Frame) (string, string) {
-			return "", fmt.Sprintf("%s:%d", formatFilePath(f.File), f.Line)
+			return "", fmt.Sprintf("%s:%d", formatFilePath(f.Function), f.Line)
 		},
 	}
 	logrus.SetFormatter(formatter)
@@ -61,6 +63,13 @@ func main() {
 		config.RefreshSecret,
 		config.AccessExp,
 		config.RefreshExp).HandleAll()
+
+	router.NoMethod(func(c *gin.Context) {
+		c.AbortWithStatusJSON(http.StatusNotFound, models.Message{Message: "method not allowed"})
+	})
+	router.NoRoute(func(c *gin.Context) {
+		c.AbortWithStatusJSON(http.StatusNotFound, models.Message{Message: "route not found"})
+	})
 
 	router.Run(config.GinUrl)
 }
