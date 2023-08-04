@@ -34,11 +34,7 @@ func (h *Handlers) restaurantCreate(c *gin.Context) {
 
 func (h *Handlers) restaurantGetMine(c *gin.Context) {
 	admin := c.MustGet("Admin").(models.Admin)
-	if admin.ID == "" {
-		c.JSON(http.StatusBadRequest, models.Message{Message: "Admin not found"})
-		return
-	}
-	rest, err := h.service.RestaurantGetByIDService(uuid.Parse(admin.RestaurantID))
+	rest, err := h.service.RestaurantGetByIDService(uuid.Parse(admin.Restaurant.ID))
 	if err != nil {
 		log.Info("RestaurantGetByID: ", err)
 		c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
@@ -59,18 +55,6 @@ func (h *Handlers) restaurantGetByID(c *gin.Context) {
 	log.Info("RestaurantGetByID: restaurant found")
 }
 
-func (h *Handlers) restaurantGetByAdminsID(c *gin.Context) {
-	id := c.Param("id")
-	rest, err := h.service.RestaurantGetByAdminsIDService(uuid.UUID(id))
-	if err != nil {
-		log.Info("RestaurantGetByAdminsID: ", err)
-		c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, rest)
-	log.Info("RestaurantGetByAdminsID: restaurant found")
-}
-
 func (h *Handlers) restaurantUpdate(c *gin.Context) {
 	var r models.Restaurant
 	if err := c.ShouldBindJSON(&r); err != nil {
@@ -78,7 +62,8 @@ func (h *Handlers) restaurantUpdate(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
 		return
 	}
-	if err := h.service.RestaurantUpdateService(r); err != nil {
+	admin := c.MustGet("Admin").(models.Admin)
+	if err := h.service.RestaurantUpdateService(r, uuid.UUID(admin.Restaurant.ID)); err != nil {
 		log.Info("RestaurantUpdate: ", err)
 		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
 		return
@@ -88,8 +73,8 @@ func (h *Handlers) restaurantUpdate(c *gin.Context) {
 }
 
 func (h *Handlers) restaurantDelete(c *gin.Context) {
-	id := uuid.Parse(c.Param("id"))
-	if err := h.service.RestaurantDeleteService(id); err != nil {
+	restaurant := c.MustGet("Admin").(models.Admin).Restaurant
+	if err := h.service.RestaurantDeleteService(restaurant); err != nil {
 		log.Info("RestaurantDelete: ", err)
 		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
 		return
