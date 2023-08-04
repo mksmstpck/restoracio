@@ -27,12 +27,7 @@ func (h *Handlers) adminCreate(c *gin.Context) {
 }
 
 func (h *Handlers) adminGetMe(c *gin.Context) {
-	admin, ifExists := c.Get("Admin")
-	if !ifExists {
-		log.Info("AdminGetMe: admin does not exist")
-		c.JSON(http.StatusBadRequest, models.Message{Message: "Admin does not exist"})
-		return
-	}
+	admin := c.MustGet("Admin")
 	c.JSON(http.StatusOK, admin.(models.Admin))
 }
 
@@ -65,7 +60,8 @@ func (h *Handlers) adminUpdate(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
 		return
 	}
-	if err := h.service.AdminUpdateService(admin); err != nil {
+	authAdmin := c.MustGet("Admin").(models.Admin)
+	if err := h.service.AdminUpdateService(admin, uuid.Parse(authAdmin.ID)); err != nil {
 		log.Info("AdminUpdate: ", err)
 		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
 		return
@@ -74,7 +70,7 @@ func (h *Handlers) adminUpdate(c *gin.Context) {
 }
 
 func (h *Handlers) adminDelete(c *gin.Context) {
-	id := uuid.Parse(c.Param("id"))
+	id := uuid.Parse(c.MustGet("Admin").(models.Admin).Restaurant.ID)
 	if err := h.service.AdminDeleteService(id); err != nil {
 		log.Info("AdminDelete: ", err)
 		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
