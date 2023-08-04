@@ -1,11 +1,9 @@
-drop table if exists restaurant;
+drop table if exists restaurants;
 
-create table if not exists restaurant (
+create table if not exists restaurants (
     id varchar(36) primary key,
     name varchar(255) not null,
     location varchar(255) not null,
-    staff_ids varchar(36)[] not null,
-    dish_ids varchar(36)[] not null,
-    table_ids varchar(36)[] not null,
-    admin_id varchar(36)[] not null
+    admin_id varchar(36) not null,
+    constraint fk_admin_id foreign key (admin_id) references admins (id)
     );
