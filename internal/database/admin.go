@@ -13,7 +13,6 @@ import (
 )
 
 func (d *AdminDatabase) AdminCreate(admin models.Admin) (models.Admin, error) {
-	admin.RestaurantID = uuid.NIL.String()
 	admin.Password = utils.PasswordHash(admin.Password)
 	admin.ID = uuid.NewUUID().String()
 	_, err := d.db.
@@ -34,7 +33,8 @@ func (d *AdminDatabase) AdminGetByID(id uuid.UUID) (models.Admin, error) {
 		NewSelect().
 		Model(&admin).
 		ExcludeColumn("password").
-		Where("id = ?", id.String()).
+		Relation("Restaurant").
+		Where("admin.id = ?", id.String()).
 		Scan(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -53,7 +53,8 @@ func (d *AdminDatabase) AdminGetByEmail(email string) (models.Admin, error) {
 	err := d.db.NewSelect().
 		Model(&admin).
 		ExcludeColumn("password").
-		Where("email = ?", email).
+		Relation("Restaurant").
+		Where("admin.email = ?", email).
 		Scan(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -65,25 +66,6 @@ func (d *AdminDatabase) AdminGetByEmail(email string) (models.Admin, error) {
 	}
 	log.Info("admin found")
 	return admin, nil
-}
-
-func (d *AdminDatabase) AdminGetByRestID(id uuid.UUID) (string, error) {
-	var admin models.Admin
-	err := d.db.NewSelect().
-		Model(&admin).
-		ExcludeColumn("password").
-		Where("restaurant_id = ?", id).
-		Scan(context.Background())
-	if err != nil {
-		if err == sql.ErrNoRows {
-			log.Error("admin not found")
-			return "", errors.New("admin not found")
-		}
-		log.Error("database.AdminGetByRestID: ", err)
-		return "", err
-	}
-	log.Info("admin found")
-	return admin.Password, nil
 }
 
 func (d *AdminDatabase) AdminGetPasswordByID(id uuid.UUID) (string, error) {
