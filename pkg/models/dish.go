@@ -9,5 +9,6 @@ type Dish struct {
 	MassGrams   int      `json:"mass_grams" binding:"required"`
 	Ingredients []string `json:"ingredients" binding:"required"`
 	Description string   `json:"description" binding:"required"`
-	Photo       string   `json:"photo"`
+	Photo       []byte   `json:"photo"`
+	MenuID      string   `json:"menu_id" binding:"required" bun:"menu_id"`
 }
