@@ -7,7 +7,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/mksmstpck/restoracio/pkg/models"
+	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/mksmstpck/restoracio/pkg/utils"
 	"github.com/pborman/uuid"
 )

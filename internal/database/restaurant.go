@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/mksmstpck/restoracio/pkg/models"
+	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )

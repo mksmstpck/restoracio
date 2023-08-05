@@ -3,7 +3,7 @@ package services
 import (
 	"errors"
 
-	"github.com/mksmstpck/restoracio/pkg/models"
+	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/patrickmn/go-cache"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"

@@ -2,7 +2,7 @@ package services
 
 import (
 	"github.com/mksmstpck/restoracio/internal/database"
-	"github.com/mksmstpck/restoracio/pkg/models"
+	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/patrickmn/go-cache"
 	"github.com/pborman/uuid"
 )
