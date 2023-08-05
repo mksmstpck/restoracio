@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mksmstpck/restoracio/internal/models"
-	"github.com/mksmstpck/restoracio/pkg/utils"
+	"github.com/mksmstpck/restoracio/utils"
 )
 
 func (h *Handlers) DeserializeUser() gin.HandlerFunc {
