@@ -40,21 +40,18 @@ func (h *Handlers) login(c *gin.Context) {
 		return
 	}
 
-	access, err := utils.CreateJWT(h.accessExp, h.accessSecret, uuid.Parse(admin.ID))
+	jwt, err := utils.CreateJWTs(
+		h.refreshExp,
+		h.accessExp,
+		h.refreshSecret,
+		h.accessSecret,
+		uuid.UUID(admin.ID),
+	)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
-		log.Error("handlers.LogInByEmail: ", err)
-		return
+		c.JSON(http.StatusUnauthorized, models.Message{Message: err.Error()})
 	}
-
-	refresh, err := utils.CreateJWT(h.refreshExp, h.refreshSecret, uuid.Parse(admin.ID))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
-		log.Error("handlers.LogInByEmail: ", err)
-		return
-	}
-	c.Header("access", access)
-	c.Header("refresh", refresh)
+	c.Header("access", jwt.Access)
+	c.Header("refresh", jwt.Refresh)
 	c.Set("Admin", admin)
 
 	c.JSON(http.StatusNoContent, nil)
@@ -75,21 +72,19 @@ func (h *Handlers) refresh(c *gin.Context) {
 		return
 	}
 
-	access, err := utils.CreateJWT(h.accessExp, h.accessSecret, uuid.Parse(admin.ID))
+	jwt, err := utils.CreateJWTs(
+		h.refreshExp,
+		h.accessExp,
+		h.refreshSecret,
+		h.accessSecret,
+		uuid.UUID(admin.ID),
+	)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
-		log.Error("handlers.LogInByUsername: ", err)
-		return
+		c.JSON(http.StatusUnauthorized, models.Message{Message: err.Error()})
 	}
 
-	refresh, err := utils.CreateJWT(h.refreshExp, h.refreshSecret, uuid.Parse(admin.ID))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
-		log.Error("handlers.LogInByUsername: ", err)
-		return
-	}
-	c.Header("access", access)
-	c.Header("refresh", refresh)
+	c.Header("access", jwt.Access)
+	c.Header("refresh", jwt.Refresh)
 
 	c.JSON(http.StatusNoContent, nil)
 	log.Info("handlers.Refresh: user logged in")

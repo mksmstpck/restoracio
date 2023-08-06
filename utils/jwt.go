@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/mksmstpck/restoracio/internal/models"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/pborman/uuid"
@@ -36,4 +37,24 @@ func ValidateJWT(token string, secret []byte) (uuid.UUID, error) {
 	}
 	user_id := parsToken.Claims.(jwt.MapClaims)["admin_id"]
 	return uuid.Parse(user_id.(string)), nil
+}
+
+func CreateJWTs(
+	refreshExp time.Duration,
+	accessExp time.Duration,
+	refreshSecret []byte,
+	accessSecret []byte,
+	adminID uuid.UUID,
+) (*models.JWT, error) {
+	access, err := CreateJWT(accessExp, accessSecret, adminID)
+	if err != nil {
+		return nil, err
+	}
+
+	refresh, err := CreateJWT(refreshExp, refreshSecret, adminID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.JWT{Access: access, Refresh: refresh}, nil
 }
