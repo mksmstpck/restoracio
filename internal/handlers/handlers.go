@@ -8,27 +8,27 @@ import (
 )
 
 type Handlers struct {
-	gin            *gin.Engine
-	service        services.Servicer
-	access_secret  []byte
-	refresh_secret []byte
-	access_exp     time.Duration
-	refresh_exp    time.Duration
+	gin           *gin.Engine
+	service       services.Servicer
+	accessSecret  []byte
+	refreshSecret []byte
+	accessExp     time.Duration
+	refreshExp    time.Duration
 }
 
 func NewHandlers(gin *gin.Engine,
 	service *services.Services,
-	access_secret []byte,
-	refresh_secret []byte,
-	access_exp time.Duration,
-	refresh_exp time.Duration) *Handlers {
+	accessSecret []byte,
+	refreshSecret []byte,
+	accessExp time.Duration,
+	refreshExp time.Duration) *Handlers {
 	return &Handlers{
-		gin:            gin,
-		service:        service,
-		access_secret:  access_secret,
-		refresh_secret: refresh_secret,
-		access_exp:     access_exp,
-		refresh_exp:    refresh_exp,
+		gin:           gin,
+		service:       service,
+		accessSecret:  accessSecret,
+		refreshSecret: refreshSecret,
+		accessExp:     accessExp,
+		refreshExp:    refreshExp,
 	}
 }
 

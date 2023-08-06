@@ -15,7 +15,7 @@ func (h *Handlers) DeserializeUser() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, models.Message{Message: "Token not found"})
 			return
 		}
-		admin_id, err := utils.ValidateJWT(token, h.access_secret)
+		admin_id, err := utils.ValidateJWT(token, h.accessSecret)
 
 		admin, err := h.service.AdminGetByIDService(admin_id)
 		if err != nil {

@@ -40,14 +40,14 @@ func (h *Handlers) login(c *gin.Context) {
 		return
 	}
 
-	access, err := utils.CreateJWT(h.access_exp, h.access_secret, uuid.Parse(admin.ID))
+	access, err := utils.CreateJWT(h.accessExp, h.accessSecret, uuid.Parse(admin.ID))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
 		log.Error("handlers.LogInByEmail: ", err)
 		return
 	}
 
-	refresh, err := utils.CreateJWT(h.refresh_exp, h.refresh_secret, uuid.Parse(admin.ID))
+	refresh, err := utils.CreateJWT(h.refreshExp, h.refreshSecret, uuid.Parse(admin.ID))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
 		log.Error("handlers.LogInByEmail: ", err)
@@ -62,7 +62,7 @@ func (h *Handlers) login(c *gin.Context) {
 }
 
 func (h *Handlers) refresh(c *gin.Context) {
-	admin_id, err := utils.ValidateJWT(c.Request.Header.Get("refresh"), h.refresh_secret)
+	admin_id, err := utils.ValidateJWT(c.Request.Header.Get("refresh"), h.refreshSecret)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
 		log.Error("handlers.Refresh: ", err)
@@ -75,14 +75,14 @@ func (h *Handlers) refresh(c *gin.Context) {
 		return
 	}
 
-	access, err := utils.CreateJWT(h.access_exp, h.access_secret, uuid.Parse(admin.ID))
+	access, err := utils.CreateJWT(h.accessExp, h.accessSecret, uuid.Parse(admin.ID))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
 		log.Error("handlers.LogInByUsername: ", err)
 		return
 	}
 
-	refresh, err := utils.CreateJWT(h.refresh_exp, h.refresh_secret, uuid.Parse(admin.ID))
+	refresh, err := utils.CreateJWT(h.refreshExp, h.refreshSecret, uuid.Parse(admin.ID))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
 		log.Error("handlers.LogInByUsername: ", err)
