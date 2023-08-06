@@ -23,6 +23,13 @@ type RestaurantDatabases interface {
 	DeleteOne(id uuid.UUID) error
 }
 
+type TableDatabases interface {
+	CreateOne(table models.Table) (models.Table, error)
+	GetByID(id uuid.UUID) (models.Table, error)
+	UpdateOne(table models.Table) error
+	DeleteOne(id uuid.UUID) error
+}
+
 type AdminDatabase struct {
 	db *bun.DB
 }
@@ -39,14 +46,24 @@ func NewRestaurantDatabase(db *bun.DB) RestaurantDatabases {
 	return &RestDatabase{db: db}
 }
 
+type TableDatabase struct {
+	db *bun.DB
+}
+
+func NewTableDatabase(db *bun.DB) TableDatabases {
+	return &TableDatabase{db: db}
+}
+
 type Database struct {
 	Admin AdminDatabases
 	Rest  RestaurantDatabases
+	Table TableDatabases
 }
 
 func NewDatabase(db *bun.DB) *Database {
 	return &Database{
 		Admin: NewAdminDatabase(db),
 		Rest:  NewRestaurantDatabase(db),
+		Table: NewTableDatabase(db),
 	}
 }
