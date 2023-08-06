@@ -16,6 +16,9 @@ func (h *Handlers) DeserializeUser() gin.HandlerFunc {
 			return
 		}
 		admin_id, err := utils.ValidateJWT(token, h.accessSecret)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, models.Message{Message: err.Error()})
+		}
 
 		admin, err := h.service.AdminGetByIDService(admin_id)
 		if err != nil {
