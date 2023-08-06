@@ -10,7 +10,7 @@ import (
 )
 
 func (s Services) AdminCreateService(admin models.Admin) (models.Admin, error) {
-	adminExists, err := s.db.Admin.AdminGetByEmail(admin.Email)
+	adminExists, err := s.db.Admin.GetByEmail(admin.Email)
 	if err != nil {
 		if err.Error() != "admin not found" {
 			log.Error("AdminCreate: ", err)
@@ -21,7 +21,7 @@ func (s Services) AdminCreateService(admin models.Admin) (models.Admin, error) {
 		log.Error("AdminCreate: admin already exists")
 		return models.Admin{}, errors.New("admin already exists")
 	}
-	admin, err = s.db.Admin.AdminCreate(admin)
+	admin, err = s.db.Admin.CreateOne(admin)
 	if err != nil {
 		log.Error("AdminCreate: ", err)
 		return models.Admin{}, err
@@ -37,7 +37,7 @@ func (s Services) AdminGetByIDService(id uuid.UUID) (models.Admin, error) {
 		log.Info("admin found")
 		return admin.(models.Admin), nil
 	}
-	admin, err := s.db.Admin.AdminGetByID(id)
+	admin, err := s.db.Admin.GetByID(id)
 	if err != nil {
 		log.Error("AdminGetByID: ", err)
 		return models.Admin{}, err
@@ -53,7 +53,7 @@ func (s Services) AdminGetByEmailService(email string) (models.Admin, error) {
 		log.Info("admin found")
 		return admin.(models.Admin), nil
 	}
-	admin, err := s.db.Admin.AdminGetByEmail(email)
+	admin, err := s.db.Admin.GetByEmail(email)
 	if err != nil {
 		log.Error("AdminGetByEmail: ", err)
 		return models.Admin{}, err
@@ -64,7 +64,7 @@ func (s Services) AdminGetByEmailService(email string) (models.Admin, error) {
 }
 
 func (s Services) AdminGetPasswordByIdService(id uuid.UUID) (string, error) {
-	password, err := s.db.Admin.AdminGetPasswordByID(id)
+	password, err := s.db.Admin.GetPasswordByID(id)
 	if err != nil {
 		log.Error("AdminGetPasswordById: ", err)
 		return "", err
@@ -76,7 +76,7 @@ func (s Services) AdminGetPasswordByIdService(id uuid.UUID) (string, error) {
 func (s Services) AdminUpdateService(admin models.Admin, adminID uuid.UUID) error {
 	admin.ID = adminID.String()
 	s.cache.Set(admin.ID, admin, cache.DefaultExpiration)
-	err := s.db.Admin.AdminUpdate(admin)
+	err := s.db.Admin.UpdateOne(admin)
 	if err != nil {
 		log.Error("AdminUpdate: ", err)
 		return err
@@ -86,17 +86,17 @@ func (s Services) AdminUpdateService(admin models.Admin, adminID uuid.UUID) erro
 }
 
 func (s Services) AdminDeleteService(id uuid.UUID) error {
-	admin, err := s.db.Admin.AdminGetByID(id)
+	admin, err := s.db.Admin.GetByID(id)
 	if err != nil {
 		log.Error("AdminDelete: ", err)
 		return err
 	}
-	err = s.db.Admin.AdminDelete(id)
+	err = s.db.Admin.DeleteOne(id)
 	if err != nil {
 		log.Error("AdminDelete: ", err)
 		return err
 	}
-	err = s.db.Rest.RestaurantDelete(uuid.Parse(admin.Restaurant.ID))
+	err = s.db.Rest.DeleteOne(uuid.Parse(admin.Restaurant.ID))
 	if err != nil {
 		log.Error("RestaurantDelete: ", err)
 		return err

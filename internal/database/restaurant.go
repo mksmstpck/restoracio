@@ -10,7 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (d *RestDatabase) RestaurantCreate(restaurant models.Restaurant) (models.Restaurant, error) {
+func (d *RestDatabase) CreateOne(restaurant models.Restaurant) (models.Restaurant, error) {
 	restaurant.ID = uuid.NewUUID().String()
 	_, err := d.db.
 		NewInsert().
@@ -24,7 +24,7 @@ func (d *RestDatabase) RestaurantCreate(restaurant models.Restaurant) (models.Re
 	return restaurant, nil
 }
 
-func (d *RestDatabase) RestaurantGetByID(id uuid.UUID) (models.Restaurant, error) {
+func (d *RestDatabase) GetByID(id uuid.UUID) (models.Restaurant, error) {
 	var restaurant models.Restaurant
 	err := d.db.
 		NewSelect().
@@ -43,7 +43,7 @@ func (d *RestDatabase) RestaurantGetByID(id uuid.UUID) (models.Restaurant, error
 	return restaurant, nil
 }
 
-func (d *RestDatabase) RestaurantGetByAdminsID(id uuid.UUID) (models.Restaurant, error) {
+func (d *RestDatabase) GetByAdminsID(id uuid.UUID) (models.Restaurant, error) {
 	var restaurant models.Restaurant
 	err := d.db.
 		NewSelect().
@@ -62,7 +62,7 @@ func (d *RestDatabase) RestaurantGetByAdminsID(id uuid.UUID) (models.Restaurant,
 	return restaurant, nil
 }
 
-func (d *RestDatabase) RestaurantUpdate(restaurant models.Restaurant) error {
+func (d *RestDatabase) UpdateOne(restaurant models.Restaurant) error {
 	_, err := d.db.
 		NewUpdate().
 		Model(&restaurant).
@@ -77,7 +77,7 @@ func (d *RestDatabase) RestaurantUpdate(restaurant models.Restaurant) error {
 	return nil
 }
 
-func (d *RestDatabase) RestaurantDelete(id uuid.UUID) error {
+func (d *RestDatabase) DeleteOne(id uuid.UUID) error {
 	_, err := d.db.
 		NewDelete().
 		Model(&models.Restaurant{}).

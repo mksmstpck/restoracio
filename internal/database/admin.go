@@ -12,7 +12,7 @@ import (
 	"github.com/pborman/uuid"
 )
 
-func (d *AdminDatabase) AdminCreate(admin models.Admin) (models.Admin, error) {
+func (d *AdminDatabase) CreateOne(admin models.Admin) (models.Admin, error) {
 	admin.Password = utils.PasswordHash(admin.Password)
 	admin.ID = uuid.NewUUID().String()
 	_, err := d.db.
@@ -27,7 +27,7 @@ func (d *AdminDatabase) AdminCreate(admin models.Admin) (models.Admin, error) {
 	return admin, nil
 }
 
-func (d *AdminDatabase) AdminGetByID(id uuid.UUID) (models.Admin, error) {
+func (d *AdminDatabase) GetByID(id uuid.UUID) (models.Admin, error) {
 	var admin models.Admin
 	err := d.db.
 		NewSelect().
@@ -48,7 +48,7 @@ func (d *AdminDatabase) AdminGetByID(id uuid.UUID) (models.Admin, error) {
 	return admin, nil
 }
 
-func (d *AdminDatabase) AdminGetByEmail(email string) (models.Admin, error) {
+func (d *AdminDatabase) GetByEmail(email string) (models.Admin, error) {
 	var admin models.Admin
 	err := d.db.NewSelect().
 		Model(&admin).
@@ -68,7 +68,7 @@ func (d *AdminDatabase) AdminGetByEmail(email string) (models.Admin, error) {
 	return admin, nil
 }
 
-func (d *AdminDatabase) AdminGetPasswordByID(id uuid.UUID) (string, error) {
+func (d *AdminDatabase) GetPasswordByID(id uuid.UUID) (string, error) {
 	var admin models.Admin
 	err := d.db.NewSelect().
 		Model(&admin).
@@ -86,7 +86,7 @@ func (d *AdminDatabase) AdminGetPasswordByID(id uuid.UUID) (string, error) {
 	return admin.Password, nil
 }
 
-func (d *AdminDatabase) AdminUpdate(admin models.Admin) error {
+func (d *AdminDatabase) UpdateOne(admin models.Admin) error {
 	res, err := d.db.
 		NewUpdate().
 		Model(&admin).
@@ -110,7 +110,7 @@ func (d *AdminDatabase) AdminUpdate(admin models.Admin) error {
 	return nil
 }
 
-func (d *AdminDatabase) AdminDelete(id uuid.UUID) error {
+func (d *AdminDatabase) DeleteOne(id uuid.UUID) error {
 	res, err := d.db.
 		NewDelete().
 		Model(&models.Admin{}).

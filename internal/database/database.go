@@ -7,20 +7,20 @@ import (
 )
 
 type AdminDatabases interface {
-	AdminCreate(user models.Admin) (models.Admin, error)
-	AdminGetByID(id uuid.UUID) (models.Admin, error)
-	AdminGetByEmail(email string) (models.Admin, error)
-	AdminGetPasswordByID(id uuid.UUID) (string, error)
-	AdminUpdate(user models.Admin) error
-	AdminDelete(id uuid.UUID) error
+	CreateOne(user models.Admin) (models.Admin, error)
+	GetByID(id uuid.UUID) (models.Admin, error)
+	GetByEmail(email string) (models.Admin, error)
+	GetPasswordByID(id uuid.UUID) (string, error)
+	UpdateOne(user models.Admin) error
+	DeleteOne(id uuid.UUID) error
 }
 
 type RestaurantDatabases interface {
-	RestaurantCreate(restaurant models.Restaurant) (models.Restaurant, error)
-	RestaurantGetByID(id uuid.UUID) (models.Restaurant, error)
-	RestaurantGetByAdminsID(id uuid.UUID) (models.Restaurant, error)
-	RestaurantUpdate(restaurant models.Restaurant) error
-	RestaurantDelete(id uuid.UUID) error
+	CreateOne(restaurant models.Restaurant) (models.Restaurant, error)
+	GetByID(id uuid.UUID) (models.Restaurant, error)
+	GetByAdminsID(id uuid.UUID) (models.Restaurant, error)
+	UpdateOne(restaurant models.Restaurant) error
+	DeleteOne(id uuid.UUID) error
 }
 
 type AdminDatabase struct {
