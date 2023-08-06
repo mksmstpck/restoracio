@@ -8,19 +8,16 @@ import (
 )
 
 type Services struct {
-	admindb *database.AdminDatabase
-	restdb  *database.RestDatabase
+	db      *database.Database
 	cache   *cache.Cache
 }
 
 func NewServices(
-	admindb *database.AdminDatabase,
-	restdb *database.RestDatabase,
+	db *database.Database,
 	cache *cache.Cache,
 ) *Services {
 	return &Services{
-		admindb: admindb,
-		restdb:  restdb,
+		db:      db,
 		cache:   cache,
 	}
 }

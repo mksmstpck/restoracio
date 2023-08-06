@@ -6,22 +6,6 @@ import (
 	"github.com/uptrace/bun"
 )
 
-type AdminDatabase struct {
-	db *bun.DB
-}
-
-func NewAdminDatabase(db *bun.DB) *AdminDatabase {
-	return &AdminDatabase{db: db}
-}
-
-type RestDatabase struct {
-	db *bun.DB
-}
-
-func NewDRatabase(db *bun.DB) *RestDatabase {
-	return &RestDatabase{db: db}
-}
-
 type AdminDatabases interface {
 	AdminCreate(user models.Admin) (models.Admin, error)
 	AdminGetByID(id uuid.UUID) (models.Admin, error)
@@ -37,4 +21,32 @@ type RestaurantDatabases interface {
 	RestaurantGetByAdminsID(id uuid.UUID) (models.Restaurant, error)
 	RestaurantUpdate(restaurant models.Restaurant) error
 	RestaurantDelete(id uuid.UUID) error
+}
+
+type AdminDatabase struct {
+	db *bun.DB
+}
+
+func NewAdminDatabase(db *bun.DB) AdminDatabases {
+	return &AdminDatabase{db: db}
+}
+
+type RestDatabase struct {
+	db *bun.DB
+}
+
+func NewRestaurantDatabase(db *bun.DB) RestaurantDatabases {
+	return &RestDatabase{db: db}
+}
+
+type Database struct {
+	Admin AdminDatabases
+	Rest  RestaurantDatabases
+}
+
+func NewDatabase(db *bun.DB) *Database {
+	return &Database{
+		Admin: NewAdminDatabase(db),
+		Rest:  NewRestaurantDatabase(db),
+	}
 }

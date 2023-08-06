@@ -11,7 +11,7 @@ import (
 
 func (s *Services) RestaurantCreateService(rest models.Restaurant, admin models.Admin) (models.Restaurant, error) {
 	rest.AdminID = admin.ID
-	res, err := s.restdb.RestaurantCreate(rest)
+	res, err := s.db.Rest.RestaurantCreate(rest)
 	if err != nil {
 		log.Info("RestaurantCreate: ", err)
 		return models.Restaurant{}, err
@@ -30,7 +30,7 @@ func (s *Services) RestaurantGetByIDService(id uuid.UUID) (models.Restaurant, er
 		log.Info("restaurant found")
 		return res.(models.Restaurant), nil
 	}
-	res, err := s.restdb.RestaurantGetByID(id)
+	res, err := s.db.Rest.RestaurantGetByID(id)
 	if err != nil {
 		log.Info("RestaurantGetByID: ", err)
 		return models.Restaurant{}, err
@@ -44,7 +44,7 @@ func (s *Services) RestaurantGetByIDService(id uuid.UUID) (models.Restaurant, er
 
 func (s *Services) RestaurantUpdateService(rest models.Restaurant, restID uuid.UUID) error {
 	rest.ID = restID.String()
-	err := s.restdb.RestaurantUpdate(rest)
+	err := s.db.Rest.RestaurantUpdate(rest)
 	if err != nil {
 		log.Info("RestaurantUpdate: ", err)
 		return err
@@ -61,7 +61,7 @@ func (s *Services) RestaurantDeleteService(rest *models.Restaurant) error {
 		log.Info("restaurant not found")
 		return errors.New("restaurant not found")
 	}
-	err := s.restdb.RestaurantDelete(uuid.Parse(rest.ID))
+	err := s.db.Rest.RestaurantDelete(uuid.Parse(rest.ID))
 	if err != nil {
 		log.Info("RestaurantDelete: ", err)
 		return err
