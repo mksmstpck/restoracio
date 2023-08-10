@@ -10,12 +10,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (d *TableDatabase) CreateOne(table models.Table) (models.Table, error) {
+func (d *TableDatabase) CreateOne(ctx context.Context, table models.Table) (models.Table, error) {
 	table.ID = uuid.NewUUID().String()
 	_, err := d.db.
 		NewInsert().
 		Model(&table).
-		Exec(context.Background())
+		Exec(ctx)
 	if err != nil {
 		log.Error("database.TableCreate: ", err)
 		return models.Table{}, err
@@ -24,13 +24,13 @@ func (d *TableDatabase) CreateOne(table models.Table) (models.Table, error) {
 	return table, nil
 }
 
-func (d *TableDatabase) GetByID(id uuid.UUID) (models.Table, error) {
+func (d *TableDatabase) GetByID(ctx context.Context, id uuid.UUID) (models.Table, error) {
 	var table models.Table
 	err := d.db.
 		NewSelect().
 		Model(&table).
 		Where("id = ?", id.String()).
-		Scan(context.Background())
+		Scan(ctx)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			log.Error("table not found")
@@ -43,12 +43,12 @@ func (d *TableDatabase) GetByID(id uuid.UUID) (models.Table, error) {
 	return table, nil
 }
 
-func (d *TableDatabase) UpdateOne(table models.Table) error {
+func (d *TableDatabase) UpdateOne(ctx context.Context, table models.Table) error {
 	_, err := d.db.
 		NewUpdate().
 		Model(&table).
 		Where("id = ?", table.ID).
-		Exec(context.Background())
+		Exec(ctx)
 	if err != nil {
 		log.Error("database.TableUpdate: ", err)
 		return err
@@ -57,12 +57,12 @@ func (d *TableDatabase) UpdateOne(table models.Table) error {
 	return nil
 }
 
-func (d *TableDatabase) DeleteOne(id uuid.UUID) error {
+func (d *TableDatabase) DeleteOne(ctx context.Context, id uuid.UUID) error {
 	_, err := d.db.
 		NewDelete().
 		Model(models.Table{}).
 		Where("id = ?", id).
-		Exec(context.Background())
+		Exec(ctx)
 	if err != nil {
 		log.Error("database.TableDelete: ", err)
 		return err

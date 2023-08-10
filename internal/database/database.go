@@ -1,33 +1,35 @@
 package database
 
 import (
+	"context"
+
 	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/pborman/uuid"
 	"github.com/uptrace/bun"
 )
 
 type AdminDatabases interface {
-	CreateOne(user models.Admin) (models.Admin, error)
-	GetByID(id uuid.UUID) (models.Admin, error)
-	GetByEmail(email string) (models.Admin, error)
-	GetPasswordByID(id uuid.UUID) (string, error)
-	UpdateOne(user models.Admin) error
-	DeleteOne(id uuid.UUID) error
+	CreateOne(ctx context.Context, user models.Admin) (models.Admin, error)
+	GetByID(ctx context.Context, id uuid.UUID) (models.Admin, error)
+	GetByEmail(ctx context.Context, email string) (models.Admin, error)
+	GetPasswordByID(ctx context.Context, id uuid.UUID) (string, error)
+	UpdateOne(ctx context.Context, user models.Admin) error
+	DeleteOne(ctx context.Context, id uuid.UUID) error
 }
 
 type RestaurantDatabases interface {
-	CreateOne(restaurant models.Restaurant) (models.Restaurant, error)
-	GetByID(id uuid.UUID) (models.Restaurant, error)
-	GetByAdminsID(id uuid.UUID) (models.Restaurant, error)
-	UpdateOne(restaurant models.Restaurant) error
-	DeleteOne(id uuid.UUID) error
+	CreateOne(ctx context.Context, restaurant models.Restaurant) (models.Restaurant, error)
+	GetByID(ctx context.Context, id uuid.UUID) (models.Restaurant, error)
+	GetByAdminsID(ctx context.Context, id uuid.UUID) (models.Restaurant, error)
+	UpdateOne(ctx context.Context, restaurant models.Restaurant) error
+	DeleteOne(ctx context.Context, id uuid.UUID) error
 }
 
 type TableDatabases interface {
-	CreateOne(table models.Table) (models.Table, error)
-	GetByID(id uuid.UUID) (models.Table, error)
-	UpdateOne(table models.Table) error
-	DeleteOne(id uuid.UUID) error
+	CreateOne(ctx context.Context, table models.Table) (models.Table, error)
+	GetByID(ctx context.Context, id uuid.UUID) (models.Table, error)
+	UpdateOne(ctx context.Context, table models.Table) error
+	DeleteOne(ctx context.Context, id uuid.UUID) error
 }
 
 type AdminDatabase struct {

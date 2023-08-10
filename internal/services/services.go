@@ -1,6 +1,8 @@
 package services
 
 import (
+	"context"
+
 	"github.com/mksmstpck/restoracio/internal/database"
 	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/patrickmn/go-cache"
@@ -10,15 +12,18 @@ import (
 type Services struct {
 	db      *database.Database
 	cache   *cache.Cache
+	ctx context.Context
 }
 
 func NewServices(
+	ctx context.Context,
 	db *database.Database,
 	cache *cache.Cache,
-) *Services {
+) Servicer {
 	return &Services{
 		db:      db,
 		cache:   cache,
+		ctx:     ctx,
 	}
 }
 
@@ -34,5 +39,5 @@ type Servicer interface {
 	RestaurantCreateService(rest models.Restaurant, admin models.Admin) (models.Restaurant, error)
 	RestaurantGetByIDService(id uuid.UUID) (models.Restaurant, error)
 	RestaurantUpdateService(rest models.Restaurant, restID uuid.UUID) error
-	RestaurantDeleteService(*models.Restaurant) error
+	RestaurantDeleteService(rest *models.Restaurant) error
 }
