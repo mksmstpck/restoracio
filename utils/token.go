@@ -5,13 +5,12 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/mksmstpck/restoracio/internal/models"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/pborman/uuid"
 )
 
-func CreateJWT(exp time.Duration, secret []byte, admin_id uuid.UUID) (string, error) {
+func CreateToken(exp time.Duration, secret []byte, admin_id uuid.UUID) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	clanims := token.Claims.(jwt.MapClaims)
 	clanims["exp"] = time.Now().Add(exp * time.Hour).Unix()
@@ -23,7 +22,7 @@ func CreateJWT(exp time.Duration, secret []byte, admin_id uuid.UUID) (string, er
 	return tokenString, nil
 }
 
-func ValidateJWT(token string, secret []byte) (uuid.UUID, error) {
+func ValidateToken(token string, secret []byte) (uuid.UUID, error) {
 	parsToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
 		if !ok {
@@ -37,24 +36,4 @@ func ValidateJWT(token string, secret []byte) (uuid.UUID, error) {
 	}
 	user_id := parsToken.Claims.(jwt.MapClaims)["admin_id"]
 	return uuid.Parse(user_id.(string)), nil
-}
-
-func CreateJWTs(
-	refreshExp time.Duration,
-	accessExp time.Duration,
-	refreshSecret []byte,
-	accessSecret []byte,
-	adminID uuid.UUID,
-) (*models.JWT, error) {
-	access, err := CreateJWT(accessExp, accessSecret, adminID)
-	if err != nil {
-		return nil, err
-	}
-
-	refresh, err := CreateJWT(refreshExp, refreshSecret, adminID)
-	if err != nil {
-		return nil, err
-	}
-
-	return &models.JWT{Access: access, Refresh: refresh}, nil
 }
