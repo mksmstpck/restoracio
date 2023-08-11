@@ -43,6 +43,21 @@ func (d *TableDatabase) GetByID(ctx context.Context, id uuid.UUID) (models.Table
 	return table, nil
 }
 
+func (d *TableDatabase) GetAllInRestaurant(ctx context.Context, id uuid.UUID) ([]models.Table, error) {
+	var tables []models.Table
+	err := d.db.
+		NewSelect().
+		Model(&tables).
+		Where("restaurant_id = ?", id.String()).
+		Scan(ctx)
+	if err != nil {
+		log.Error("database.TableGetAllInRestaurant: ", err)
+		return nil, err
+	}
+	log.Info("tables found")
+	return tables, nil
+}
+
 func (d *TableDatabase) UpdateOne(ctx context.Context, table models.Table) error {
 	_, err := d.db.
 		NewUpdate().

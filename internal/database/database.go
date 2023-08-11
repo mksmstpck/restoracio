@@ -28,6 +28,7 @@ type RestaurantDatabases interface {
 type TableDatabases interface {
 	CreateOne(ctx context.Context, table models.Table) (models.Table, error)
 	GetByID(ctx context.Context, id uuid.UUID) (models.Table, error)
+	GetAllInRestaurant(ctx context.Context, id uuid.UUID) ([]models.Table, error)
 	UpdateOne(ctx context.Context, table models.Table) error
 	DeleteOne(ctx context.Context, id uuid.UUID) error
 }
