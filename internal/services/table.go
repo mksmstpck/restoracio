@@ -28,6 +28,15 @@ func (s *Services) TableGetByIDService(id uuid.UUID) (models.Table, error) {
 	return table, nil
 }
 
+func (s *Services) TableGetAllInRestaurantService(id uuid.UUID) ([]models.Table, error) {
+	tables, err := s.db.Table.GetAllInRestaurant(s.ctx, id)
+	if err != nil {
+		log.Info("TableGetAllInRestaurant: ", err)
+		return nil, err
+	}
+	return tables, nil
+}
+
 func (s *Services) TableUpdateService(table models.Table) error {
 	err := s.db.Table.UpdateOne(s.ctx, table)
 	if err != nil {
