@@ -43,23 +43,23 @@ func (h *Handlers) HandleAll() {
 	rest.Use(h.DeserializeUser())
 
 	// admin
-	admin.POST("/create", h.adminCreate)
-	admin.GET("/get-by-id/:id", h.adminGetByID)
-	admin.GET("/get-by-email/:email", h.DeserializeUser(), h.adminGetByEmail)
-	admin.GET("/get-me", h.DeserializeUser(), h.adminGetMe)
-	admin.PUT("/update", h.DeserializeUser(), h.adminUpdate)
-	admin.DELETE("/delete", h.DeserializeUser(), h.adminDelete)
+	admin.POST("/", h.adminCreate)
+	admin.GET("/id/:id", h.adminGetByID)
+	admin.GET("/email/:email", h.DeserializeUser(), h.adminGetByEmail)
+	admin.GET("/me", h.DeserializeUser(), h.adminGetMe)
+	admin.PUT("/", h.DeserializeUser(), h.adminUpdate)
+	admin.DELETE("/", h.DeserializeUser(), h.adminDelete)
 
 	// auth
 	auth.POST("/login", h.login)
 	auth.POST("/refresh", h.refresh)
 
 	// restorant
-	rest.POST("/create", h.restaurantCreate)
-	rest.GET("/get-by-id/:id", h.restaurantGetByID)
-	rest.GET("/get-mine", h.restaurantGetMine)
-	rest.PUT("/update", h.restaurantUpdate)
-	rest.DELETE("/delete", h.restaurantDelete)
+	rest.POST("/", h.restaurantCreate)
+	rest.GET("/:id", h.restaurantGetByID)
+	rest.GET("/mine", h.restaurantGetMine)
+	rest.PUT("/", h.restaurantUpdate)
+	rest.DELETE("/", h.restaurantDelete)
 
 	// table
 	table.POST("/", h.tableCreate)
