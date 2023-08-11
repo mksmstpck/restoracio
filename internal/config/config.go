@@ -12,16 +12,22 @@ type Config struct {
 	CockDNS       string
 	CacheExpire   time.Duration
 	CachePurge    time.Duration
-	TokenSecret []byte
-	TokenExp    time.Duration
+	AccessSecret  []byte
+	RefreshSecret []byte
+	AccessExp     time.Duration
+	RefreshExp    time.Duration
 }
 
 func NewConfig() Config {
-	tokenExp, err := strconv.Atoi(os.Getenv("TOKEN_EXP"))
+	accessExp, err := strconv.Atoi(os.Getenv("ACCESS_EXP"))
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	refreshExp, err := strconv.Atoi(os.Getenv("REFRESH_EXP"))
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	cacheExp, err := strconv.Atoi(os.Getenv("CACHE_EXP"))
 	if err != nil {
@@ -37,7 +43,9 @@ func NewConfig() Config {
 		CockDNS:       os.Getenv("COCK_DNS"),
 		CacheExpire:   time.Duration(cacheExp),
 		CachePurge:    time.Duration(cachePurge),
-		TokenSecret:   []byte(os.Getenv("TOKEN_SECRET")),
-		TokenExp:      time.Duration(tokenExp),
+		AccessSecret:  []byte(os.Getenv("ACCESS_SECRET")),
+		RefreshSecret: []byte(os.Getenv("REFRESH_SECRET")),
+		AccessExp:     time.Duration(accessExp),
+		RefreshExp:    time.Duration(refreshExp),
 	}
 }

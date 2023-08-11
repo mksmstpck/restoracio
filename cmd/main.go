@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"net/http"
@@ -52,16 +53,18 @@ func main() {
 	cache := cache.New(config.CacheExpire, config.CachePurge)
 
 	// services
-	service := services.NewServices(database, cache)
+	service := services.NewServices(context.TODO(), database, cache)
 
 	// gin
 	router := gin.Default()
-	handlers.NewHandlers(router,
+	handlers.NewHandlers(
+		router,
 		service,
 		config.AccessSecret,
 		config.RefreshSecret,
 		config.AccessExp,
-		config.RefreshExp).HandleAll()
+		config.RefreshExp,
+		).HandleAll()
 
 	router.NoMethod(func(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusNotFound, models.Message{Message: "method not allowed"})
@@ -69,6 +72,8 @@ func main() {
 	router.NoRoute(func(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusNotFound, models.Message{Message: "route not found"})
 	})
-
-	router.Run(config.GinUrl)
+	
+	if err := router.Run(config.GinUrl); err != nil {
+		log.Fatal(err)
+	}
 }

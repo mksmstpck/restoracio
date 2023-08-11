@@ -17,7 +17,7 @@ type Handlers struct {
 }
 
 func NewHandlers(gin *gin.Engine,
-	service *services.Services,
+	service services.Servicer,
 	accessSecret []byte,
 	refreshSecret []byte,
 	accessExp time.Duration,
@@ -43,7 +43,7 @@ func (h *Handlers) HandleAll() {
 
 	//admin
 	admin.POST("/create", h.adminCreate)
-	admin.GET("/get-by-id/:id", h.DeserializeUser(), h.adminGetByID)
+	admin.GET("/get-by-id/:id", h.adminGetByID)
 	admin.GET("/get-by-email/:email", h.DeserializeUser(), h.adminGetByEmail)
 	admin.GET("/get-me", h.DeserializeUser(), h.adminGetMe)
 	admin.PUT("/update", h.DeserializeUser(), h.adminUpdate)

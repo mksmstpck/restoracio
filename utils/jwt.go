@@ -10,7 +10,7 @@ import (
 	"github.com/pborman/uuid"
 )
 
-func CreateToken(exp time.Duration, secret []byte, admin_id uuid.UUID) (string, error) {
+func CreateJWT(exp time.Duration, secret []byte, admin_id uuid.UUID) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	clanims := token.Claims.(jwt.MapClaims)
 	clanims["exp"] = time.Now().Add(exp * time.Hour).Unix()
@@ -22,7 +22,7 @@ func CreateToken(exp time.Duration, secret []byte, admin_id uuid.UUID) (string, 
 	return tokenString, nil
 }
 
-func ValidateToken(token string, secret []byte) (uuid.UUID, error) {
+func ValidateJWT(token string, secret []byte) (uuid.UUID, error) {
 	parsToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
 		if !ok {
