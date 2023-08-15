@@ -62,8 +62,9 @@ func (h *Handlers) HandleAll() {
 	rest.DELETE("/", h.restaurantDelete)
 
 	// table
-	table.POST("/", h.tableCreate)
+	table.POST("/", h.DeserializeUser(),  h.tableCreate)
 	table.GET("/:id", h.tableGetByID)
-	table.PUT("/", h.tableUpdate)
-	table.DELETE("/", h.tableDelete)
+	table.GET("/all/:id", h.tableGetAllInRestaurant)
+	table.PUT("/", h.DeserializeUser(), h.tableUpdate)
+	table.DELETE("/:id", h.DeserializeUser(), h.tableDelete)
 }
