@@ -44,6 +44,6 @@ type Servicer interface {
 	TableCreateService(table models.Table, admin models.Admin) (models.Table, error)
 	TableGetByIDService(id uuid.UUID) (models.Table, error)
 	TableGetAllInRestaurantService(id uuid.UUID) ([]models.Table, error)
-	TableUpdateService(table models.Table) error
-	TableDeleteService(id uuid.UUID) error
+	TableUpdateService(table models.Table, admin models.Admin) error
+	TableDeleteService(id uuid.UUID, admin models.Admin) error
 }
