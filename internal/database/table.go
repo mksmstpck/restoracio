@@ -62,6 +62,7 @@ func (d *TableDatabase) UpdateOne(ctx context.Context, table models.Table) error
 	_, err := d.db.
 		NewUpdate().
 		Model(&table).
+		ExcludeColumn("restaurant_id", "id").
 		Where("id = ?", table.ID).
 		Exec(ctx)
 	if err != nil {
@@ -75,7 +76,7 @@ func (d *TableDatabase) UpdateOne(ctx context.Context, table models.Table) error
 func (d *TableDatabase) DeleteOne(ctx context.Context, id uuid.UUID) error {
 	_, err := d.db.
 		NewDelete().
-		Model(models.Table{}).
+		Model(&models.Table{}).
 		Where("id = ?", id).
 		Exec(ctx)
 	if err != nil {
