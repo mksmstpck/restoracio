@@ -20,7 +20,6 @@ type AdminDatabases interface {
 type RestaurantDatabases interface {
 	CreateOne(ctx context.Context, restaurant models.Restaurant) (models.Restaurant, error)
 	GetByID(ctx context.Context, id uuid.UUID) (models.Restaurant, error)
-	GetByAdminsID(ctx context.Context, id uuid.UUID) (models.Restaurant, error)
 	UpdateOne(ctx context.Context, restaurant models.Restaurant) error
 	DeleteOne(ctx context.Context, id uuid.UUID) error
 }
