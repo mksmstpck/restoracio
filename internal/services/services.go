@@ -1,27 +1,29 @@
 package services
 
 import (
+	"context"
+
 	"github.com/mksmstpck/restoracio/internal/database"
-	"github.com/mksmstpck/restoracio/pkg/models"
+	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/patrickmn/go-cache"
 	"github.com/pborman/uuid"
 )
 
 type Services struct {
-	admindb *database.AdminDatabase
-	restdb  *database.RestDatabase
+	db      *database.Database
 	cache   *cache.Cache
+	ctx context.Context
 }
 
 func NewServices(
-	admindb *database.AdminDatabase,
-	restdb *database.RestDatabase,
+	ctx context.Context,
+	db *database.Database,
 	cache *cache.Cache,
-) *Services {
+) Servicer {
 	return &Services{
-		admindb: admindb,
-		restdb:  restdb,
+		db:      db,
 		cache:   cache,
+		ctx:     ctx,
 	}
 }
 
@@ -37,5 +39,11 @@ type Servicer interface {
 	RestaurantCreateService(rest models.Restaurant, admin models.Admin) (models.Restaurant, error)
 	RestaurantGetByIDService(id uuid.UUID) (models.Restaurant, error)
 	RestaurantUpdateService(rest models.Restaurant, restID uuid.UUID) error
-	RestaurantDeleteService(*models.Restaurant) error
+	RestaurantDeleteService(rest *models.Restaurant) error
+	// table
+	TableCreateService(table models.Table, admin models.Admin) (models.Table, error)
+	TableGetByIDService(id uuid.UUID) (models.Table, error)
+	TableGetAllInRestaurantService(id uuid.UUID) ([]models.Table, error)
+	TableUpdateService(table models.Table, admin models.Admin) error
+	TableDeleteService(id uuid.UUID, admin models.Admin) error
 }

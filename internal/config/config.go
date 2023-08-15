@@ -35,6 +35,9 @@ func NewConfig() Config {
 	}
 
 	cachePurge, err := strconv.Atoi(os.Getenv("CACHE_PURGE"))
+	if err != nil {
+		log.Fatal(err)
+	}
 	return Config{
 		GinUrl:        os.Getenv("GIN_URL"),
 		CockDNS:       os.Getenv("COCK_DNS"),

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"net/http"
@@ -11,8 +12,8 @@ import (
 	"github.com/mksmstpck/restoracio/internal/config"
 	"github.com/mksmstpck/restoracio/internal/database"
 	"github.com/mksmstpck/restoracio/internal/handlers"
+	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/mksmstpck/restoracio/internal/services"
-	"github.com/mksmstpck/restoracio/pkg/models"
 	"github.com/patrickmn/go-cache"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
@@ -46,23 +47,24 @@ func main() {
 	// cockroachdb
 	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(config.CockDNS)))
 	db := bun.NewDB(sqldb, pgdialect.New())
-	adminDB := database.NewAdminDatabase(db)
-	restDB := database.NewDRatabase(db)
+	database := database.NewDatabase(db)
 
 	// cache
 	cache := cache.New(config.CacheExpire, config.CachePurge)
 
 	// services
-	service := services.NewServices(adminDB, restDB, cache)
+	service := services.NewServices(context.TODO(), database, cache)
 
 	// gin
 	router := gin.Default()
-	handlers.NewHandlers(router,
+	handlers.NewHandlers(
+		router,
 		service,
 		config.AccessSecret,
 		config.RefreshSecret,
 		config.AccessExp,
-		config.RefreshExp).HandleAll()
+		config.RefreshExp,
+		).HandleAll()
 
 	router.NoMethod(func(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusNotFound, models.Message{Message: "method not allowed"})
@@ -70,6 +72,8 @@ func main() {
 	router.NoRoute(func(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusNotFound, models.Message{Message: "route not found"})
 	})
-
-	router.Run(config.GinUrl)
+	
+	if err := router.Run(config.GinUrl); err != nil {
+		log.Fatal(err)
+	}
 }

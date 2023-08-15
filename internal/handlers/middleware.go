@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mksmstpck/restoracio/pkg/models"
-	"github.com/mksmstpck/restoracio/pkg/utils"
+	"github.com/mksmstpck/restoracio/internal/models"
+	"github.com/mksmstpck/restoracio/utils"
 )
 
 func (h *Handlers) DeserializeUser() gin.HandlerFunc {
@@ -15,7 +15,11 @@ func (h *Handlers) DeserializeUser() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, models.Message{Message: "Token not found"})
 			return
 		}
-		admin_id, err := utils.ValidateJWT(token, h.access_secret)
+		admin_id, err := utils.ValidateJWT(token, h.accessSecret)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, models.Message{Message: err.Error()})
+			return
+		}
 
 		admin, err := h.service.AdminGetByIDService(admin_id)
 		if err != nil {

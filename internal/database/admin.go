@@ -7,18 +7,18 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/mksmstpck/restoracio/pkg/models"
-	"github.com/mksmstpck/restoracio/pkg/utils"
+	"github.com/mksmstpck/restoracio/internal/models"
+	"github.com/mksmstpck/restoracio/utils"
 	"github.com/pborman/uuid"
 )
 
-func (d *AdminDatabase) AdminCreate(admin models.Admin) (models.Admin, error) {
+func (d *AdminDatabase) CreateOne(ctx context.Context, admin models.Admin) (models.Admin, error) {
 	admin.Password = utils.PasswordHash(admin.Password)
 	admin.ID = uuid.NewUUID().String()
 	_, err := d.db.
 		NewInsert().
 		Model(&admin).
-		Exec(context.Background())
+		Exec(ctx)
 	if err != nil {
 		log.Error("database.AdminCreate: ", err)
 		return models.Admin{}, err
@@ -27,15 +27,16 @@ func (d *AdminDatabase) AdminCreate(admin models.Admin) (models.Admin, error) {
 	return admin, nil
 }
 
-func (d *AdminDatabase) AdminGetByID(id uuid.UUID) (models.Admin, error) {
+func (d *AdminDatabase) GetByID(ctx context.Context, id uuid.UUID) (models.Admin, error) {
 	var admin models.Admin
 	err := d.db.
 		NewSelect().
 		Model(&admin).
 		ExcludeColumn("password").
 		Relation("Restaurant").
+		Relation("Restaurant.Tables").
 		Where("admin.id = ?", id.String()).
-		Scan(context.Background())
+		Scan(ctx)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			log.Error("admin not found")
@@ -48,14 +49,15 @@ func (d *AdminDatabase) AdminGetByID(id uuid.UUID) (models.Admin, error) {
 	return admin, nil
 }
 
-func (d *AdminDatabase) AdminGetByEmail(email string) (models.Admin, error) {
+func (d *AdminDatabase) GetByEmail(ctx context.Context, email string) (models.Admin, error) {
 	var admin models.Admin
 	err := d.db.NewSelect().
 		Model(&admin).
 		ExcludeColumn("password").
 		Relation("Restaurant").
+		Relation("Restaurant.Tables").
 		Where("admin.email = ?", email).
-		Scan(context.Background())
+		Scan(ctx)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			log.Error("admin not found")
@@ -68,12 +70,12 @@ func (d *AdminDatabase) AdminGetByEmail(email string) (models.Admin, error) {
 	return admin, nil
 }
 
-func (d *AdminDatabase) AdminGetPasswordByID(id uuid.UUID) (string, error) {
+func (d *AdminDatabase) GetPasswordByID(ctx context.Context, id uuid.UUID) (string, error) {
 	var admin models.Admin
 	err := d.db.NewSelect().
 		Model(&admin).
 		Where("id = ?", id).
-		Scan(context.Background())
+		Scan(ctx)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			log.Error("admin not found")
@@ -86,13 +88,13 @@ func (d *AdminDatabase) AdminGetPasswordByID(id uuid.UUID) (string, error) {
 	return admin.Password, nil
 }
 
-func (d *AdminDatabase) AdminUpdate(admin models.Admin) error {
+func (d *AdminDatabase) UpdateOne(ctx context.Context, admin models.Admin) error {
 	res, err := d.db.
 		NewUpdate().
 		Model(&admin).
 		ExcludeColumn("id", "password").
 		Where("id = ?", admin.ID).
-		Exec(context.Background())
+		Exec(ctx)
 	if err != nil {
 		log.Error("database.AdminUpdate: ", err)
 		return err
@@ -110,12 +112,12 @@ func (d *AdminDatabase) AdminUpdate(admin models.Admin) error {
 	return nil
 }
 
-func (d *AdminDatabase) AdminDelete(id uuid.UUID) error {
+func (d *AdminDatabase) DeleteOne(ctx context.Context, id uuid.UUID) error {
 	res, err := d.db.
 		NewDelete().
 		Model(&models.Admin{}).
 		Where("id = ?", id).
-		Exec(context.Background())
+		Exec(ctx)
 	if err != nil {
 		log.Error("database.AdminDelete: ", err)
 		return err

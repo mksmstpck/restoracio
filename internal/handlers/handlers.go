@@ -8,27 +8,27 @@ import (
 )
 
 type Handlers struct {
-	gin            *gin.Engine
-	service        services.Servicer
-	access_secret  []byte
-	refresh_secret []byte
-	access_exp     time.Duration
-	refresh_exp    time.Duration
+	gin           *gin.Engine
+	service       services.Servicer
+	accessSecret  []byte
+	refreshSecret []byte
+	accessExp     time.Duration
+	refreshExp    time.Duration
 }
 
 func NewHandlers(gin *gin.Engine,
-	service *services.Services,
-	access_secret []byte,
-	refresh_secret []byte,
-	access_exp time.Duration,
-	refresh_exp time.Duration) *Handlers {
+	service services.Servicer,
+	accessSecret []byte,
+	refreshSecret []byte,
+	accessExp time.Duration,
+	refreshExp time.Duration) *Handlers {
 	return &Handlers{
-		gin:            gin,
-		service:        service,
-		access_secret:  access_secret,
-		refresh_secret: refresh_secret,
-		access_exp:     access_exp,
-		refresh_exp:    refresh_exp,
+		gin:           gin,
+		service:       service,
+		accessSecret:  accessSecret,
+		refreshSecret: refreshSecret,
+		accessExp:     accessExp,
+		refreshExp:    refreshExp,
 	}
 }
 
@@ -37,26 +37,34 @@ func (h *Handlers) HandleAll() {
 	admin := h.gin.Group("/admin")
 	auth := h.gin.Group("/auth")
 	rest := h.gin.Group("/restaurant")
+	table := h.gin.Group("/table")
 
 	// middleware
 	rest.Use(h.DeserializeUser())
 
-	//admin
-	admin.POST("/create", h.adminCreate)
-	admin.GET("/get-by-id/:id", h.DeserializeUser(), h.adminGetByID)
-	admin.GET("/get-by-email/:email", h.DeserializeUser(), h.adminGetByEmail)
-	admin.GET("/get-me", h.DeserializeUser(), h.adminGetMe)
-	admin.PUT("/update", h.DeserializeUser(), h.adminUpdate)
-	admin.DELETE("/delete", h.DeserializeUser(), h.adminDelete)
+	// admin
+	admin.POST("/", h.adminCreate)
+	admin.GET("/id/:id", h.adminGetByID)
+	admin.GET("/email/:email", h.DeserializeUser(), h.adminGetByEmail)
+	admin.GET("/me", h.DeserializeUser(), h.adminGetMe)
+	admin.PUT("/", h.DeserializeUser(), h.adminUpdate)
+	admin.DELETE("/", h.DeserializeUser(), h.adminDelete)
 
-	//auth
+	// auth
 	auth.POST("/login", h.login)
 	auth.POST("/refresh", h.refresh)
 
-	//restorant
-	rest.POST("/create", h.restaurantCreate)
-	rest.GET("/get-by-id/:id", h.restaurantGetByID)
-	rest.GET("/get-mine", h.restaurantGetMine)
-	rest.POST("/update", h.restaurantUpdate)
-	rest.DELETE("/delete", h.restaurantDelete)
+	// restorant
+	rest.POST("/", h.restaurantCreate)
+	rest.GET("/:id", h.restaurantGetByID)
+	rest.GET("/mine", h.restaurantGetMine)
+	rest.PUT("/", h.restaurantUpdate)
+	rest.DELETE("/", h.restaurantDelete)
+
+	// table
+	table.POST("/", h.DeserializeUser(),  h.tableCreate)
+	table.GET("/:id", h.tableGetByID)
+	table.GET("/all/:id", h.tableGetAllInRestaurant)
+	table.PUT("/", h.DeserializeUser(), h.tableUpdate)
+	table.DELETE("/:id", h.DeserializeUser(), h.tableDelete)
 }

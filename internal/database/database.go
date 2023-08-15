@@ -1,16 +1,42 @@
 package database
 
 import (
-	"github.com/mksmstpck/restoracio/pkg/models"
+	"context"
+
+	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/pborman/uuid"
 	"github.com/uptrace/bun"
 )
+
+type AdminDatabases interface {
+	CreateOne(ctx context.Context, user models.Admin) (models.Admin, error)
+	GetByID(ctx context.Context, id uuid.UUID) (models.Admin, error)
+	GetByEmail(ctx context.Context, email string) (models.Admin, error)
+	GetPasswordByID(ctx context.Context, id uuid.UUID) (string, error)
+	UpdateOne(ctx context.Context, user models.Admin) error
+	DeleteOne(ctx context.Context, id uuid.UUID) error
+}
+
+type RestaurantDatabases interface {
+	CreateOne(ctx context.Context, restaurant models.Restaurant) (models.Restaurant, error)
+	GetByID(ctx context.Context, id uuid.UUID) (models.Restaurant, error)
+	UpdateOne(ctx context.Context, restaurant models.Restaurant) error
+	DeleteOne(ctx context.Context, id uuid.UUID) error
+}
+
+type TableDatabases interface {
+	CreateOne(ctx context.Context, table models.Table) (models.Table, error)
+	GetByID(ctx context.Context, id uuid.UUID) (models.Table, error)
+	GetAllInRestaurant(ctx context.Context, id uuid.UUID) ([]models.Table, error)
+	UpdateOne(ctx context.Context, table models.Table) error
+	DeleteOne(ctx context.Context, id uuid.UUID) error
+}
 
 type AdminDatabase struct {
 	db *bun.DB
 }
 
-func NewAdminDatabase(db *bun.DB) *AdminDatabase {
+func NewAdminDatabase(db *bun.DB) AdminDatabases {
 	return &AdminDatabase{db: db}
 }
 
@@ -18,23 +44,28 @@ type RestDatabase struct {
 	db *bun.DB
 }
 
-func NewDRatabase(db *bun.DB) *RestDatabase {
+func NewRestaurantDatabase(db *bun.DB) RestaurantDatabases {
 	return &RestDatabase{db: db}
 }
 
-type AdminDatabases interface {
-	AdminCreate(user models.Admin) (models.Admin, error)
-	AdminGetByID(id uuid.UUID) (models.Admin, error)
-	AdminGetByEmail(email string) (models.Admin, error)
-	AdminGetPasswordByID(id uuid.UUID) (string, error)
-	AdminUpdate(user models.Admin) error
-	AdminDelete(id uuid.UUID) error
+type TableDatabase struct {
+	db *bun.DB
 }
 
-type RestaurantDatabases interface {
-	RestaurantCreate(restaurant models.Restaurant) (models.Restaurant, error)
-	RestaurantGetByID(id uuid.UUID) (models.Restaurant, error)
-	RestaurantGetByAdminsID(id uuid.UUID) (models.Restaurant, error)
-	RestaurantUpdate(restaurant models.Restaurant) error
-	RestaurantDelete(id uuid.UUID) error
+func NewTableDatabase(db *bun.DB) TableDatabases {
+	return &TableDatabase{db: db}
+}
+
+type Database struct {
+	Admin AdminDatabases
+	Rest  RestaurantDatabases
+	Table TableDatabases
+}
+
+func NewDatabase(db *bun.DB) *Database {
+	return &Database{
+		Admin: NewAdminDatabase(db),
+		Rest:  NewRestaurantDatabase(db),
+		Table: NewTableDatabase(db),
+	}
 }
