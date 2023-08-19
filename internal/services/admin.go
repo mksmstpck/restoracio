@@ -9,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (s Services) AdminCreateService(admin models.Admin,) (models.Admin, error) {
+func (s Services) AdminCreateService(admin models.Admin) (models.Admin, error) {
 	adminExists, err := s.db.Admin.GetByEmail(s.ctx, admin.Email)
 	if err != nil {
 		if err.Error() != "admin not found" {
