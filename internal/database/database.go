@@ -32,6 +32,13 @@ type TableDatabases interface {
 	DeleteOne(ctx context.Context, id uuid.UUID) error
 }
 
+type MenuDatabases interface {
+	CreateOne(ctx context.Context, menu models.Menu) (models.Menu, error)
+	GetByID(ctx context.Context, id uuid.UUID) (models.Menu, error)
+	UpdateOne(ctx context.Context, menu models.Menu) error
+	DeleteOne(ctx context.Context, menu models.Menu) error
+}
+
 type AdminDatabase struct {
 	db *bun.DB
 }
@@ -56,10 +63,19 @@ func NewTableDatabase(db *bun.DB) TableDatabases {
 	return &TableDatabase{db: db}
 }
 
+type MenuDatabase struct {
+	db *bun.DB
+}
+
+func NewMenuDatabase(db *bun.DB) MenuDatabases {
+	return &MenuDatabase{db: db}
+}
+
 type Database struct {
 	Admin AdminDatabases
 	Rest  RestaurantDatabases
 	Table TableDatabases
+	Menu  MenuDatabases
 }
 
 func NewDatabase(db *bun.DB) *Database {
@@ -67,5 +83,6 @@ func NewDatabase(db *bun.DB) *Database {
 		Admin: NewAdminDatabase(db),
 		Rest:  NewRestaurantDatabase(db),
 		Table: NewTableDatabase(db),
+		Menu:  NewMenuDatabase(db),
 	}
 }
