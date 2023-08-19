@@ -38,6 +38,7 @@ func (h *Handlers) HandleAll() {
 	auth := h.gin.Group("/auth")
 	rest := h.gin.Group("/restaurant")
 	table := h.gin.Group("/table")
+	menu := h.gin.Group("/menu")
 
 	// middleware
 	rest.Use(h.DeserializeUser())
@@ -67,4 +68,10 @@ func (h *Handlers) HandleAll() {
 	table.GET("/all/:id", h.tableGetAllInRestaurant)
 	table.PUT("/", h.DeserializeUser(), h.tableUpdate)
 	table.DELETE("/:id", h.DeserializeUser(), h.tableDelete)
+
+	// menu
+	menu.POST("/", h.DeserializeUser(), h.menuCreate)
+	menu.GET("/:id", h.menuGetByID)
+	menu.PUT("/", h.DeserializeUser(), h.menuUpdate)
+	menu.DELETE("/", h.DeserializeUser(), h.menuDelete)
 }
