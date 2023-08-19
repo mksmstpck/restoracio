@@ -1,11 +1,13 @@
 package utils
 
 import (
+	"github.com/mksmstpck/restoracio/internal/config"
 	"github.com/skip2/go-qrcode"
 )
 
-func QrGenerate(url string) ([]byte, error) {
-	code, err := qrcode.New(url, qrcode.Medium)
+func QrGenerate(route string) ([]byte, error) {
+	url := config.NewConfig().GinUrl
+	code, err := qrcode.New(url+route, qrcode.Medium)
 	if err != nil {
 		return nil, err
 	}

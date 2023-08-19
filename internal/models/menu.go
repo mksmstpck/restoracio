@@ -5,6 +5,6 @@ type Menu struct {
 	Name         string  `json:"name" binding:"required"`
 	Description  string  `json:"description" binding:"required"`
 	DishIDs      []*Dish `json:"dish" bun:"rel:has-many,join:id=menu_id"`
-	QRCode       []byte  `json:"qr_code" bun:"qr_code"`
-	RestaurantID string  `json:"restaurant_id" bun:"rel:restaurant_id"`
+	QRCode       []byte  `json:"qrcode" bun:"qrcode"`
+	RestaurantID string  `json:"restaurant_id" bun:"restaurant_id"`
 }

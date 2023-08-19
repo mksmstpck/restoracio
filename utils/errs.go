@@ -5,4 +5,6 @@ const (
 	ErrConflict = "conflict"
 	ErrRestaurantNotFound = "restaurant not found"
 	ErrTableNotFound = "table not found"
+	ErrMenuNotFound = "menu not found"
+	ErrMenuAlreadyExists = "menu already exists"
 )

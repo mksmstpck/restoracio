@@ -35,6 +35,7 @@ func (d *AdminDatabase) GetByID(ctx context.Context, id uuid.UUID) (models.Admin
 		ExcludeColumn("password").
 		Relation("Restaurant").
 		Relation("Restaurant.Tables").
+		Relation("Restaurant.Menu").
 		Where("admin.id = ?", id.String()).
 		Scan(ctx)
 	if err != nil {
