@@ -7,4 +7,6 @@ const (
 	ErrTableNotFound = "table not found"
 	ErrMenuNotFound = "menu not found"
 	ErrMenuAlreadyExists = "menu already exists"
+	ErrDishNotFound = "dish not found"
+	ErrDishAlreadyExists = "dish already exists"
 )
