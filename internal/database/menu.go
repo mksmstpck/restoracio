@@ -30,6 +30,7 @@ func (d *MenuDatabase) GetByID(ctx context.Context, id uuid.UUID) (models.Menu, 
 	err := d.db.
 		NewSelect().
 		Model(&menu).
+		Relation("Dish").
 		Where("id = ?", id.String()).
 		Scan(ctx)
 	if err != nil {
