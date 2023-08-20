@@ -39,6 +39,14 @@ type MenuDatabases interface {
 	DeleteOne(ctx context.Context, menu models.Menu) error
 }
 
+type DishDatabases interface {
+	CreateOne(ctx context.Context, dish models.Dish) (models.Dish, error)
+	GetByID(ctx context.Context, id uuid.UUID) (models.Dish, error)
+	GetAllInMenu(ctx context.Context, id uuid.UUID) ([]models.Dish, error)
+	UpdateOne(ctx context.Context, dish models.Dish) error
+	DeleteOne(ctx context.Context, id uuid.UUID, menuID uuid.UUID) error
+}
+
 type AdminDatabase struct {
 	db *bun.DB
 }
@@ -71,11 +79,20 @@ func NewMenuDatabase(db *bun.DB) MenuDatabases {
 	return &MenuDatabase{db: db}
 }
 
+type DishDatabase struct {
+	db *bun.DB
+}
+
+func NewDishDatabase(db *bun.DB) DishDatabases {
+	return &DishDatabase{db: db}
+}
+
 type Database struct {
 	Admin AdminDatabases
 	Rest  RestaurantDatabases
 	Table TableDatabases
 	Menu  MenuDatabases
+	Dish  DishDatabases
 }
 
 func NewDatabase(db *bun.DB) *Database {
@@ -84,5 +101,6 @@ func NewDatabase(db *bun.DB) *Database {
 		Rest:  NewRestaurantDatabase(db),
 		Table: NewTableDatabase(db),
 		Menu:  NewMenuDatabase(db),
+		Dish:  NewDishDatabase(db),
 	}
 }

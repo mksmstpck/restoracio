@@ -30,6 +30,7 @@ func (d *MenuDatabase) GetByID(ctx context.Context, id uuid.UUID) (models.Menu, 
 	err := d.db.
 		NewSelect().
 		Model(&menu).
+		Relation("Dishes").
 		Where("id = ?", id.String()).
 		Scan(ctx)
 	if err != nil {
@@ -42,21 +43,6 @@ func (d *MenuDatabase) GetByID(ctx context.Context, id uuid.UUID) (models.Menu, 
 	}
 	log.Info("menu found")
 	return menu, nil
-}
-
-func (d *MenuDatabase) GetAllInRestaurant(ctx context.Context, id uuid.UUID) ([]models.Menu, error) {
-	var menus []models.Menu
-	err := d.db.
-		NewSelect().
-		Model(&menus).
-		Where("restaurant_id = ?", id.String()).
-		Scan(ctx)
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
-	log.Info("menus found")
-	return menus, nil
 }
 
 func (d *MenuDatabase) UpdateOne(ctx context.Context, menu models.Menu) error {
