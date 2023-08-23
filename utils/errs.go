@@ -10,4 +10,6 @@ const (
 	ErrDishNotFound = "dish not found"
 	ErrDishAlreadyExists = "dish already exists"
 	ErrStaffNotFound = "staff not found"
+	ErrReservationNotFound = "reservation not found"
+	ErrReservationAlreadyExists = "reservation already exists"
 )
