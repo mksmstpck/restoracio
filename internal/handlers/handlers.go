@@ -40,9 +40,11 @@ func (h *Handlers) HandleAll() {
 	table := h.gin.Group("/table")
 	menu := h.gin.Group("/menu")
 	dish := h.gin.Group("/dish")
+	staff := h.gin.Group("/staff")
 
 	// middleware
 	rest.Use(h.DeserializeUser())
+	staff.Use(h.DeserializeUser())
 
 	// admin
 	admin.POST("/", h.adminCreate)
@@ -82,4 +84,12 @@ func (h *Handlers) HandleAll() {
 	dish.GET("/all/:id", h.dishGetAllInMenu)
 	dish.PUT("/", h.DeserializeUser(), h.dishUpdate)
 	dish.DELETE("/:id", h.DeserializeUser(), h.dishDelete)
+
+	// staff
+	staff.POST("/", h.staffCreate)
+	staff.GET("/:id", h.staffGetByID)
+	staff.GET("/", h.staffGetInRestaurant)
+	staff.PUT("/", h.staffUpdate)
+	staff.DELETE("/:id", h.staffDelete)
+
 }
