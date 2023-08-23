@@ -18,5 +18,7 @@ type ReservAPI struct {
 	Hour      int    `json:"hour"`
 	Minute    int    `json:"minute"`
 	Second    int    `json:"second"`
+	TableID   string `json:"table_id"`
 	ReserverName string `json:"reserver_name"`
+	ReserverPhone string `json:"reserver_phone"`
 }
