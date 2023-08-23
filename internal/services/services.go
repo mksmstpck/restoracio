@@ -57,4 +57,10 @@ type Servicer interface {
 	DishGetAllInMenuService(id uuid.UUID) ([]models.Dish, error)
 	DishUpdateService(dish models.Dish, admin models.Admin) error
 	DishDeleteService(id uuid.UUID, admin models.Admin) error
+	// staff
+	StaffCreateService(staff models.Staff, admin models.Admin) (models.Staff, error)
+	StaffGetByIDService(id uuid.UUID, admin models.Admin) (models.Staff, error)
+	StaffGetAllInRestaurantService(admin models.Admin) ([]models.Staff, error)
+	StaffUpdateService(staff models.Staff, admin models.Admin) error
+	StaffDeleteService(id uuid.UUID, admin models.Admin) error
 }

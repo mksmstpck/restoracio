@@ -9,4 +9,5 @@ const (
 	ErrMenuAlreadyExists = "menu already exists"
 	ErrDishNotFound = "dish not found"
 	ErrDishAlreadyExists = "dish already exists"
+	ErrStaffNotFound = "staff not found"
 )
