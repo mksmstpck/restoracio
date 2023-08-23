@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-type ReservationDB struct {
+type ReservDB struct {
 	ID              string    `json:"id" bun:",pk"`
 	ReservationTime time.Time `json:"reservation_time"`
 	ReserverName    string    `json:"reserver_name" bun:"reserver_name"`
@@ -11,7 +11,7 @@ type ReservationDB struct {
 	RestaurantID    string    `json:"restaurant_id" bun:"restaurant_id"`
 }
 
-type ReservationAPI struct {
+type ReservAPI struct {
 	Year      int    `json:"year"`
 	Month     int    `json:"month"`
 	Day       int    `json:"day"`
