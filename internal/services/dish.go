@@ -9,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (s *Services)DishCreateService(dish models.Dish, admin models.Admin) (models.Dish, error) {
+func (s *Services) DishCreateService(dish models.Dish, admin models.Admin) (models.Dish, error) {
 	if admin.Restaurant == nil {
 		log.Info(utils.ErrRestaurantNotFound)
 		return models.Dish{}, errors.New(utils.ErrRestaurantNotFound)
@@ -30,7 +30,7 @@ func (s *Services)DishCreateService(dish models.Dish, admin models.Admin) (model
 	return dish, nil
 }
 
-func (s *Services)DishGetByIDService(id uuid.UUID) (models.Dish, error) {
+func (s *Services) DishGetByIDService(id uuid.UUID) (models.Dish, error) {
 	dish, err := s.db.Dish.GetByID(s.ctx, id)
 	if err != nil {
 		log.Error(err)
@@ -40,7 +40,7 @@ func (s *Services)DishGetByIDService(id uuid.UUID) (models.Dish, error) {
 	return dish, nil
 }
 
-func (s *Services)DishGetAllInMenuService(id uuid.UUID) ([]models.Dish, error) {
+func (s *Services) DishGetAllInMenuService(id uuid.UUID) ([]models.Dish, error) {
 	dishes, err := s.db.Dish.GetAllInMenu(s.ctx, id)
 	if err != nil {
 		log.Error(err)
@@ -50,7 +50,7 @@ func (s *Services)DishGetAllInMenuService(id uuid.UUID) ([]models.Dish, error) {
 	return dishes, nil
 }
 
-func (s *Services)DishUpdateService(dish models.Dish, admin models.Admin) error {
+func (s *Services) DishUpdateService(dish models.Dish, admin models.Admin) error {
 	if admin.Restaurant == nil {
 		log.Info(utils.ErrRestaurantNotFound)
 		return errors.New(utils.ErrRestaurantNotFound)
@@ -71,7 +71,7 @@ func (s *Services)DishUpdateService(dish models.Dish, admin models.Admin) error 
 	return nil
 }
 
-func (s *Services)DishDeleteService(id uuid.UUID, admin models.Admin) error {
+func (s *Services) DishDeleteService(id uuid.UUID, admin models.Admin) error {
 	if admin.Restaurant == nil {
 		log.Info(utils.ErrRestaurantNotFound)
 		return errors.New(utils.ErrRestaurantNotFound)
