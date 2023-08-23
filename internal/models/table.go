@@ -8,5 +8,5 @@ type Table struct {
 	IsReserved   bool         `json:"is_reserved" bun:"is_reserved"`
 	IsOccupied   bool         `json:"is_occupied" binding:"required" bun:"is_occupied"`
 	RestaurantID string       `json:"restaurant_id" bun:"restaurant_id"`
-	Reservation  *Reservation `json:"reservation" bun:"rel:has-one"`
+	Reservation  *ReservationDB `json:"reservation" bun:"rel:has-one"`
 }
