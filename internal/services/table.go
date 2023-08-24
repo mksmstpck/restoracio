@@ -26,12 +26,18 @@ func (s *Services) TableCreateService(table models.Table, admin models.Admin) (m
 }
 
 func (s *Services) TableGetByIDService(id uuid.UUID) (models.Table, error) {
+	table, exist := s.cache.Get(id.String())
+	if exist {
+		log.Info("table found")
+		return table.(models.Table), nil
+	}
+
 	table, err := s.db.Table.GetByID(s.ctx, id)
 	if err != nil {
 		log.Info("TableGetByID: ", err)
 		return models.Table{}, err
 	}
-	return table, nil
+	return table.(models.Table), nil
 }
 
 func (s *Services) TableGetAllInRestaurantService(id uuid.UUID) ([]models.Table, error) {
@@ -64,6 +70,9 @@ func (s *Services) TableUpdateService(table models.Table, admin models.Admin) er
 		log.Info("TableUpdate: ", err)
 		return err
 	}
+
+	s.cache.Set(table.ID, table, cache.DefaultExpiration)
+
 	log.Info("table updated")
 	return nil
 }
@@ -86,6 +95,9 @@ func (s *Services) TableDeleteService(id uuid.UUID, admin models.Admin) error {
 		log.Info("TableDelete: ", err)
 		return err
 	}
+
+	s.cache.Delete(id.String())
+
 	log.Info("table deleted")
 	return nil
 }
