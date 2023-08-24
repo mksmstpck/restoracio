@@ -54,7 +54,7 @@ func (s *Services) TableUpdateService(table models.Table, admin models.Admin) er
 	}
 	table.RestaurantID = admin.Restaurant.ID
 
-	if !tableExists(admin.Restaurant.Tables, table.ID) {
+	if !TableExists(admin.Restaurant.Tables, table.ID) {
 		log.Info("table not found")
 		return errors.New("table not found")
 	}
@@ -77,7 +77,7 @@ func (s *Services) TableDeleteService(id uuid.UUID, admin models.Admin) error {
 		log.Info("create tables first")
 		return errors.New(utils.ErrTableNotFound)
 	}
-	if !tableExists(admin.Restaurant.Tables, id.String()) {
+	if !TableExists(admin.Restaurant.Tables, id.String()) {
 		log.Info("table not found")
 		return errors.New("table not found")
 	}
@@ -90,7 +90,7 @@ func (s *Services) TableDeleteService(id uuid.UUID, admin models.Admin) error {
 	return nil
 }
 
-func tableExists(tables []*models.Table, id string) bool {
+func TableExists(tables []*models.Table, id string) bool {
 	for _, table := range tables {
 		if table.ID == id {
 			return true
