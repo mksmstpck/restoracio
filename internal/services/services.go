@@ -63,4 +63,11 @@ type Servicer interface {
 	StaffGetAllInRestaurantService(admin models.Admin) ([]models.Staff, error)
 	StaffUpdateService(staff models.Staff, admin models.Admin) error
 	StaffDeleteService(id uuid.UUID, admin models.Admin) error
+	// reservation
+	ReservCreateService(reserv models.ReservAPI, admin models.Admin) (models.ReservDB, error)
+	ReservGetByIDService(id uuid.UUID, admin models.Admin) (models.ReservDB, error)
+	ReservGetAllInRestaurantService(admin models.Admin) ([]models.ReservDB, error)
+	ReservUpdateService(reserv models.ReservAPI, admin models.Admin) error
+	ReservDeleteService(id uuid.UUID, admin models.Admin) error
+
 }
