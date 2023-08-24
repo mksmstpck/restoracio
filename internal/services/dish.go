@@ -5,6 +5,7 @@ import (
 
 	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/mksmstpck/restoracio/utils"
+	"github.com/patrickmn/go-cache"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -26,18 +27,28 @@ func (s *Services) DishCreateService(dish models.Dish, admin models.Admin) (mode
 		log.Error(err)
 		return models.Dish{}, err
 	}
+	s.cache.Set(dish.ID, dish, cache.DefaultExpiration)
+
 	log.Info("dish created")
 	return dish, nil
 }
 
 func (s *Services) DishGetByIDService(id uuid.UUID) (models.Dish, error) {
+	dish, exist := s.cache.Get(id.String())
+	if exist {
+		log.Info("dish found")
+		return dish.(models.Dish), nil
+	}
 	dish, err := s.db.Dish.GetByID(s.ctx, id)
 	if err != nil {
 		log.Error(err)
 		return models.Dish{}, err
 	}
+
+	s.cache.Set(dish.(models.Dish).ID, dish, cache.DefaultExpiration)
+
 	log.Info("dish found")
-	return dish, nil
+	return dish.(models.Dish), nil
 }
 
 func (s *Services) DishGetAllInMenuService(id uuid.UUID) ([]models.Dish, error) {
@@ -67,6 +78,9 @@ func (s *Services) DishUpdateService(dish models.Dish, admin models.Admin) error
 		log.Error(err)
 		return err
 	}
+
+	s.cache.Set(dish.ID, dish, cache.DefaultExpiration)
+
 	log.Info("dish updated")
 	return nil
 }
@@ -86,6 +100,9 @@ func (s *Services) DishDeleteService(id uuid.UUID, admin models.Admin) error {
 		log.Error(err)
 		return err
 	}
+
+	s.cache.Delete(id.String())
+
 	log.Info("dish deleted")
 	return nil
 }
