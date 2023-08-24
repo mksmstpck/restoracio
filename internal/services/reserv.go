@@ -6,6 +6,7 @@ import (
 
 	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/mksmstpck/restoracio/utils"
+	"github.com/patrickmn/go-cache"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -39,6 +40,9 @@ func (s *Services) ReservCreateService(reserv models.ReservAPI, admin models.Adm
 		log.Error(err)
 		return models.ReservDB{}, err
 	}
+
+	s.cache.Set(reservDB.ID, reservDB, cache.DefaultExpiration)
+
 	log.Info("reservation created")
 	return reservDB, nil
 }
@@ -48,13 +52,20 @@ func (s *Services) ReservGetByIDService(id uuid.UUID, admin models.Admin) (model
 		log.Info(utils.ErrRestaurantNotFound)
 		return models.ReservDB{}, errors.New(utils.ErrRestaurantNotFound)
 	}
+
+	reserv, exist := s.cache.Get(id.String())
+	if exist {
+		log.Info("reservation found")
+		return reserv.(models.ReservDB), nil
+	}
+
 	reserv, err := s.db.Reserv.GetByID(s.ctx, id, uuid.Parse(admin.Restaurant.ID))
 	if err != nil {
 		log.Error(err)
 		return models.ReservDB{}, err
 	}
 	log.Info("reservation found")
-	return reserv, nil
+	return reserv.(models.ReservDB), nil
 }
 
 func (s *Services) ReservGetAllInRestaurantService(admin models.Admin) ([]models.ReservDB, error) {
@@ -100,6 +111,9 @@ func (s *Services) ReservUpdateService(reserv models.ReservAPI, admin models.Adm
 		log.Error(err)
 		return err
 	}
+
+	s.cache.Set(reservDB.ID, reservDB, cache.DefaultExpiration)
+
 	log.Info("reservation updated")
 	return nil
 }
@@ -116,6 +130,9 @@ func (s *Services) ReservDeleteService(id uuid.UUID, admin models.Admin) error {
 		log.Error(err)
 		return err
 	}
+
+	s.cache.Delete(id.String())
+
 	log.Info("reservation deleted")
 	return nil
 }
