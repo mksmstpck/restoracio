@@ -10,6 +10,17 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+//	@Summary		DishCreate
+//	@Security		JWTAuth
+//	@Tags			Dish
+//	@Description	creates a new dish
+//	@ID				dish-create
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		models.Dish	true	"Dish"
+//	@Success		201		{object}	models.Dish
+//	@Failure		default	{object}	models.Message
+//	@Router			/dish [post]
 func (h *Handlers) dishCreate(c *gin.Context) {
 	admin := c.MustGet("Admin")
 	var m models.Dish
@@ -38,6 +49,15 @@ func (h *Handlers) dishCreate(c *gin.Context) {
 	c.JSON(http.StatusOK, m)
 }
 
+//	@Summary		DishGetByID
+//	@Tags			Dish
+//	@Description	returns a dish by id
+//	@ID				dish-get-by-id
+//	@Accept			json
+//	@Produce		json
+//	@Success		200		{object}	models.Dish
+//	@Failure		default	{object}	models.Message
+//	@Router			/dish$id [get]
 func (h *Handlers) dishGetByID(c *gin.Context) {
 	id := uuid.Parse(c.Param("id"))
 	dish, err := h.service.DishGetByIDService(id)
@@ -50,6 +70,16 @@ func (h *Handlers) dishGetByID(c *gin.Context) {
 	log.Info("dish found")
 }
 
+//	@Summary		DishGetAllInMenu
+//	@Tags			Dish
+//	@Description	returns all dishes in a menu
+//	@ID				dish-get-all-in-menu
+//	@Accept			json
+//	@Produce		json
+//	@Success		200		{object}	[]models.Dish
+//	@Failure		default	{object}	models.Message
+//	@Router			/dish/all/{id} [get]
+//	@Param			id	path	string	true	"Menu ID"
 func (h *Handlers) dishGetAllInMenu(c *gin.Context) {
 	id := uuid.Parse(c.Param("id"))
 	dishes, err := h.service.DishGetAllInMenuService(id)
@@ -62,6 +92,17 @@ func (h *Handlers) dishGetAllInMenu(c *gin.Context) {
 	log.Info("dishes found")
 }
 
+//	@Summary		DishUpdate
+//	@Security		JWTAuth
+//	@Tags			Dish
+//	@Description	updates a dish
+//	@ID				dish-update
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		models.Dish	true	"Dish"
+//	@Success		204		{object}	nil
+//	@Failure		default	{object}	models.Message
+//	@Router			/dish [put]
 func (h *Handlers) dishUpdate(c *gin.Context) {
 	admin := c.MustGet("Admin")
 	var m models.Dish
@@ -96,6 +137,17 @@ func (h *Handlers) dishUpdate(c *gin.Context) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
+//	@Summary		DishDelete
+//	@Security		JWTAuth
+//	@Tags			Dish
+//	@Description	deletes a dish
+//	@ID				dish-delete
+//	@Accept			json
+//	@Produce		json
+//	@Success		204		{object}	nil
+//	@Failure		default	{object}	models.Message
+//	@Router			/dish/{id} [delete]
+//	@Param			id	path	string	true	"Dish ID"
 func (h *Handlers) dishDelete(c *gin.Context) {
 	admin := c.MustGet("Admin")
 	id := uuid.Parse(c.Param("id"))
