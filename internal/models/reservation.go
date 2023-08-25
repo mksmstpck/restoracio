@@ -7,7 +7,7 @@ import (
 )
 
 type ReservDB struct {
-	bun.BaseModel `bun:"table:reserv"`
+	bun.BaseModel `json:"-" bun:"table:reserv"`
 	ID              string    `json:"id" bun:",pk"`
 	ReservationTime time.Time `json:"reservation_time"`
 	ReserverName    string    `json:"reserver_name" bun:"reserver_name"`
