@@ -4,7 +4,10 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/mksmstpck/restoracio/docs"
 	"github.com/mksmstpck/restoracio/internal/services"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Handlers struct {
@@ -100,4 +103,7 @@ func (h *Handlers) HandleAll() {
 	reserv.GET("/", h.reservGetAllInRestaurant)
 	reserv.PUT("/", h.reservUpdate)
 	reserv.DELETE("/:id", h.reservDelete)
+
+	// swagger
+	h.gin.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 }
