@@ -492,7 +492,7 @@ paths:
             $ref: '#/definitions/models.Message'
       summary: DishGetByID
       tags:
-      - Admin
+      - Dish
   /dish/{id}:
     delete:
       consumes:

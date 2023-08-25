@@ -427,7 +427,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Admin"
+                    "Dish"
                 ],
                 "summary": "DishGetByID",
                 "operationId": "dish-get-by-id",
