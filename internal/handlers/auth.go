@@ -11,6 +11,18 @@ import (
 	"github.com/pborman/uuid"
 )
 
+//	@Summary		Login
+//	@Tags			Auth
+//	@Description	logs in an admin
+//	@ID				login
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		models.Login	true	"Login"
+//	@Success		204		{object}	nil
+//	@Failure		401		{object}	models.Message
+//	@Failure		500		{object}	models.Message
+//	@Failure		default	{object}	models.Message
+//	@Router			/auth/login [post]
 func (h *Handlers) login(c *gin.Context) {
 	var creds *models.Login
 
@@ -61,6 +73,18 @@ func (h *Handlers) login(c *gin.Context) {
 	log.Info("handlers.LogInByEmail: user logged in")
 }
 
+//	@Summary		Refresh
+//	@Tags			Auth
+//	@Description	gives a new access and refresh token
+//	@ID				refresh
+//	@Accept			json
+//	@Produce		json
+//	@Param			refresh	header		string	true	"Refresh token"
+//	@Success		204		{object}	nil
+//	@Failure		401		{object}	models.Message
+//	@Failure		500		{object}	models.Message
+//	@Failure		default	{object}	models.Message
+//	@Router			/auth/refresh [post]
 func (h *Handlers) refresh(c *gin.Context) {
 	admin_id, err := utils.ValidateJWT(c.Request.Header.Get("refresh"), h.refreshSecret)
 	if err != nil {

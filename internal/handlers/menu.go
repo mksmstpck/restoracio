@@ -10,6 +10,17 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+//	@Summary		MenuCreate
+//	@Security		JWTAuth
+//	@Tags			Menu
+//	@Description	creates a new menu
+//	@ID				menu-create
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		models.Menu	true	"Menu"
+//	@Success		201		{object}	models.Menu
+//	@Failure		default	{object}	models.Message
+//	@Router			/menu [post]
 func (h *Handlers) menuCreate(c *gin.Context) {
 	admin := c.MustGet("Admin")
 
@@ -29,6 +40,16 @@ func (h *Handlers) menuCreate(c *gin.Context) {
 	c.JSON(http.StatusOK, m)
 }
 
+//	@Summary		MenuGetByID
+//	@Tags			Menu
+//	@Description	returns a menu by id
+//	@ID				menu-get-by-id
+//	@Accept			json
+//	@Produce		json
+//	@Success		200		{object}	models.Menu
+//	@Failure		default	{object}	models.Message
+//	@Router			/menu/{id} [get]
+//	@Param			id	path	string	true	"Menu ID"
 func (h *Handlers) menuGetByID(c *gin.Context) {
 	id := uuid.Parse(c.Param("id"))
 	menu, err := h.service.MenuGetByIDService(id)
@@ -41,6 +62,17 @@ func (h *Handlers) menuGetByID(c *gin.Context) {
 	log.Info("menu found")
 }
 
+//	@Summary		MenuUpdate
+//	@Security		JWTAuth
+//	@Tags			Menu
+//	@Description	updates a menu
+//	@ID				menu-update
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		models.Menu	true	"Menu"
+//	@Success		204		{object}	nil
+//	@Failure		default	{object}	models.Message
+//	@Router			/menu [put]
 func (h *Handlers) menuUpdate(c *gin.Context) {
 	admin := c.MustGet("Admin").(models.Admin)
 	var m models.Menu
@@ -68,6 +100,17 @@ func (h *Handlers) menuUpdate(c *gin.Context) {
 	log.Info("menu updated")
 }
 
+//	@Summary		MenuDelete
+//	@Security		JWTAuth
+//	@Tags			Menu
+//	@Description	deletes a menu
+//	@ID				menu delete
+//	@Accept			json
+//	@Produce		json
+//	@Success		201		{object}	models.Menu
+//	@Failure		default	{object}	models.Message
+//	@Router			/menu{id} [delete]
+//	@Param			id	path	string	true	"Menu ID"
 func (h *Handlers) menuDelete(c *gin.Context) {
 	admin := c.MustGet("Admin").(models.Admin)
 	err := h.service.MenuDeleteService(admin)

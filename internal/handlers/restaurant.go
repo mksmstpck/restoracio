@@ -9,6 +9,17 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+//	@Summary		RestaurantCreate
+//	@Security		JWTAuth
+//	@Tags			Restaurant
+//	@Description	creates a new restaurant
+//	@ID				rest-create
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		models.Restaurant	true	"Restaurant"
+//	@Success		201		{object}	models.Restaurant
+//	@Failure		default	{object}	models.Message
+//	@Router			/restaurant [post]
 func (h *Handlers) restaurantCreate(c *gin.Context) {
 	admin, exists := c.Get("Admin")
 	if !exists {
@@ -32,6 +43,16 @@ func (h *Handlers) restaurantCreate(c *gin.Context) {
 	c.JSON(http.StatusOK, r)
 }
 
+//	@Summary		RestaurantGetMine
+//	@Security		JWTAuth
+//	@Tags			Restaurant
+//	@Description	returns an admin's restaurant
+//	@ID				rest-get-mine
+//	@Accept			json
+//	@Produce		json
+//	@Success		200		{object}	models.Restaurant
+//	@Failure		default	{object}	models.Message
+//	@Router			/restaurant [get]
 func (h *Handlers) restaurantGetMine(c *gin.Context) {
 	admin := c.MustGet("Admin").(models.Admin)
 	rest, err := h.service.RestaurantGetByIDService(uuid.Parse(admin.Restaurant.ID))
@@ -43,6 +64,17 @@ func (h *Handlers) restaurantGetMine(c *gin.Context) {
 	c.JSON(http.StatusOK, rest)
 }
 
+//	@Summary		RestaurantGetByID
+//	@Security		JWTAuth
+//	@Tags			Restaurant
+//	@Description	returns a restaurant by id
+//	@ID				rest-get-by-id
+//	@Accept			json
+//	@Produce		json
+//	@Success		200		{object}	models.Restaurant
+//	@Failure		default	{object}	models.Message
+//	@Router			/restaurant/{id} [get]
+//	@Param			id	path	string	true	"Restaurant ID"
 func (h *Handlers) restaurantGetByID(c *gin.Context) {
 	id := uuid.Parse(c.Param("id"))
 	rest, err := h.service.RestaurantGetByIDService(id)
@@ -55,6 +87,17 @@ func (h *Handlers) restaurantGetByID(c *gin.Context) {
 	log.Info("RestaurantGetByID: restaurant found")
 }
 
+//	@Summary		RestaurantUpdate
+//	@Security		JWTAuth
+//	@Tags			Restaurant
+//	@Description	updates a restaurant
+//	@ID				rest-update
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		models.Restaurant	true	"Restaurant"
+//	@Success		204		{object}	nil
+//	@Failure		default	{object}	models.Message
+//	@Router			/restaurant [put]
 func (h *Handlers) restaurantUpdate(c *gin.Context) {
 	var r models.Restaurant
 	if err := c.ShouldBindJSON(&r); err != nil {
@@ -72,6 +115,16 @@ func (h *Handlers) restaurantUpdate(c *gin.Context) {
 	c.JSON(http.StatusOK, models.Message{Message: "Restaurant updated"})
 }
 
+//	@Summary		RestaurantDelete
+//	@Security		JWTAuth
+//	@Tags			Restaurant
+//	@Description	deletes a restaurant
+//	@ID				rest-delete
+//	@Accept			json
+//	@Produce		json
+//	@Success		204		{object}	nil
+//	@Failure		default	{object}	models.Message
+//	@Router			/restaurant [delete]
 func (h *Handlers) restaurantDelete(c *gin.Context) {
 	restaurant := c.MustGet("Admin").(models.Admin).Restaurant
 	if err := h.service.RestaurantDeleteService(restaurant); err != nil {

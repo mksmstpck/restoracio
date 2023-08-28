@@ -40,6 +40,17 @@ func formatFilePath(path string) string {
 	return arr[len(arr)-1]
 }
 
+//	@title			Restoracio
+//	@version		1.0
+//	@description	API for restaurant's management
+
+//	@host		localhost:8080
+//	@BasePath	/
+
+//	@securityDefinitions.apikey	JWTAuth
+//	@in							header
+//	@name						Authorization
+
 func main() {
 	// config
 	config := config.NewConfig()

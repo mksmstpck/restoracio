@@ -9,6 +9,18 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+//	@Summary		AdminCreate
+//	@Tags			Admin
+//	@Description	creates a new admin
+//	@ID				admin-create
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		models.Admin	true	"Admin"
+//	@Success		201		{object}	models.Admin
+//	@Failure		400		{object}	models.Message
+//	@Failure		500		{object}	models.Message
+//	@Failure		default	{object}	models.Message
+//	@Router			/admin [post]
 func (h *Handlers) adminCreate(c *gin.Context) {
 	var a models.Admin
 	if err := c.ShouldBindJSON(&a); err != nil {
@@ -23,9 +35,23 @@ func (h *Handlers) adminCreate(c *gin.Context) {
 		return
 	}
 	admin.Password = ""
-	c.JSON(http.StatusOK, admin)
+	c.JSON(http.StatusCreated, admin)
 }
 
+//	@Summary		AdminGetMe
+//	@Security		JWTAuth
+//	@Tags			Admin
+//	@Description	returns the logged in admin
+//	@ID				admin-get-me
+//	@Accept			json
+//	@Produce		json
+//	@Success		200		{object}	models.Admin
+//	@Failure		400		{object}	models.Message
+//	@Failure		404		{object}	models.Message
+//	@Failure		501		{object}	models.Message
+//	@Failure		500		{object}	models.Message
+//	@Failure		default	{object}	models.Message
+//	@Router			/admin/me [get]
 func (h *Handlers) adminGetMe(c *gin.Context) {
 	admin := c.MustGet("Admin")
 	c.JSON(http.StatusOK, admin.(models.Admin))
@@ -53,6 +79,20 @@ func (h *Handlers) adminGetByEmail(c *gin.Context) {
 	c.JSON(http.StatusOK, admin)
 }
 
+//	@Summary		AdminUpdate
+//	@Security		JWTAuth
+//	@Tags			Admin
+//	@Description	creates a new admin
+//	@ID				admin-update
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		models.Admin	true	"Admin"
+//	@Success		204		{object}	models.Admin
+//	@Failure		400		{object}	models.Message
+//	@Failure		404		{object}	models.Message
+//	@Failure		500		{object}	models.Message
+//	@Failure		default	{object}	models.Message
+//	@Router			/admin [put]
 func (h *Handlers) adminUpdate(c *gin.Context) {
 	var admin models.Admin
 	if err := c.ShouldBindJSON(&admin); err != nil {
@@ -69,6 +109,18 @@ func (h *Handlers) adminUpdate(c *gin.Context) {
 	c.JSON(http.StatusOK, admin)
 }
 
+//	@Summary		AdminDelete
+//	@Security		JWTAuth
+//	@Tags			Admin
+//	@Description	creates a new admin
+//	@ID				admin-delete
+//	@Accept			json
+//	@Produce		json
+//	@Success		204		{object}	nil
+//	@Failure		400		{object}	models.Message
+//	@Failure		500		{object}	models.Message
+//	@Failure		default	{object}	models.Message
+//	@Router			/admin [delete]
 func (h *Handlers) adminDelete(c *gin.Context) {
 	id := uuid.Parse(c.MustGet("Admin").(models.Admin).Restaurant.ID)
 	if err := h.service.AdminDeleteService(id); err != nil {

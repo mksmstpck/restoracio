@@ -1,0 +1,1187 @@
+basePath: /
+definitions:
+  models.Admin:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      restaurant:
+        $ref: '#/definitions/models.Restaurant'
+    required:
+    - email
+    - name
+    - password
+    type: object
+  models.Dish:
+    properties:
+      category:
+        type: string
+      currency:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      ingredients:
+        items:
+          type: string
+        type: array
+      mass_grams:
+        type: integer
+      menu_id:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      type:
+        type: string
+    required:
+    - category
+    - currency
+    - description
+    - ingredients
+    - mass_grams
+    - name
+    - price
+    - type
+    type: object
+  models.Login:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  models.Menu:
+    properties:
+      description:
+        type: string
+      dish:
+        items:
+          $ref: '#/definitions/models.Dish'
+        type: array
+      id:
+        type: string
+      name:
+        type: string
+      qrcode:
+        items:
+          type: integer
+        type: array
+      restaurant_id:
+        type: string
+    required:
+    - description
+    - name
+    type: object
+  models.Message:
+    properties:
+      message:
+        type: string
+    type: object
+  models.ReservAPI:
+    properties:
+      day:
+        type: integer
+      hour:
+        type: integer
+      id:
+        type: string
+      minute:
+        type: integer
+      month:
+        type: integer
+      reserver_name:
+        type: string
+      reserver_phone:
+        type: string
+      second:
+        type: integer
+      table_id:
+        type: string
+      year:
+        type: integer
+    required:
+    - day
+    - hour
+    - minute
+    - month
+    - reserver_name
+    - reserver_phone
+    - table_id
+    - year
+    type: object
+  models.ReservDB:
+    properties:
+      id:
+        type: string
+      reservation_time:
+        type: string
+      reserver_name:
+        type: string
+      reserver_phone:
+        type: string
+      restaurant_id:
+        type: string
+      table_id:
+        type: string
+    type: object
+  models.Restaurant:
+    properties:
+      admin_id:
+        type: string
+      id:
+        type: string
+      location:
+        type: string
+      menu:
+        $ref: '#/definitions/models.Menu'
+      name:
+        type: string
+      staff:
+        items:
+          $ref: '#/definitions/models.Staff'
+        type: array
+      table:
+        items:
+          $ref: '#/definitions/models.Table'
+        type: array
+    required:
+    - location
+    - name
+    type: object
+  models.Staff:
+    properties:
+      age:
+        type: integer
+      email:
+        type: string
+      gender:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      position:
+        type: string
+      restaurant_id:
+        type: string
+    required:
+    - age
+    - email
+    - gender
+    - name
+    - phone
+    - position
+    type: object
+  models.Table:
+    properties:
+      id:
+        type: string
+      is_occupied:
+        type: boolean
+      is_reserved:
+        type: boolean
+      max_people:
+        type: integer
+      number:
+        type: integer
+      placement:
+        type: string
+      reservation:
+        $ref: '#/definitions/models.ReservDB'
+      restaurant_id:
+        type: string
+    required:
+    - is_occupied
+    - max_people
+    - number
+    - placement
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API for restaurant's management
+  title: Restoracio
+  version: "1.0"
+paths:
+  /admin:
+    delete:
+      consumes:
+      - application/json
+      description: creates a new admin
+      operationId: admin-delete
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Message'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: AdminDelete
+      tags:
+      - Admin
+    post:
+      consumes:
+      - application/json
+      description: creates a new admin
+      operationId: admin-create
+      parameters:
+      - description: Admin
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Admin'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Admin'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Message'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      summary: AdminCreate
+      tags:
+      - Admin
+    put:
+      consumes:
+      - application/json
+      description: creates a new admin
+      operationId: admin-update
+      parameters:
+      - description: Admin
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Admin'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.Admin'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Message'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Message'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: AdminUpdate
+      tags:
+      - Admin
+  /admin/me:
+    get:
+      consumes:
+      - application/json
+      description: returns the logged in admin
+      operationId: admin-get-me
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Admin'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Message'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Message'
+        "501":
+          description: Not Implemented
+          schema:
+            $ref: '#/definitions/models.Message'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: AdminGetMe
+      tags:
+      - Admin
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: logs in an admin
+      operationId: login
+      parameters:
+      - description: Login
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Login'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Message'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      summary: Login
+      tags:
+      - Auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: gives a new access and refresh token
+      operationId: refresh
+      parameters:
+      - description: Refresh token
+        in: header
+        name: refresh
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Message'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      summary: Refresh
+      tags:
+      - Auth
+  /dish:
+    post:
+      consumes:
+      - application/json
+      description: creates a new dish
+      operationId: dish-create
+      parameters:
+      - description: Dish
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Dish'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Dish'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: DishCreate
+      tags:
+      - Dish
+    put:
+      consumes:
+      - application/json
+      description: updates a dish
+      operationId: dish-update
+      parameters:
+      - description: Dish
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Dish'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: DishUpdate
+      tags:
+      - Dish
+  /dish$id:
+    get:
+      consumes:
+      - application/json
+      description: returns a dish by id
+      operationId: dish-get-by-id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Dish'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      summary: DishGetByID
+      tags:
+      - Dish
+  /dish/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: deletes a dish
+      operationId: dish-delete
+      parameters:
+      - description: Dish ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: DishDelete
+      tags:
+      - Dish
+  /dish/all/{id}:
+    get:
+      consumes:
+      - application/json
+      description: returns all dishes in a menu
+      operationId: dish-get-all-in-menu
+      parameters:
+      - description: Menu ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Dish'
+            type: array
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      summary: DishGetAllInMenu
+      tags:
+      - Dish
+  /menu:
+    post:
+      consumes:
+      - application/json
+      description: creates a new menu
+      operationId: menu-create
+      parameters:
+      - description: Menu
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Menu'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Menu'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: MenuCreate
+      tags:
+      - Menu
+    put:
+      consumes:
+      - application/json
+      description: updates a menu
+      operationId: menu-update
+      parameters:
+      - description: Menu
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Menu'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: MenuUpdate
+      tags:
+      - Menu
+  /menu/{id}:
+    get:
+      consumes:
+      - application/json
+      description: returns a menu by id
+      operationId: menu-get-by-id
+      parameters:
+      - description: Menu ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Menu'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      summary: MenuGetByID
+      tags:
+      - Menu
+  /menu{id}:
+    delete:
+      consumes:
+      - application/json
+      description: deletes a menu
+      operationId: menu delete
+      parameters:
+      - description: Menu ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Menu'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: MenuDelete
+      tags:
+      - Menu
+  /reserv:
+    get:
+      consumes:
+      - application/json
+      description: returns all reservations in a restaurant
+      operationId: reserv-arst
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ReservDB'
+            type: array
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: ReservationGetAllInRestaurant
+      tags:
+      - Reservation
+    post:
+      consumes:
+      - application/json
+      description: creates a new reservation
+      operationId: reserv-create
+      parameters:
+      - description: Reservation
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.ReservAPI'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ReservDB'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: ReservationCreate
+      tags:
+      - Reservation
+    put:
+      consumes:
+      - application/json
+      description: updates a reservation
+      operationId: reserv-update
+      parameters:
+      - description: Reservation
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.ReservAPI'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: ReservationUpdate
+      tags:
+      - Reservation
+  /reserv/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: deletes a  reservation
+      operationId: reserv-delete
+      parameters:
+      - description: Reservation ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: ReservationDelete
+      tags:
+      - Reservation
+    get:
+      consumes:
+      - application/json
+      description: returns a reservation by id
+      operationId: reserv-get-by-id
+      parameters:
+      - description: Reservation ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ReservDB'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: ReservationGetByID
+      tags:
+      - Reservation
+  /restaurant:
+    delete:
+      consumes:
+      - application/json
+      description: deletes a restaurant
+      operationId: rest-delete
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: RestaurantDelete
+      tags:
+      - Restaurant
+    get:
+      consumes:
+      - application/json
+      description: returns an admin's restaurant
+      operationId: rest-get-mine
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Restaurant'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: RestaurantGetMine
+      tags:
+      - Restaurant
+    post:
+      consumes:
+      - application/json
+      description: creates a new restaurant
+      operationId: rest-create
+      parameters:
+      - description: Restaurant
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Restaurant'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Restaurant'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: RestaurantCreate
+      tags:
+      - Restaurant
+    put:
+      consumes:
+      - application/json
+      description: updates a restaurant
+      operationId: rest-update
+      parameters:
+      - description: Restaurant
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Restaurant'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: RestaurantUpdate
+      tags:
+      - Restaurant
+  /restaurant/{id}:
+    get:
+      consumes:
+      - application/json
+      description: returns a restaurant by id
+      operationId: rest-get-by-id
+      parameters:
+      - description: Restaurant ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Restaurant'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: RestaurantGetByID
+      tags:
+      - Restaurant
+  /staff:
+    get:
+      consumes:
+      - application/json
+      description: returns all staff in a restaurant
+      operationId: staff-get-all
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Staff'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: StaffGetAllInRestaurant
+      tags:
+      - Staff
+    post:
+      consumes:
+      - application/json
+      description: creates a new employee
+      operationId: staff-create
+      parameters:
+      - description: Staff
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Staff'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Staff'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: StaffCreate
+      tags:
+      - Staff
+    put:
+      consumes:
+      - application/json
+      description: updates an employee
+      operationId: staff-update
+      parameters:
+      - description: Staff
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Staff'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.Staff'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: StaffUpdate
+      tags:
+      - Staff
+  /staff/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: deletes an employee
+      operationId: staff-delete
+      parameters:
+      - description: Staff ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.Staff'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: StaffDelete
+      tags:
+      - Staff
+    get:
+      consumes:
+      - application/json
+      description: returns an employee by id
+      operationId: staff-get-by-id
+      parameters:
+      - description: Staff ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Staff'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: StaffGetByID
+      tags:
+      - Staff
+  /table:
+    post:
+      consumes:
+      - application/json
+      description: creates a new table
+      operationId: table-create
+      parameters:
+      - description: Table
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Table'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Table'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: TableCreate
+      tags:
+      - Table
+    put:
+      consumes:
+      - application/json
+      description: updates a table
+      operationId: table update
+      parameters:
+      - description: Table
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Table'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: TableUpdate
+      tags:
+      - Table
+  /table/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: deletes a table
+      operationId: table-delete
+      parameters:
+      - description: Table ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: TableDelete
+      tags:
+      - Table
+    get:
+      consumes:
+      - application/json
+      description: returns a table by id
+      operationId: table-get-by-id
+      parameters:
+      - description: Table ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Table'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: TableGetByID
+      tags:
+      - Table
+  /table/all/{id}:
+    get:
+      consumes:
+      - application/json
+      description: returns all tables in a restaurant
+      operationId: table-get-all-in-restaurant
+      parameters:
+      - description: Table ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Table'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - JWTAuth: []
+      summary: TableGetAllInRestaurant
+      tags:
+      - Table
+securityDefinitions:
+  JWTAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
