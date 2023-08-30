@@ -4,63 +4,91 @@ import (
 	"errors"
 
 	"github.com/mksmstpck/restoracio/internal/models"
-	"github.com/patrickmn/go-cache"
+	"github.com/mksmstpck/restoracio/utils"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
-func (s Services) AdminCreateService(admin models.Admin) (models.Admin, error) {
-	adminExists, err := s.db.Admin.GetByEmail(s.ctx, admin.Email)
-	if err != nil {
-		if err.Error() != "admin not found" {
-			log.Error("AdminCreate: ", err)
-			return models.Admin{}, err
-		}
-	}
-	if adminExists.ID != "" {
-		log.Error("AdminCreate: admin already exists")
-		return models.Admin{}, errors.New("admin already exists")
-	}
-	admin, err = s.db.Admin.CreateOne(s.ctx, admin)
-	if err != nil {
-		log.Error("AdminCreate: ", err)
+func (s Services) AdminCreateService(id uuid.UUID) (models.Admin, error) {
+	admin, err := s.cache.AdminGet(id)
+	if err != nil{
+		log.Error(err)
 		return models.Admin{}, err
 	}
-	s.cache.Set(admin.ID, admin, cache.DefaultExpiration)
+	if admin.ID == "" {
+		log.Error(utils.ErrAdminNotFound)
+		return models.Admin{}, errors.New(utils.ErrAdminNotFound)
+	}
+
+	admin, err = s.db.Admin.CreateOne(s.ctx, admin)
+	if err != nil {
+		log.Error(err)
+		return models.Admin{}, err
+	}
+	s.cache.Set(uuid.Parse(admin.ID), admin)
 	log.Info("admin created")
 	return admin, nil
 }
 
-func (s Services) AdminGetByIDService(id uuid.UUID) (models.Admin, error) {
-	admin, exist := s.cache.Get(id.String())
-	if exist {
-		log.Info("admin found")
-		return admin.(models.Admin), nil
-	}
-	admin, err := s.db.Admin.GetByID(s.ctx, id)
+func (s *Services) AdminValidateService(admin models.Admin) error {
+	adminExists, err := s.db.Admin.GetByEmail(s.ctx, admin.Email)
 	if err != nil {
-		log.Error("AdminGetByID: ", err)
+		if err.Error() != "admin not found" {
+			log.Error(err)
+			return err
+		}
+	}
+	if adminExists.ID != "" {
+		log.Error("AdminValidate: admin already exists")
+		return errors.New("admin already exists")
+	}
+
+	genUUID := uuid.NewUUID()
+	err = s.cache.Set(genUUID, admin)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+
+	err = utils.EmailValidator(admin.Email, genUUID)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+
+	log.Info("admin validated")
+	return nil
+}
+
+func (s Services) AdminGetByIDService(id uuid.UUID) (models.Admin, error) {
+	admin, err := s.cache.AdminGet(id)
+	if admin.ID != "" {
+		log.Info("admin found")
+		return admin, nil
+	}
+	if err != nil {
+		log.Error(err)
 		return models.Admin{}, err
 	}
-	s.cache.Set(admin.(models.Admin).ID, admin, cache.DefaultExpiration)
+	admin, err = s.db.Admin.GetByID(s.ctx, id)
+	if err != nil {
+		log.Error(err)
+		return models.Admin{}, err
+	}
+	s.cache.Set(uuid.Parse(admin.ID), admin)
 	log.Info("admin found")
-	return admin.(models.Admin), nil
+	return admin, nil
 }
 
 func (s Services) AdminGetByEmailService(email string) (models.Admin, error) {
-	admin, exist := s.cache.Get(email)
-	if exist {
-		log.Info("admin found")
-		return admin.(models.Admin), nil
-	}
 	admin, err := s.db.Admin.GetByEmail(s.ctx, email)
 	if err != nil {
 		log.Error("AdminGetByEmail: ", err)
 		return models.Admin{}, err
 	}
-	s.cache.Set(admin.(models.Admin).ID, admin, cache.DefaultExpiration)
+	s.cache.Set(uuid.Parse(admin.ID), admin)
 	log.Info("admin found")
-	return admin.(models.Admin), nil
+	return admin, nil
 }
 
 func (s Services) AdminGetPasswordByIdService(id uuid.UUID) (string, error) {
@@ -75,7 +103,7 @@ func (s Services) AdminGetPasswordByIdService(id uuid.UUID) (string, error) {
 
 func (s Services) AdminUpdateService(admin models.Admin, adminID uuid.UUID) error {
 	admin.ID = adminID.String()
-	s.cache.Set(admin.ID, admin, cache.DefaultExpiration)
+	s.cache.Set(uuid.Parse(admin.ID), admin)
 	err := s.db.Admin.UpdateOne(s.ctx, admin)
 	if err != nil {
 		log.Error("AdminUpdate: ", err)
@@ -102,8 +130,8 @@ func (s Services) AdminDeleteService(id uuid.UUID) error {
 		return err
 	}
 
-	s.cache.Delete(admin.ID)
-	s.cache.Delete(admin.Restaurant.ID)
+	s.cache.Delete(uuid.Parse(admin.ID))
+	s.cache.Delete(uuid.Parse(admin.Restaurant.ID))
 
 	log.Info("admin deleted")
 	return nil

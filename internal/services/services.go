@@ -3,22 +3,22 @@ package services
 import (
 	"context"
 
+	"github.com/mksmstpck/restoracio/internal/cache"
 	"github.com/mksmstpck/restoracio/internal/database"
 	"github.com/mksmstpck/restoracio/internal/models"
-	"github.com/patrickmn/go-cache"
 	"github.com/pborman/uuid"
 )
 
 type Services struct {
 	db      *database.Database
-	cache   *cache.Cache
+	cache cache.Cacher
 	ctx context.Context
 }
 
 func NewServices(
 	ctx context.Context,
 	db *database.Database,
-	cache *cache.Cache,
+	cache cache.Cacher,
 ) Servicer {
 	return &Services{
 		db:      db,
@@ -29,7 +29,8 @@ func NewServices(
 
 type Servicer interface {
 	// admin
-	AdminCreateService(admin models.Admin) (models.Admin, error)
+	AdminCreateService(id uuid.UUID) (models.Admin, error)
+	AdminValidateService(admin models.Admin) error
 	AdminGetByIDService(id uuid.UUID) (models.Admin, error)
 	AdminGetByEmailService(email string) (models.Admin, error)
 	AdminGetPasswordByIdService(id uuid.UUID) (string, error)
