@@ -16,6 +16,13 @@ type Config struct {
 	RefreshSecret []byte
 	AccessExp     time.Duration
 	RefreshExp    time.Duration
+	EmailSender   string
+	EmailPassword string
+	SMTPHost      string
+	SMTPPort      string
+	RedisURL      string
+	RedisExp 	  time.Duration
+	GlobalURL     string
 }
 
 func NewConfig() Config {
@@ -38,6 +45,11 @@ func NewConfig() Config {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	redisExp, err := strconv.Atoi(os.Getenv("REDIS_EXP"))
+	if err != nil {
+		log.Fatal(err)
+	}
 	return Config{
 		GinUrl:        os.Getenv("GIN_URL"),
 		CockDNS:       os.Getenv("COCK_DNS"),
@@ -47,5 +59,12 @@ func NewConfig() Config {
 		RefreshSecret: []byte(os.Getenv("REFRESH_SECRET")),
 		AccessExp:     time.Duration(accessExp),
 		RefreshExp:    time.Duration(refreshExp),
+		EmailSender:   os.Getenv("EMAIL_SENDER"),
+		EmailPassword: os.Getenv("EMAIL_PASSWORD"),
+		SMTPHost:      os.Getenv("SMTP_HOST"),
+		SMTPPort:      os.Getenv("SMTP_PORT"),
+		RedisURL:      os.Getenv("REDIS_URL"),
+		RedisExp:      time.Duration(redisExp),
+		GlobalURL:     os.Getenv("GLOBAL_URL"),
 	}
 }
