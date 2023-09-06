@@ -22,8 +22,13 @@ import (
 //	@Failure		default	{object}	models.Message
 //	@Router			/admin [post]
 func (h *Handlers) adminCreate(c *gin.Context) {
-	id := c.Param("id")
-	admin, err := h.service.AdminCreateService(uuid.Parse(id))
+	var a models.Admin
+	if err := c.ShouldBindJSON(&a); err != nil {
+		log.Info("AdminCreate: ", err)
+		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
+		return
+	}
+	admin, err := h.service.AdminCreateService(a)
 	if err != nil {
 		log.Info("AdminCreate: ", err)
 		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
@@ -31,22 +36,6 @@ func (h *Handlers) adminCreate(c *gin.Context) {
 	}
 	admin.Password = ""
 	c.JSON(http.StatusCreated, admin)
-}
-
-func (h *Handlers) adminValidate(c *gin.Context) {
-	var admin models.Admin
-	if err := c.ShouldBindJSON(&admin); err != nil {
-		log.Info(err)
-		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
-		return
-	}
-	err := h.service.AdminValidateService(admin)
-	if err != nil {
-		log.Info(err)
-		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, models.Message{Message: "Email sent"})
 }
 
 //	@Summary		AdminGetMe

@@ -52,8 +52,7 @@ func (h *Handlers) HandleAll() {
 	reserv.Use(h.DeserializeUser())
 
 	// admin
-	admin.GET("/:id", h.adminCreate)
-	admin.POST("/validate", h.adminValidate)
+	admin.POST("/", h.adminCreate)
 	admin.GET("/id/:id", h.adminGetByID)
 	admin.GET("/email/:email", h.DeserializeUser(), h.adminGetByEmail)
 	admin.GET("/me", h.DeserializeUser(), h.adminGetMe)

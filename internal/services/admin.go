@@ -9,20 +9,22 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (s Services) AdminCreateService(id uuid.UUID) (models.Admin, error) {
-	admin, err := s.cache.AdminGet(id)
-	if err != nil{
-		log.Error(err)
-		return models.Admin{}, err
-	}
-	if admin.ID == "" {
-		log.Error(utils.ErrAdminNotFound)
-		return models.Admin{}, errors.New(utils.ErrAdminNotFound)
-	}
 
+func (s Services) AdminCreateService(admin models.Admin) (models.Admin, error) {
+	adminExists, err := s.db.Admin.GetByEmail(s.ctx, admin.Email)
+	if err != nil {
+		if err.Error() != "admin not found" {
+			log.Error("AdminCreate: ", err)
+			return models.Admin{}, err
+		}
+	}
+	if adminExists.ID != "" {
+		log.Error("AdminCreate: admin already exists")
+		return models.Admin{}, errors.New("admin already exists")
+	}
 	admin, err = s.db.Admin.CreateOne(s.ctx, admin)
 	if err != nil {
-		log.Error(err)
+		log.Error("AdminCreate: ", err)
 		return models.Admin{}, err
 	}
 	s.cache.Set(uuid.Parse(admin.ID), admin)
