@@ -25,8 +25,9 @@ type Cacher interface {
 	Delete(key uuid.UUID) error
 }
 
-func NewCache(client *redis.Client) Cacher {
+func NewCache(client *redis.Client, exp time.Duration) Cacher {
 	return &Cache{
 		client: client,
+		exp: exp,
 	}
 }

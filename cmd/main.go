@@ -69,7 +69,7 @@ func main() {
 
 	rclient := redis.NewClient(opt)
 
-	cache := cache.NewCache(rclient)
+	cache := cache.NewCache(rclient, config.RedisExp)
 
 	// services
 	service := services.NewServices(context.TODO(), database, cache)
