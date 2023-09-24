@@ -47,17 +47,18 @@ func (h *Handlers) HandleAll() {
 	reserv := h.gin.Group("/reserv")
 
 	// middleware
-	rest.Use(h.DeserializeUser())
-	staff.Use(h.DeserializeUser())
-	reserv.Use(h.DeserializeUser())
+	h.gin.Use(h.corsMiddleware)
+	rest.Use(h.authMiddleware)
+	staff.Use(h.authMiddleware)
+	reserv.Use(h.authMiddleware)
 
 	// admin
 	admin.POST("/", h.adminCreate)
 	admin.GET("/id/:id", h.adminGetByID)
-	admin.GET("/email/:email", h.DeserializeUser(), h.adminGetByEmail)
-	admin.GET("/me", h.DeserializeUser(), h.adminGetMe)
-	admin.PUT("/", h.DeserializeUser(), h.adminUpdate)
-	admin.DELETE("/", h.DeserializeUser(), h.adminDelete)
+	admin.GET("/email/:email", h.authMiddleware, h.adminGetByEmail)
+	admin.GET("/me", h.authMiddleware, h.adminGetMe)
+	admin.PUT("/", h.authMiddleware, h.adminUpdate)
+	admin.DELETE("/", h.authMiddleware, h.adminDelete)
 
 	// auth
 	auth.POST("/login", h.login)
@@ -71,24 +72,24 @@ func (h *Handlers) HandleAll() {
 	rest.DELETE("/", h.restaurantDelete)
 
 	// table
-	table.POST("/", h.DeserializeUser(),  h.tableCreate)
+	table.POST("/", h.authMiddleware,  h.tableCreate)
 	table.GET("/:id", h.tableGetByID)
 	table.GET("/all/:id", h.tableGetAllInRestaurant)
-	table.PUT("/", h.DeserializeUser(), h.tableUpdate)
-	table.DELETE("/:id", h.DeserializeUser(), h.tableDelete)
+	table.PUT("/", h.authMiddleware, h.tableUpdate)
+	table.DELETE("/:id", h.authMiddleware, h.tableDelete)
 
 	// menu
-	menu.POST("/", h.DeserializeUser(), h.menuCreate)
+	menu.POST("/", h.authMiddleware, h.menuCreate)
 	menu.GET("/:id", h.menuGetByID)
-	menu.PUT("/", h.DeserializeUser(), h.menuUpdate)
-	menu.DELETE("/", h.DeserializeUser(), h.menuDelete)
+	menu.PUT("/", h.authMiddleware, h.menuUpdate)
+	menu.DELETE("/", h.authMiddleware, h.menuDelete)
 
 	// dish
-	dish.POST("/", h.DeserializeUser(), h.dishCreate)
+	dish.POST("/", h.authMiddleware, h.dishCreate)
 	dish.GET("/:id", h.dishGetByID)
 	dish.GET("/all/:id", h.dishGetAllInMenu)
-	dish.PUT("/", h.DeserializeUser(), h.dishUpdate)
-	dish.DELETE("/:id", h.DeserializeUser(), h.dishDelete)
+	dish.PUT("/", h.authMiddleware, h.dishUpdate)
+	dish.DELETE("/:id", h.authMiddleware, h.dishDelete)
 
 	// staff
 	staff.POST("/", h.staffCreate)

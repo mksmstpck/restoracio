@@ -40,7 +40,7 @@ func (h *Handlers) restaurantCreate(c *gin.Context) {
 		return
 	}
 	log.Info("RestaurantCreate: ", r)
-	c.JSON(http.StatusOK, r)
+	c.JSON(http.StatusCreated, r)
 }
 
 //	@Summary		RestaurantGetMine
@@ -112,7 +112,7 @@ func (h *Handlers) restaurantUpdate(c *gin.Context) {
 		return
 	}
 	log.Info("RestaurantUpdate: restaurant updated")
-	c.JSON(http.StatusOK, models.Message{Message: "Restaurant updated"})
+	c.JSON(http.StatusNoContent, nil)
 }
 
 //	@Summary		RestaurantDelete
@@ -133,5 +133,5 @@ func (h *Handlers) restaurantDelete(c *gin.Context) {
 		return
 	}
 	log.Info("RestaurantDelete: restaurant deleted")
-	c.JSON(http.StatusOK, models.Message{Message: "Restaurant deleted"})
+	c.JSON(http.StatusNoContent, nil)
 }

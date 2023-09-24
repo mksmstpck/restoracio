@@ -206,7 +206,7 @@ definitions:
     - number
     - placement
     type: object
-host: localhost:8080
+host: restoracio.fly.dev
 info:
   contact: {}
   description: API for restaurant's management

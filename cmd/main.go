@@ -9,12 +9,13 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mksmstpck/restoracio/internal/cache"
 	"github.com/mksmstpck/restoracio/internal/config"
 	"github.com/mksmstpck/restoracio/internal/database"
 	"github.com/mksmstpck/restoracio/internal/handlers"
 	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/mksmstpck/restoracio/internal/services"
-	"github.com/patrickmn/go-cache"
+	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"github.com/uptrace/bun"
@@ -44,7 +45,7 @@ func formatFilePath(path string) string {
 //	@version		1.0
 //	@description	API for restaurant's management
 
-//	@host		localhost:8080
+//	@host		restoracio.fly.dev
 //	@BasePath	/
 
 //	@securityDefinitions.apikey	JWTAuth
@@ -61,7 +62,14 @@ func main() {
 	database := database.NewDatabase(db)
 
 	// cache
-	cache := cache.New(config.CacheExpire, config.CachePurge)
+	opt, err := redis.ParseURL(config.RedisURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	rclient := redis.NewClient(opt)
+
+	cache := cache.NewCache(rclient, config.RedisExp)
 
 	// services
 	service := services.NewServices(context.TODO(), database, cache)

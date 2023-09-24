@@ -5,7 +5,6 @@ import (
 
 	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/mksmstpck/restoracio/utils"
-	"github.com/patrickmn/go-cache"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -20,24 +19,28 @@ func (s *Services) TableCreateService(table models.Table, admin models.Admin) (m
 		log.Info("TableCreate: ", err)
 		return models.Table{}, err
 	}
-	s.cache.Set(res.ID, res, cache.DefaultExpiration)
+	s.cache.Set(uuid.Parse(res.ID), res)
 	log.Info("table created")
 	return res, nil
 }
 
 func (s *Services) TableGetByIDService(id uuid.UUID) (models.Table, error) {
-	table, exist := s.cache.Get(id.String())
-	if exist {
+	table, err := s.cache.TableGet(id)
+	if table.ID != "" {
 		log.Info("table found")
-		return table.(models.Table), nil
+		return table, nil
 	}
-
-	table, err := s.db.Table.GetByID(s.ctx, id)
 	if err != nil {
 		log.Info("TableGetByID: ", err)
 		return models.Table{}, err
 	}
-	return table.(models.Table), nil
+
+	table, err = s.db.Table.GetByID(s.ctx, id)
+	if err != nil {
+		log.Info("TableGetByID: ", err)
+		return models.Table{}, err
+	}
+	return table, nil
 }
 
 func (s *Services) TableGetAllInRestaurantService(id uuid.UUID) ([]models.Table, error) {
@@ -71,7 +74,7 @@ func (s *Services) TableUpdateService(table models.Table, admin models.Admin) er
 		return err
 	}
 
-	s.cache.Set(table.ID, table, cache.DefaultExpiration)
+	s.cache.Set(uuid.Parse(table.ID), table)
 
 	log.Info("table updated")
 	return nil
@@ -96,7 +99,7 @@ func (s *Services) TableDeleteService(id uuid.UUID, admin models.Admin) error {
 		return err
 	}
 
-	s.cache.Delete(id.String())
+	s.cache.Delete(id)
 
 	log.Info("table deleted")
 	return nil

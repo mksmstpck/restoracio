@@ -5,7 +5,6 @@ import (
 
 	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/mksmstpck/restoracio/utils"
-	"github.com/patrickmn/go-cache"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -22,7 +21,11 @@ func (s *Services) StaffCreateService(staff models.Staff, admin models.Admin) (m
 		return models.Staff{}, err
 	}
 
-	s.cache.Set(res.ID, res, cache.DefaultExpiration)
+	err = s.cache.Set(uuid.Parse(res.ID), res)
+	if err != nil {
+		log.Info(err)
+		return models.Staff{}, err
+	}
 
 	log.Info("staff created")
 	return res, nil
@@ -34,18 +37,22 @@ func (s *Services) StaffGetByIDService(id uuid.UUID, admin models.Admin) (models
 		return models.Staff{}, errors.New(utils.ErrRestaurantNotFound)
 	}
 
-	staff, exist := s.cache.Get(id.String())
-	if exist {
+	staff, err := s.cache.StaffGet(id)
+	if staff.ID != "" {
 		log.Info("staff found")
-		return staff.(models.Staff), nil
+		return staff, nil
 	}
-
-	staff, err := s.db.Staff.GetByID(s.ctx, id, uuid.Parse(admin.Restaurant.ID))
 	if err != nil {
 		log.Info(err)
 		return models.Staff{}, err
 	}
-	return staff.(models.Staff), nil
+
+	staff, err = s.db.Staff.GetByID(s.ctx, id, uuid.Parse(admin.Restaurant.ID))
+	if err != nil {
+		log.Info(err)
+		return models.Staff{}, err
+	}
+	return staff, nil
 }
 
 func (s *Services) StaffGetAllInRestaurantService(admin models.Admin) ([]models.Staff, error) {
@@ -74,7 +81,7 @@ func (s *Services) StaffUpdateService(staff models.Staff, admin models.Admin) er
 		return err
 	}
 
-	s.cache.Set(staff.ID, staff, cache.DefaultExpiration)
+	s.cache.Set(uuid.Parse(staff.ID), staff)
 
 	log.Info("staff updated")
 	return nil
@@ -91,7 +98,7 @@ func (s *Services) StaffDeleteService(id uuid.UUID, admin models.Admin) error {
 		return err
 	}
 
-	s.cache.Delete(id.String())
+	s.cache.Delete(id)
 
 	log.Info("staff deleted")
 	return nil

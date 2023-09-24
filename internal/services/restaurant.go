@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/mksmstpck/restoracio/internal/models"
-	"github.com/patrickmn/go-cache"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -17,29 +16,34 @@ func (s *Services) RestaurantCreateService(rest models.Restaurant, admin models.
 		return models.Restaurant{}, err
 	}
 
-	s.cache.Set(res.ID, res, cache.DefaultExpiration)
-	s.cache.Set(admin.ID, admin, cache.DefaultExpiration)
+	s.cache.Set(uuid.Parse(res.ID), res)
+	s.cache.Set(uuid.Parse(admin.ID), admin)
 
 	log.Info("restaurant created")
 	return res, nil
 }
 
 func (s *Services) RestaurantGetByIDService(id uuid.UUID) (models.Restaurant, error) {
-	res, exist := s.cache.Get(id.String())
-	if exist {
+	res, err := s.cache.RestaurantGet(id)
+	if res.ID != "" {
 		log.Info("restaurant found")
-		return res.(models.Restaurant), nil
+		return res, nil
 	}
-	res, err := s.db.Rest.GetByID(s.ctx, id)
 	if err != nil {
 		log.Info("RestaurantGetByID: ", err)
 		return models.Restaurant{}, err
 	}
 
-	s.cache.Set(res.(models.Restaurant).ID, res, cache.DefaultExpiration)
+	res, err = s.db.Rest.GetByID(s.ctx, id)
+	if err != nil {
+		log.Info("RestaurantGetByID: ", err)
+		return models.Restaurant{}, err
+	}
+
+	s.cache.Set(uuid.Parse(res.ID), res)
 
 	log.Info("restaurant found")
-	return res.(models.Restaurant), nil
+	return res, nil
 }
 
 func (s *Services) RestaurantUpdateService(rest models.Restaurant, restID uuid.UUID) error {
@@ -50,7 +54,7 @@ func (s *Services) RestaurantUpdateService(rest models.Restaurant, restID uuid.U
 		return err
 	}
 
-	s.cache.Set(rest.ID, rest, cache.DefaultExpiration)
+	s.cache.Set(uuid.Parse(rest.ID), rest)
 
 	log.Info("restaurant updated")
 	return nil
@@ -67,8 +71,8 @@ func (s *Services) RestaurantDeleteService(rest *models.Restaurant) error {
 		return err
 	}
 
-	s.cache.Delete(rest.ID)
-	s.cache.Delete(rest.AdminID)
+	s.cache.Delete(uuid.Parse(rest.ID))
+	s.cache.Delete(uuid.Parse(rest.AdminID))
 
 	log.Info("restaurant deleted")
 	return nil

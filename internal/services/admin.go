@@ -4,10 +4,10 @@ import (
 	"errors"
 
 	"github.com/mksmstpck/restoracio/internal/models"
-	"github.com/patrickmn/go-cache"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
+
 
 func (s Services) AdminCreateService(admin models.Admin) (models.Admin, error) {
 	adminExists, err := s.db.Admin.GetByEmail(s.ctx, admin.Email)
@@ -26,41 +26,40 @@ func (s Services) AdminCreateService(admin models.Admin) (models.Admin, error) {
 		log.Error("AdminCreate: ", err)
 		return models.Admin{}, err
 	}
-	s.cache.Set(admin.ID, admin, cache.DefaultExpiration)
+	s.cache.Set(uuid.Parse(admin.ID), admin)
 	log.Info("admin created")
 	return admin, nil
 }
 
 func (s Services) AdminGetByIDService(id uuid.UUID) (models.Admin, error) {
-	admin, exist := s.cache.Get(id.String())
-	if exist {
+	admin, err := s.cache.AdminGet(id)
+	if admin.ID != "" {
 		log.Info("admin found")
-		return admin.(models.Admin), nil
+		return admin, nil
 	}
-	admin, err := s.db.Admin.GetByID(s.ctx, id)
 	if err != nil {
-		log.Error("AdminGetByID: ", err)
+		log.Error(err)
 		return models.Admin{}, err
 	}
-	s.cache.Set(admin.(models.Admin).ID, admin, cache.DefaultExpiration)
+	admin, err = s.db.Admin.GetByID(s.ctx, id)
+	if err != nil {
+		log.Error(err)
+		return models.Admin{}, err
+	}
+	s.cache.Set(uuid.Parse(admin.ID), admin)
 	log.Info("admin found")
-	return admin.(models.Admin), nil
+	return admin, nil
 }
 
 func (s Services) AdminGetByEmailService(email string) (models.Admin, error) {
-	admin, exist := s.cache.Get(email)
-	if exist {
-		log.Info("admin found")
-		return admin.(models.Admin), nil
-	}
 	admin, err := s.db.Admin.GetByEmail(s.ctx, email)
 	if err != nil {
 		log.Error("AdminGetByEmail: ", err)
 		return models.Admin{}, err
 	}
-	s.cache.Set(admin.(models.Admin).ID, admin, cache.DefaultExpiration)
+	s.cache.Set(uuid.Parse(admin.ID), admin)
 	log.Info("admin found")
-	return admin.(models.Admin), nil
+	return admin, nil
 }
 
 func (s Services) AdminGetPasswordByIdService(id uuid.UUID) (string, error) {
@@ -75,7 +74,7 @@ func (s Services) AdminGetPasswordByIdService(id uuid.UUID) (string, error) {
 
 func (s Services) AdminUpdateService(admin models.Admin, adminID uuid.UUID) error {
 	admin.ID = adminID.String()
-	s.cache.Set(admin.ID, admin, cache.DefaultExpiration)
+	s.cache.Set(uuid.Parse(admin.ID), admin)
 	err := s.db.Admin.UpdateOne(s.ctx, admin)
 	if err != nil {
 		log.Error("AdminUpdate: ", err)
@@ -102,8 +101,8 @@ func (s Services) AdminDeleteService(id uuid.UUID) error {
 		return err
 	}
 
-	s.cache.Delete(admin.ID)
-	s.cache.Delete(admin.Restaurant.ID)
+	s.cache.Delete(uuid.Parse(admin.ID))
+	s.cache.Delete(uuid.Parse(admin.Restaurant.ID))
 
 	log.Info("admin deleted")
 	return nil

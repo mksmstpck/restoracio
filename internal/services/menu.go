@@ -5,7 +5,6 @@ import (
 
 	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/mksmstpck/restoracio/utils"
-	"github.com/patrickmn/go-cache"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -34,28 +33,32 @@ func (s Services) MenuCreateService(menu models.Menu, admin models.Admin) (model
 		return models.Menu{}, err
 	}
 
-	s.cache.Set(menu.ID, menu, cache.DefaultExpiration)
+	s.cache.Set(uuid.Parse(menu.ID), menu)
 
 	log.Info("menu created")
 	return menu, nil
 }
 
 func (s *Services) MenuGetByIDService(id uuid.UUID) (models.Menu, error) {
-	menu, exist := s.cache.Get(id.String())
-	if exist {
+	menu, err := s.cache.MenuGet(id)
+	if menu.ID != "" {
 		log.Info("menu found")
-		return menu.(models.Menu), nil
+		return menu, nil
 	}
-	menu, err := s.db.Menu.GetByID(s.ctx, id)
+	if err != nil {
+		log.Error(err)
+		return models.Menu{}, err
+	}
+	menu, err = s.db.Menu.GetByID(s.ctx, id)
 	if err != nil {
 		log.Error(err)
 		return models.Menu{}, err
 	}
 
-	s.cache.Set(menu.(models.Menu).ID, menu, cache.DefaultExpiration)
+	s.cache.Set(uuid.Parse(menu.ID), menu)
 
 	log.Info("menu found")
-	return menu.(models.Menu), nil
+	return menu, nil
 }
 
 func (s *Services) MenuUpdateService(menu models.Menu, admin models.Admin) error {
@@ -74,7 +77,7 @@ func (s *Services) MenuUpdateService(menu models.Menu, admin models.Admin) error
 		return err
 	}
 
-	s.cache.Set(menu.ID, menu, cache.DefaultExpiration)
+	s.cache.Set(uuid.Parse(menu.ID), menu)
 
 	log.Info("menu updated")
 	return nil
@@ -94,7 +97,7 @@ func (s *Services) MenuDeleteService(admin models.Admin) error {
 		return err
 	}
 
-	s.cache.Delete(admin.Restaurant.Menu.ID)
+	s.cache.Delete(uuid.Parse(admin.Restaurant.Menu.ID))
 
 	log.Info("menu deleted")
 	return nil

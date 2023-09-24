@@ -36,7 +36,7 @@ func (h *Handlers) tableCreate(c *gin.Context){
 		return
 	}
 	log.Info("tablec created")
-	c.JSON(http.StatusOK, t)
+	c.JSON(http.StatusCreated, t)
 }
 
 //	@Summary		TableGetByID
