@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/mksmstpck/restoracio/internal/models"
-	"github.com/mksmstpck/restoracio/utils"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -30,36 +29,6 @@ func (s Services) AdminCreateService(admin models.Admin) (models.Admin, error) {
 	s.cache.Set(uuid.Parse(admin.ID), admin)
 	log.Info("admin created")
 	return admin, nil
-}
-
-func (s *Services) AdminValidateService(admin models.Admin) error {
-	adminExists, err := s.db.Admin.GetByEmail(s.ctx, admin.Email)
-	if err != nil {
-		if err.Error() != "admin not found" {
-			log.Error(err)
-			return err
-		}
-	}
-	if adminExists.ID != "" {
-		log.Error("AdminValidate: admin already exists")
-		return errors.New("admin already exists")
-	}
-
-	genUUID := uuid.NewUUID()
-	err = s.cache.Set(genUUID, admin)
-	if err != nil {
-		log.Error(err)
-		return err
-	}
-
-	err = utils.EmailValidator(admin.Email, genUUID)
-	if err != nil {
-		log.Error(err)
-		return err
-	}
-
-	log.Info("admin validated")
-	return nil
 }
 
 func (s Services) AdminGetByIDService(id uuid.UUID) (models.Admin, error) {

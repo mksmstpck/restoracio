@@ -30,7 +30,6 @@ func NewServices(
 type Servicer interface {
 	// admin
 	AdminCreateService(models.Admin) (models.Admin, error)
-	AdminValidateService(admin models.Admin) error
 	AdminGetByIDService(id uuid.UUID) (models.Admin, error)
 	AdminGetByEmailService(email string) (models.Admin, error)
 	AdminGetPasswordByIdService(id uuid.UUID) (string, error)
