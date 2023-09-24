@@ -45,7 +45,7 @@ func formatFilePath(path string) string {
 //	@version		1.0
 //	@description	API for restaurant's management
 
-//	@host		localhost:8080
+//	@host		restoracio.fly.dev
 //	@BasePath	/
 
 //	@securityDefinitions.apikey	JWTAuth
