@@ -39,7 +39,7 @@ func (h *Handlers) reservCreate(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, reservDB)
+	c.JSON(http.StatusCreated, reservDB)
 }
 
 //	@Summary		ReservationGetByID

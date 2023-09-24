@@ -106,7 +106,7 @@ func (h *Handlers) adminUpdate(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, admin)
+	c.JSON(http.StatusNoContent, nil)
 }
 
 //	@Summary		AdminDelete
@@ -128,5 +128,5 @@ func (h *Handlers) adminDelete(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, models.Message{Message: "Admin deleted"})
+	c.JSON(http.StatusNoContent, nil)
 }

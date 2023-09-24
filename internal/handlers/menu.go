@@ -37,7 +37,7 @@ func (h *Handlers) menuCreate(c *gin.Context) {
 		return
 	}
 	log.Info("menu created")
-	c.JSON(http.StatusOK, m)
+	c.JSON(http.StatusCreated, m)
 }
 
 //	@Summary		MenuGetByID
@@ -97,6 +97,7 @@ func (h *Handlers) menuUpdate(c *gin.Context) {
 		log.Info(err)
 		return
 	}
+	c.JSON(http.StatusNoContent, nil)
 	log.Info("menu updated")
 }
 
@@ -130,5 +131,5 @@ func (h *Handlers) menuDelete(c *gin.Context) {
 		return
 	}
 	log.Info("menu deleted")
-	c.JSON(http.StatusOK, models.Message{Message: "menu deleted"})
+	c.JSON(http.StatusNoContent, nil)
 }

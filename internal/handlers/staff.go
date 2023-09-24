@@ -39,7 +39,7 @@ func (h *Handlers) staffCreate(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, staff)
+	c.JSON(http.StatusCreated, staff)
 }
 
 //	@Summary		StaffGetByID

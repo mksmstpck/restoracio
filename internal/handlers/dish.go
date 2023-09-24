@@ -46,7 +46,7 @@ func (h *Handlers) dishCreate(c *gin.Context) {
 		return
 	}
 	log.Info("dish created")
-	c.JSON(http.StatusOK, m)
+	c.JSON(http.StatusCreated, m)
 }
 
 //	@Summary		DishGetByID
