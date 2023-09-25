@@ -98,7 +98,7 @@ func (s *Services) DishDeleteService(id uuid.UUID, admin models.Admin) error {
 		return errors.New(utils.ErrMenuNotFound)
 	}
 
-	err := s.db.Dish.DeleteOne(s.ctx, uuid.UUID(id), uuid.UUID(admin.Restaurant.Menu.ID))
+	err := s.db.Dish.DeleteOne(s.ctx, id, uuid.Parse(admin.Restaurant.Menu.ID))
 	if err != nil {
 		log.Error(err)
 		return err
@@ -107,5 +107,24 @@ func (s *Services) DishDeleteService(id uuid.UUID, admin models.Admin) error {
 	s.cache.Delete(id)
 
 	log.Info("dish deleted")
+	return nil
+}
+
+func (s *Services) DishDeleteAllService(admin models.Admin) error {
+	if admin.Restaurant == nil {
+		log.Info(utils.ErrRestaurantNotFound)
+		return errors.New(utils.ErrRestaurantNotFound)
+	}
+	if admin.Restaurant.Menu == nil {
+		log.Info(utils.ErrMenuNotFound)
+		return errors.New(utils.ErrMenuNotFound)
+	}
+	err := s.db.Dish.DeleteAll(s.ctx, uuid.Parse(admin.Restaurant.Menu.ID))
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+
+	log.Info("dishes deleted")
 	return nil
 }

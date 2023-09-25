@@ -12,7 +12,7 @@ func (s *Services) RestaurantCreateService(rest models.Restaurant, admin models.
 	rest.AdminID = admin.ID
 	res, err := s.db.Rest.CreateOne(s.ctx, rest)
 	if err != nil {
-		log.Info("RestaurantCreate: ", err)
+		log.Info(err)
 		return models.Restaurant{}, err
 	}
 
@@ -30,13 +30,13 @@ func (s *Services) RestaurantGetByIDService(id uuid.UUID) (models.Restaurant, er
 		return res, nil
 	}
 	if err != nil {
-		log.Info("RestaurantGetByID: ", err)
+		log.Info(err)
 		return models.Restaurant{}, err
 	}
 
 	res, err = s.db.Rest.GetByID(s.ctx, id)
 	if err != nil {
-		log.Info("RestaurantGetByID: ", err)
+		log.Info(err)
 		return models.Restaurant{}, err
 	}
 
@@ -50,7 +50,7 @@ func (s *Services) RestaurantUpdateService(rest models.Restaurant, restID uuid.U
 	rest.ID = restID.String()
 	err := s.db.Rest.UpdateOne(s.ctx, rest)
 	if err != nil {
-		log.Info("RestaurantUpdate: ", err)
+		log.Info(err)
 		return err
 	}
 
@@ -67,7 +67,24 @@ func (s *Services) RestaurantDeleteService(rest *models.Restaurant) error {
 	}
 	err := s.db.Rest.DeleteOne(s.ctx, uuid.Parse(rest.ID))
 	if err != nil {
-		log.Info("RestaurantDelete: ", err)
+		log.Info(err)
+		return err
+	}
+	
+	admin := models.Admin{ID: rest.AdminID,Restaurant: rest}
+	err = s.MenuDeleteService(admin)
+	if err != nil {
+		log.Info(err)
+		return err
+	}
+	err = s.TableDeleteAllService(admin)
+	if err != nil {
+		log.Info(err)
+		return err
+	}
+	err = s.StaffDeleteAllService(admin)
+	if err != nil {
+		log.Info(err)
 		return err
 	}
 

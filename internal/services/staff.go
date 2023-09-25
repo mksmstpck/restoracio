@@ -103,3 +103,17 @@ func (s *Services) StaffDeleteService(id uuid.UUID, admin models.Admin) error {
 	log.Info("staff deleted")
 	return nil
 }
+
+func (s *Services) StaffDeleteAllService(admin models.Admin) error {
+	if admin.Restaurant == nil {
+		log.Info(utils.ErrRestaurantNotFound)
+		return errors.New(utils.ErrRestaurantNotFound)
+	}
+	err := s.db.Staff.DeleteAll(s.ctx, uuid.Parse(admin.Restaurant.ID))
+	if err != nil {
+		log.Info(err)
+		return err
+	}
+	log.Info("staffs deleted")
+	return nil
+}

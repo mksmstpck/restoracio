@@ -30,6 +30,7 @@ type TableDatabases interface {
 	GetAllInRestaurant(ctx context.Context, id uuid.UUID) ([]models.Table, error)
 	UpdateOne(ctx context.Context, table models.Table) error
 	DeleteOne(ctx context.Context, id uuid.UUID) error
+	DeleteAll(ctx context.Context, id uuid.UUID) error
 }
 
 type MenuDatabases interface {
@@ -45,6 +46,7 @@ type DishDatabases interface {
 	GetAllInMenu(ctx context.Context, id uuid.UUID) ([]models.Dish, error)
 	UpdateOne(ctx context.Context, dish models.Dish) error
 	DeleteOne(ctx context.Context, id uuid.UUID, menuID uuid.UUID) error
+	DeleteAll(ctx context.Context, menuID uuid.UUID) error
 }
 
 type StaffDatabases interface {
@@ -53,6 +55,7 @@ type StaffDatabases interface {
 	GetAllInRestaurant(ctx context.Context, id uuid.UUID) ([]models.Staff, error)
 	UpdateOne(ctx context.Context, staff models.Staff) error
 	DeleteOne(ctx context.Context, id uuid.UUID, restaurantID uuid.UUID) error
+	DeleteAll(ctx context.Context, restaurantID uuid.UUID) error
 }
 
 type ReservationDatabases interface {

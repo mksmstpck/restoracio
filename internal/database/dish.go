@@ -107,3 +107,26 @@ func (d *DishDatabase) DeleteOne(ctx context.Context, id uuid.UUID, menuID uuid.
 	log.Info("dish deleted")
 	return nil
 }
+
+func (d *DishDatabase) DeleteAll(ctx context.Context, menuID uuid.UUID) (error) {
+	res, err := d.db.
+	NewDelete().
+	Model(&models.Dish{MenuID: menuID.String()}).
+	Where("menu_id = ?", menuID).
+	Exec(ctx)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	if count == 0 {
+		log.Error(utils.ErrDishNotFound)
+		return errors.New(utils.ErrDishNotFound)
+	}
+	log.Info("dish deleted")
+	return nil
+}

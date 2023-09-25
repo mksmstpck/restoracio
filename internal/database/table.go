@@ -17,7 +17,7 @@ func (d *TableDatabase) CreateOne(ctx context.Context, table models.Table) (mode
 		Model(&table).
 		Exec(ctx)
 	if err != nil {
-		log.Error("database.TableCreate: ", err)
+		log.Error(err)
 		return models.Table{}, err
 	}
 	log.Info("table created")
@@ -36,7 +36,7 @@ func (d *TableDatabase) GetByID(ctx context.Context, id uuid.UUID) (models.Table
 			log.Error("table not found")
 			return models.Table{}, errors.New("table not found")
 		}
-		log.Error("database.TableGetByID: ", err)
+		log.Error(err)
 		return models.Table{}, err
 	}
 	log.Info("table found")
@@ -51,7 +51,7 @@ func (d *TableDatabase) GetAllInRestaurant(ctx context.Context, id uuid.UUID) ([
 		Where("restaurant_id = ?", id.String()).
 		Scan(ctx)
 	if err != nil {
-		log.Error("database.TableGetAllInRestaurant: ", err)
+		log.Error(err)
 		return nil, err
 	}
 	log.Info("tables found")
@@ -66,7 +66,7 @@ func (d *TableDatabase) UpdateOne(ctx context.Context, table models.Table) error
 		Where("id = ?", table.ID).
 		Exec(ctx)
 	if err != nil {
-		log.Error("database.TableUpdate: ", err)
+		log.Error(err)
 		return err
 	}
 	log.Info("table updated")
@@ -80,9 +80,23 @@ func (d *TableDatabase) DeleteOne(ctx context.Context, id uuid.UUID) error {
 		Where("id = ?", id).
 		Exec(ctx)
 	if err != nil {
-		log.Error("database.TableDelete: ", err)
+		log.Error(err)
 		return err
 	}
 	log.Info("table deleted")
+	return nil
+}
+
+func (d *TableDatabase) DeleteAll(ctx context.Context, id uuid.UUID) error {
+	_, err := d.db.
+		NewDelete().
+		Model(&models.Table{}).
+		Where("restaurant_id = ?", id).
+		Exec(ctx)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	log.Info("tables deleted")
 	return nil
 }

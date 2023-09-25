@@ -105,6 +105,23 @@ func (s *Services) TableDeleteService(id uuid.UUID, admin models.Admin) error {
 	return nil
 }
 
+func (s *Services) TableDeleteAllService(admin models.Admin) error {
+	if admin.Restaurant == nil {
+		log.Info("create restaurant first")
+		return errors.New(utils.ErrRestaurantNotFound)
+	}
+	if admin.Restaurant.Tables == nil {
+		log.Info("create tables first")
+		return errors.New(utils.ErrTableNotFound)
+	}
+	err := s.db.Table.DeleteAll(s.ctx, uuid.Parse(admin.Restaurant.ID))
+	if err != nil {
+		log.Info("TableDeleteAll: ", err)
+		return err
+	}
+	return nil
+}
+
 func TableExists(tables []*models.Table, id string) bool {
 	for _, table := range tables {
 		if table.ID == id {
