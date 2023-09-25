@@ -13,4 +13,5 @@ const (
 	ErrReservationNotFound = "reservation not found"
 	ErrReservationAlreadyExists = "reservation already exists"
 	ErrAdminNotFound = "admin not found"
+	ErrAdminAlreadyExists = "admin already exists"
 )
