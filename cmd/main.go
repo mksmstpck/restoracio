@@ -89,12 +89,18 @@ func main() {
 	mdb := client.Database("restoracio")
 	bucketOpts := options.GridFSBucket().SetName("qrcodes")
 	bucket, err := gridfs.NewBucket(mdb, bucketOpts)
+
 	if err != nil {
 	  log.Fatal(err)
 	}
 
 	// services
-	service := services.NewServices(context.TODO(), database, cache)
+	service := services.NewServices(
+		context.TODO(),
+		database,
+		cache,
+		bucket,
+	)
 
 	// gin
 	router := gin.Default()
