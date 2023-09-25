@@ -40,6 +40,28 @@ func (h *Handlers) menuCreate(c *gin.Context) {
 	c.JSON(http.StatusCreated, m)
 }
 
+//	@Summary		MenuGetWithQrcode
+//	@Tags			Menu
+//	@Description	returns a menu by id with qrcode
+//	@ID				menu-get-by-id-with-qrcode
+//	@Accept			json
+//	@Produce		json
+//	@Success		200		{object}	models.Menu
+//	@Failure		default	{object}	models.Message
+//	@Router			/menu/qr/{id} [get]
+//	@Param			id	path	string	true	"Menu ID"
+func (h *Handlers) menuGetWithQrcode(c *gin.Context) {
+	id := uuid.Parse(c.Param("id"))
+	menu, err := h.service.MenuGetWithQrcodeService(id)
+	if err != nil {
+		log.Info(err)
+		c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, menu)
+	log.Info("menu found")
+}
+
 //	@Summary		MenuGetByID
 //	@Tags			Menu
 //	@Description	returns a menu by id

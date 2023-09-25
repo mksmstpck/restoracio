@@ -74,6 +74,8 @@ definitions:
         items:
           type: integer
         type: array
+      qrcodeID:
+        type: string
       restaurant_id:
         type: string
     required:
@@ -626,6 +628,32 @@ paths:
           schema:
             $ref: '#/definitions/models.Message'
       summary: MenuGetByID
+      tags:
+      - Menu
+  /menu/qr/{id}:
+    get:
+      consumes:
+      - application/json
+      description: returns a menu by id with qrcode
+      operationId: menu-get-by-id-with-qrcode
+      parameters:
+      - description: Menu ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Menu'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Message'
+      summary: MenuGetWithQrcode
       tags:
       - Menu
   /menu{id}:

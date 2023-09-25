@@ -616,6 +616,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/menu/qr/{id}": {
+            "get": {
+                "description": "returns a menu by id with qrcode",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "MenuGetWithQrcode",
+                "operationId": "menu-get-by-id-with-qrcode",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Menu ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Menu"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    }
+                }
+            }
+        },
         "/menu/{id}": {
             "get": {
                 "description": "returns a menu by id",
@@ -1635,6 +1674,9 @@ const docTemplate = `{
                     "items": {
                         "type": "integer"
                     }
+                },
+                "qrcodeID": {
+                    "type": "string"
                 },
                 "restaurant_id": {
                     "type": "string"

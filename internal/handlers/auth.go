@@ -23,7 +23,6 @@ import (
 //	@Failure		500		{object}	models.Message
 //	@Failure		default	{object}	models.Message
 //	@Router			/auth/login [post]
-
 func (h *Handlers) login(c *gin.Context) {
 	var creds *models.Login
 
