@@ -9,6 +9,7 @@ import (
 	"github.com/mksmstpck/restoracio/utils"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func (s Services) MenuCreateService(menu models.Menu, admin models.Admin) (models.Menu, error) {
@@ -33,7 +34,7 @@ func (s Services) MenuCreateService(menu models.Menu, admin models.Admin) (model
 		return models.Menu{}, err
 	}
 
-	menu.QRCodeID = qrcodeID
+	menu.QRCodeID = qrcodeID.Hex()
 	menu.QRCodeBytes = nil
 
 	menu, err = s.db.Menu.CreateOne(s.ctx, menu)
@@ -64,11 +65,19 @@ func (s *Services) MenuGetWithQrcodeService(id uuid.UUID) (models.Menu, error) {
 		return models.Menu{}, err
 	}
 	fileBuffer := bytes.NewBuffer(nil)
-	if _, err := s.bucket.DownloadToStream(menu.ID, fileBuffer); err != nil {
+	qrID, err := primitive.ObjectIDFromHex(menu.QRCodeID)
+	if err != nil {
+		log.Error(err)
+		return models.Menu{}, err
+	}
+	if _, err := s.bucket.DownloadToStream(qrID, fileBuffer); err != nil {
 		log.Error(err)
 		return models.Menu{}, err
 	}
 	menu.QRCodeBytes = fileBuffer.Bytes()
+
+	s.cache.Set(uuid.Parse(menu.ID), menu)
+
 	return menu, nil
 }
 
