@@ -22,6 +22,7 @@ func (s Services) AdminCreateService(admin models.Admin) (models.Admin, error) {
 		log.Error(utils.ErrAdminAlreadyExists)
 		return models.Admin{}, errors.New(utils.ErrAdminAlreadyExists)
 	}
+	admin.ID = uuid.NewUUID().String()
 	admin, err = s.db.Admin.CreateOne(s.ctx, admin)
 	if err != nil {
 		log.Error(err)

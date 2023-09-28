@@ -12,7 +12,6 @@ import (
 )
 
 func (d *StaffDatabase) CreateOne(ctx context.Context, staff models.Staff) (models.Staff, error) {
-	staff.ID = uuid.NewUUID().String()
 	_, err := d.db.
 		NewInsert().
 		Model(&staff).

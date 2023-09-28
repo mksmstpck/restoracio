@@ -11,7 +11,6 @@ import (
 )
 
 func (d *TableDatabase) CreateOne(ctx context.Context, table models.Table) (models.Table, error) {
-	table.ID = uuid.NewUUID().String()
 	_, err := d.db.
 		NewInsert().
 		Model(&table).

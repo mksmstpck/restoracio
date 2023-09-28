@@ -21,6 +21,7 @@ func (s Services) MenuCreateService(menu models.Menu, admin models.Admin) (model
 		return models.Menu{}, errors.New(utils.ErrRestaurantNotFound)
 	}
 	menu.RestaurantID = admin.Restaurant.ID
+	menu.ID = uuid.NewUUID().String()
 	
 	qrcode, err := utils.QrGenerate("/menu/"+menu.ID)
 	if err != nil {

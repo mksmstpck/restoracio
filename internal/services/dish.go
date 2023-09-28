@@ -19,6 +19,7 @@ func (s *Services) DishCreateService(dish models.Dish, admin models.Admin) (mode
 		return models.Dish{}, errors.New(utils.ErrMenuNotFound)
 	}
 
+	dish.ID = uuid.NewUUID().String()
 	dish.MenuID = admin.Restaurant.Menu.ID
 
 	dish, err := s.db.Dish.CreateOne(s.ctx, dish)

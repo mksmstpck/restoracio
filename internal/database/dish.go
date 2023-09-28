@@ -12,11 +12,10 @@ import (
 )
 
 func (d *DishDatabase) CreateOne(ctx context.Context, dish models.Dish) (models.Dish, error) {
-	dish.ID = uuid.NewUUID().String()
 	_, err := d.db.
-	NewInsert().
-	Model(&dish).
-	Exec(ctx)
+		NewInsert().
+		Model(&dish).
+		Exec(ctx)
 	if err != nil {
 		log.Error(err)
 		return models.Dish{}, err

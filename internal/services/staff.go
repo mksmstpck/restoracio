@@ -15,6 +15,7 @@ func (s *Services) StaffCreateService(staff models.Staff, admin models.Admin) (m
 		return models.Staff{}, errors.New(utils.ErrRestaurantNotFound)
 	}
 	staff.RestaurantID = admin.Restaurant.ID
+	staff.ID = uuid.NewUUID().String()
 	res, err := s.db.Staff.CreateOne(s.ctx, staff)
 	if err != nil {
 		log.Info(err)

@@ -10,6 +10,7 @@ import (
 
 func (s *Services) RestaurantCreateService(rest models.Restaurant, admin models.Admin) (models.Restaurant, error) {
 	rest.AdminID = admin.ID
+	rest.ID = uuid.NewUUID().String()
 	res, err := s.db.Rest.CreateOne(s.ctx, rest)
 	if err != nil {
 		log.Info(err)

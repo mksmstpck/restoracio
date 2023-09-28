@@ -10,6 +10,7 @@ import (
 )
 
 func (s *Services) TableCreateService(table models.Table, admin models.Admin) (models.Table, error) {
+	table.ID = uuid.NewUUID().String()
 	if admin.Restaurant == nil {
 		return models.Table{}, errors.New("create restaurant first")
 	}

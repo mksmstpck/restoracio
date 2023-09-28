@@ -12,7 +12,6 @@ import (
 )
 
 func (d *ReservDB) CreateOne(ctx context.Context, reserv models.ReservDB) (models.ReservDB, error) {
-	reserv.ID = uuid.NewUUID().String()
 	_, err := d.db.
 		NewInsert().
 		Model(&reserv).
