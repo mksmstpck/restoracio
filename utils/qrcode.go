@@ -6,7 +6,7 @@ import (
 )
 
 func QrGenerate(route string) ([]byte, error) {
-	url := config.NewConfig().GinUrl
+	url := config.NewConfig().GlobalURL
 	code, err := qrcode.New(url+route, qrcode.Medium)
 	if err != nil {
 		return nil, err

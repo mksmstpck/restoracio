@@ -21,6 +21,9 @@ import (
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/gridfs"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func init() {
@@ -71,8 +74,33 @@ func main() {
 
 	cache := cache.NewCache(rclient, config.RedisExp)
 
+	// mongodb
+	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+	opts := options.Client().ApplyURI(config.MongoURL).SetServerAPIOptions(serverAPI)
+	client, err := mongo.Connect(context.TODO(), opts)
+	if err != nil {
+	  log.Fatal(err)
+	}
+	defer func() {
+	  if err = client.Disconnect(context.TODO()); err != nil {
+		log.Fatal(err)
+	  }
+	}()
+	mdb := client.Database("restoracio")
+	bucketOpts := options.GridFSBucket().SetName("qrcodes")
+	bucket, err := gridfs.NewBucket(mdb, bucketOpts)
+
+	if err != nil {
+	  log.Fatal(err)
+	}
+
 	// services
-	service := services.NewServices(context.TODO(), database, cache)
+	service := services.NewServices(
+		context.TODO(),
+		database,
+		cache,
+		bucket,
+	)
 
 	// gin
 	router := gin.Default()

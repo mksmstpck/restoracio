@@ -12,7 +12,6 @@ import (
 )
 
 func (d *MenuDatabase) CreateOne(ctx context.Context, menu models.Menu) (models.Menu, error) {
-	menu.ID = uuid.NewUUID().String()
 	_, err := d.db.
 		NewInsert().
 		Model(&menu).

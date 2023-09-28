@@ -12,7 +12,6 @@ import (
 )
 
 func (d *StaffDatabase) CreateOne(ctx context.Context, staff models.Staff) (models.Staff, error) {
-	staff.ID = uuid.NewUUID().String()
 	_, err := d.db.
 		NewInsert().
 		Model(&staff).
@@ -95,6 +94,29 @@ func (d *StaffDatabase) DeleteOne(ctx context.Context, id uuid.UUID, restaurantI
 		NewDelete().
 		Model(&models.Staff{ID: id.String()}).
 		Where("id = ? AND restaurant_id = ?", id, restaurantID).
+		Exec(ctx)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	if count == 0 {
+		log.Error("staff not found")
+		return errors.New("staff not found")
+	}
+	log.Info("staff deleted")
+	return nil
+}
+
+func (d *StaffDatabase) DeleteAll(ctx context.Context, restaurantID uuid.UUID) error {
+	res, err := d.db.
+		NewDelete().
+		Model(&models.Staff{}).
+		Where("restaurant_id = ?", restaurantID).
 		Exec(ctx)
 	if err != nil {
 		log.Error(err)

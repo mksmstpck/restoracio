@@ -7,11 +7,13 @@ import (
 	"github.com/mksmstpck/restoracio/internal/database"
 	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/pborman/uuid"
+	"go.mongodb.org/mongo-driver/mongo/gridfs"
 )
 
 type Services struct {
 	db      *database.Database
 	cache cache.Cacher
+	bucket *gridfs.Bucket
 	ctx context.Context
 }
 
@@ -19,10 +21,12 @@ func NewServices(
 	ctx context.Context,
 	db *database.Database,
 	cache cache.Cacher,
+	bucket *gridfs.Bucket,
 ) Servicer {
 	return &Services{
 		db:      db,
 		cache:   cache,
+		bucket:  bucket,
 		ctx:     ctx,
 	}
 }
@@ -48,6 +52,7 @@ type Servicer interface {
 	TableDeleteService(id uuid.UUID, admin models.Admin) error
 	// menu
 	MenuCreateService(menu models.Menu, admin models.Admin) (models.Menu, error)
+	MenuGetWithQrcodeService(id uuid.UUID) (models.Menu, error)
 	MenuGetByIDService(id uuid.UUID) (models.Menu, error)
 	MenuUpdateService(menu models.Menu, admin models.Admin) error
 	MenuDeleteService(admin models.Admin) error
@@ -57,6 +62,7 @@ type Servicer interface {
 	DishGetAllInMenuService(id uuid.UUID) ([]models.Dish, error)
 	DishUpdateService(dish models.Dish, admin models.Admin) error
 	DishDeleteService(id uuid.UUID, admin models.Admin) error
+	DishDeleteAllService(admin models.Admin) error
 	// staff
 	StaffCreateService(staff models.Staff, admin models.Admin) (models.Staff, error)
 	StaffGetByIDService(id uuid.UUID, admin models.Admin) (models.Staff, error)

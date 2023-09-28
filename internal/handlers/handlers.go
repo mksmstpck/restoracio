@@ -81,6 +81,7 @@ func (h *Handlers) HandleAll() {
 	// menu
 	menu.POST("/", h.authMiddleware, h.menuCreate)
 	menu.GET("/:id", h.menuGetByID)
+	menu.GET("/qr/:id", h.menuGetWithQrcode)
 	menu.PUT("/", h.authMiddleware, h.menuUpdate)
 	menu.DELETE("/", h.authMiddleware, h.menuDelete)
 

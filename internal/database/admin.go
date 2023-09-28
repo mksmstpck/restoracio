@@ -14,7 +14,6 @@ import (
 
 func (d *AdminDatabase) CreateOne(ctx context.Context, admin models.Admin) (models.Admin, error) {
 	admin.Password = utils.PasswordHash(admin.Password)
-	admin.ID = uuid.NewUUID().String()
 	_, err := d.db.
 		NewInsert().
 		Model(&admin).

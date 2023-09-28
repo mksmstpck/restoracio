@@ -12,11 +12,10 @@ import (
 )
 
 func (d *DishDatabase) CreateOne(ctx context.Context, dish models.Dish) (models.Dish, error) {
-	dish.ID = uuid.NewUUID().String()
 	_, err := d.db.
-	NewInsert().
-	Model(&dish).
-	Exec(ctx)
+		NewInsert().
+		Model(&dish).
+		Exec(ctx)
 	if err != nil {
 		log.Error(err)
 		return models.Dish{}, err
@@ -91,6 +90,29 @@ func (d *DishDatabase) DeleteOne(ctx context.Context, id uuid.UUID, menuID uuid.
 		Where("id = ?", id).
 		Where("menu_id = ?", menuID).
 		Exec(ctx)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	if count == 0 {
+		log.Error(utils.ErrDishNotFound)
+		return errors.New(utils.ErrDishNotFound)
+	}
+	log.Info("dish deleted")
+	return nil
+}
+
+func (d *DishDatabase) DeleteAll(ctx context.Context, menuID uuid.UUID) (error) {
+	res, err := d.db.
+	NewDelete().
+	Model(&models.Dish{MenuID: menuID.String()}).
+	Where("menu_id = ?", menuID).
+	Exec(ctx)
 	if err != nil {
 		log.Error(err)
 		return err

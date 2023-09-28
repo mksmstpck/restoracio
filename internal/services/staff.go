@@ -15,6 +15,7 @@ func (s *Services) StaffCreateService(staff models.Staff, admin models.Admin) (m
 		return models.Staff{}, errors.New(utils.ErrRestaurantNotFound)
 	}
 	staff.RestaurantID = admin.Restaurant.ID
+	staff.ID = uuid.NewUUID().String()
 	res, err := s.db.Staff.CreateOne(s.ctx, staff)
 	if err != nil {
 		log.Info(err)
@@ -101,5 +102,19 @@ func (s *Services) StaffDeleteService(id uuid.UUID, admin models.Admin) error {
 	s.cache.Delete(id)
 
 	log.Info("staff deleted")
+	return nil
+}
+
+func (s *Services) StaffDeleteAllService(admin models.Admin) error {
+	if admin.Restaurant == nil {
+		log.Info(utils.ErrRestaurantNotFound)
+		return errors.New(utils.ErrRestaurantNotFound)
+	}
+	err := s.db.Staff.DeleteAll(s.ctx, uuid.Parse(admin.Restaurant.ID))
+	if err != nil {
+		log.Info(err)
+		return err
+	}
+	log.Info("staffs deleted")
 	return nil
 }

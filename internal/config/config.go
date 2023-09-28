@@ -21,6 +21,7 @@ type Config struct {
 	RedisURL      string
 	RedisExp 	  time.Duration
 	GlobalURL     string
+	MongoURL      string
 }
 
 func NewConfig() Config {
@@ -52,5 +53,6 @@ func NewConfig() Config {
 		RedisURL:      os.Getenv("REDIS_URL"),
 		RedisExp:      time.Duration(redisExp),
 		GlobalURL:     os.Getenv("GLOBAL_URL"),
+		MongoURL:      os.Getenv("MONGO_URL"),
 	}
 }

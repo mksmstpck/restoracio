@@ -14,7 +14,6 @@ func (d *RestDatabase) CreateOne(
 	ctx context.Context,
 	restaurant models.Restaurant,
 	) (models.Restaurant, error) {
-	restaurant.ID = uuid.NewUUID().String()
 	_, err := d.db.
 		NewInsert().
 		Model(&restaurant).

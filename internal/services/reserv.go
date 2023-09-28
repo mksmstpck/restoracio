@@ -33,6 +33,7 @@ func (s *Services) ReservCreateService(reserv models.ReservAPI, admin models.Adm
 	reservDB.ReserverPhone = reserv.ReserverPhone
 	reservDB.TableID = reserv.TableID
 	reservDB.RestaurantID = admin.Restaurant.ID
+	reserv.ID = uuid.NewUUID().String()
 
 	reservDB, err := s.db.Reserv.CreateOne(s.ctx, reservDB)
 	if err != nil {

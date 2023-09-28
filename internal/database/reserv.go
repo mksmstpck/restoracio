@@ -12,7 +12,6 @@ import (
 )
 
 func (d *ReservDB) CreateOne(ctx context.Context, reserv models.ReservDB) (models.ReservDB, error) {
-	reserv.ID = uuid.NewUUID().String()
 	_, err := d.db.
 		NewInsert().
 		Model(&reserv).
@@ -90,6 +89,29 @@ func (d ReservDB) DeleteOne(ctx context.Context, id uuid.UUID, restaurantID uuid
 		NewDelete().
 		Model(&models.ReservDB{}).
 		Where("id = ? AND restaurant_id = ?", id, restaurantID).
+		Exec(ctx)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	if count == 0 {
+		log.Error(utils.ErrReservationNotFound)
+		return errors.New(utils.ErrReservationNotFound)
+	}
+	log.Info("reservation deleted")
+	return nil
+}
+
+func (d ReservDB) DeleteAllByRestaurant(ctx context.Context, restaurantID uuid.UUID) (error) {
+	res, err := d.db.
+		NewDelete().
+		Model(&models.ReservDB{}).
+		Where("restaurant_id = ?", restaurantID).
 		Exec(ctx)
 	if err != nil {
 		log.Error(err)
