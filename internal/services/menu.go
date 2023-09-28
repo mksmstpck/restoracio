@@ -22,7 +22,7 @@ func (s Services) MenuCreateService(menu models.Menu, admin models.Admin) (model
 	}
 	menu.RestaurantID = admin.Restaurant.ID
 	
-	qrcode, err := utils.QrGenerate("menu/${menu.ID")
+	qrcode, err := utils.QrGenerate("/menu/"+menu.ID)
 	if err != nil {
 		log.Error(err)
 		return models.Menu{}, err
