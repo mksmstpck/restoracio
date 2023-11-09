@@ -1,0 +1,197 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>{{template "title" .}}</title>
+</head>
+<body class="text-gray-600 font-mono relative">
+    <div class="fixed top-0 left-0 right-0 z-50">
+        <nav class="bg-gray-100">
+            <div class="px-8 mx-auto">
+                <div class="flex justify-between">
+                    <div class="flex space-x-4">
+                        <div class="flex py-4 px-2">
+                            <!--Logo-->
+                            <a href="#" class="font-bold text-lg uppercase hover:text-red-400 duration-200">
+                                Restoracio
+                            </a>
+                        </div>
+                        <div class="hidden md:flex py-4 px-2">
+                            <!-- Primary Navbar items -->
+                            <div>
+                                <a href="#" class="py-5 px-2 hover:text-red-400 duration-200">
+                                   Restaurant
+                                </a>
+                                <a href="#" class="py-4 px-2 hover:text-red-400 duration-200">
+                                    Menu
+                                </a>
+                                <a href="#" class="py-4 px-2 hover:text-red-400 duration-200">
+                                    Staff
+                                </a>
+                                <a href="#" class="py-4 px-2 hover:text-red-400 duration-200">
+                                    Panel
+                                </a>
+                                <a href="#" class="py-4 px-2 hover:text-red-400 duration-200">
+                                    Reservations
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {{ if .Admin }}
+                        <div class="hidden md:flex space-x-1 py-2 px-3 hover:text-gray-900 duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>                              
+                            <a href="#" class="py-4 px-2 uppercase text-xs">{{ .Admin.Email }}</a>
+                        </div>
+                    {{ else }}
+                        <div class="hidden md:flex space-x-4 py-2 px-3">
+                            <!-- Secondary Navbar items -->
+                            <a href="#" class="py-3 px-2 rounded-full uppercase text-xs tracking-wide border-prymary border-2 hover:border-gray-700 hover:bg-gray-300 duration-200">
+                                Log in
+                            </a>
+                            <a href="#" class="py-3 px-2 rounded-full uppercase text-xs tracking-wide border-prymary border-2 hover:border-gray-700 hover:bg-gray-300 duration-200">    
+                                Sign up
+                            </a>
+                        </div>
+                    {{ end }}
+
+                    <div class="md:hidden flex items-center">
+                        <!-- Mobile menu button -->
+                        <button class="mobile-menu-button">
+                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="mobile-menu hidden md:hidden duration-200">
+                <!-- Mobile menu -->
+                <a href="#" class="block py-2 px-4 hover:text-red-400 duration-200">
+                    Restaurant
+                </a>
+                <a href="#" class="block py-2 px-4 hover:text-red-400 duration-200">
+                    Menu
+                </a>
+                <a href="#" class="block py-2 px-4 hover:text-red-400 duration-200">
+                    Staff
+                </a>
+                <a href="#" class="block py-2 px-4 hover:text-red-400 duration-200">
+                    Panel
+                </a>
+                <a href="#" class="block py-2 px-4 hover:text-red-400 duration-200">
+                    Reservations
+                </a>
+                <div class="py-2 border-t border-gray-400 mx-4"></div>
+                {{ if .Admin }}
+                    <div>
+                        <div class="hidden md:flex space-x-1 py-2 px-3 hover:text-gray-900 duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>                              
+                            <a href="#" class="py-4 px-2 uppercase text-xs">{{ .Admin.Email }}</a>
+                        </div>
+                    </div>
+                {{ else }}
+                    <div class="block py-2 px-4">
+                        <a href="#" class="py-2 px-4 rounded-full uppercase text-xs tracking-wide border-prymary border-2 hover:border-gray-700 hover:bg-gray-300 duration-200">
+                            Log in
+                        </a>
+                    </div>
+                    <div class="block py-4 px-4">
+                        <a href="#" class="py-2 px-4 rounded-full uppercase text-xs tracking-wide border-prymary border-2 hover:border-gray-700 hover:bg-gray-300 duration-200">
+                            Sign up
+                        </a>
+                    </div>
+                {{ end }}
+            </div>
+        </nav>
+    </div>
+    
+    <div class="pt-16">
+        {{template "content" .}}
+    </div>
+
+    <div class="bg-gray-100">
+        <div class="p-2 flex justify-around">
+            <div>
+                <div class="text-lg font-bold pb-2">
+                    Contacts
+                </div>
+                <div class="text-md">
+                    +123 456 789
+                </div>
+                <div class="text-md">
+                    asrt@example.com
+                </div>
+            </div>
+
+            <div>
+                <div class="text-lg font-bold pb-2">
+                    Social medias
+                </div>
+                <div>
+                    <a href="#" class="text-md hover:text-blue-400 duration-100">
+                        Telegram
+                    </a>
+                </div>
+                <div>
+                    <a href="#" class="text-md hover:text-green-400 duration-100">
+                        WatsApp
+                    </a>
+                </div>
+                <div>
+                    <a href="#" class="text-md hover:text-blue-500 duration-100">
+                        Facebook
+                    </a>
+                </div>
+                <div>
+                    <a href="#" class="text-md hover:text-purple-400 duration-100">
+                        Instagram
+                    </a>
+                </div>
+            </div>
+
+            <div>
+                <div class="text-lg font-bold pb-2">
+                    Support
+                </div>
+                <div>
+                    <a href="#" class="text-md hover:text-red-400 duration-100">
+                        Patreon
+                    </a>
+                </div>
+                <div>
+                    <a href="#" class="text-md hover:text-yellow-400 duration-100">
+                        By me a coffe
+                    </a>
+                </div>
+                <div>
+                    <a href="#" class="text-md hover:text-blue-400 duration-100">
+                        PayPal
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="p-2 text-gray-500 justify-center">
+            <p>
+                © 2023 <a class="hover:text-gray-800 duration-100" href="https://github.com/mksmstpck">@mksmstpck</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const btn = document.querySelector("button.mobile-menu-button");
+        const menu = document.querySelector(".mobile-menu");
+
+        btn.addEventListener("click", () => {
+            menu.classList.toggle("hidden");
+        })
+    </script>
+</body>
+</html>
+{{end}}
