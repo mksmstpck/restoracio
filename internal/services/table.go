@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/mksmstpck/restoracio/internal/models"
-	"github.com/mksmstpck/restoracio/utils"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -56,11 +55,11 @@ func (s *Services) TableGetAllInRestaurantService(id uuid.UUID) ([]models.Table,
 func (s *Services) TableUpdateService(table models.Table, admin models.Admin) error {
 	if admin.Restaurant == nil {
 		log.Info("create restaurant first")
-		return errors.New(utils.ErrRestaurantNotFound)
+		return errors.New(models.ErrRestaurantNotFound)
 	}
 	if admin.Restaurant.Tables == nil {
 		log.Info("create tables first")
-		return errors.New(utils.ErrTableNotFound)
+		return errors.New(models.ErrTableNotFound)
 	}
 	table.RestaurantID = admin.Restaurant.ID
 
@@ -84,11 +83,11 @@ func (s *Services) TableUpdateService(table models.Table, admin models.Admin) er
 func (s *Services) TableDeleteService(id uuid.UUID, admin models.Admin) error {
 	if admin.Restaurant == nil {
 		log.Info("create restaurant first")
-		return errors.New(utils.ErrRestaurantNotFound)
+		return errors.New(models.ErrRestaurantNotFound)
 	}
 	if admin.Restaurant.Tables == nil {
 		log.Info("create tables first")
-		return errors.New(utils.ErrTableNotFound)
+		return errors.New(models.ErrTableNotFound)
 	}
 	if !TableExists(admin.Restaurant.Tables, id.String()) {
 		log.Info("table not found")
@@ -109,11 +108,11 @@ func (s *Services) TableDeleteService(id uuid.UUID, admin models.Admin) error {
 func (s *Services) TableDeleteAllService(admin models.Admin) error {
 	if admin.Restaurant == nil {
 		log.Info("create restaurant first")
-		return errors.New(utils.ErrRestaurantNotFound)
+		return errors.New(models.ErrRestaurantNotFound)
 	}
 	if admin.Restaurant.Tables == nil {
 		log.Info("create tables first")
-		return errors.New(utils.ErrTableNotFound)
+		return errors.New(models.ErrTableNotFound)
 	}
 	err := s.db.Table.DeleteAll(s.ctx, uuid.Parse(admin.Restaurant.ID))
 	if err != nil {

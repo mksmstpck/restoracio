@@ -1,4 +1,4 @@
-package utils
+package models
 
 const (
 	ErrNotFound = "not found"

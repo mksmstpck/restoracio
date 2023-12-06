@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/mksmstpck/restoracio/internal/models"
-	"github.com/mksmstpck/restoracio/utils"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -19,8 +18,8 @@ func (s Services) AdminCreateService(admin models.Admin) (models.Admin, error) {
 		}
 	}
 	if adminExists.ID != "" {
-		log.Error(utils.ErrAdminAlreadyExists)
-		return models.Admin{}, errors.New(utils.ErrAdminAlreadyExists)
+		log.Error(models.ErrAdminAlreadyExists)
+		return models.Admin{}, errors.New(models.ErrAdminAlreadyExists)
 	}
 	admin.ID = uuid.NewUUID().String()
 	admin, err = s.db.Admin.CreateOne(s.ctx, admin)
@@ -46,8 +45,8 @@ func (s Services) AdminGetByIDService(id uuid.UUID) (models.Admin, error) {
 	admin, err = s.db.Admin.GetByID(s.ctx, id)
 	if err != nil {
 		if err.Error() == "admin not found" {
-			log.Error(utils.ErrAdminNotFound)
-			return models.Admin{}, errors.New(utils.ErrAdminNotFound)
+			log.Error(models.ErrAdminNotFound)
+			return models.Admin{}, errors.New(models.ErrAdminNotFound)
 		}
 		log.Error(err)
 		return models.Admin{}, err
@@ -61,8 +60,8 @@ func (s Services) AdminGetByEmailService(email string) (models.Admin, error) {
 	admin, err := s.db.Admin.GetByEmail(s.ctx, email)
 	if err != nil {
 		if err.Error() == "admin not found" {
-			log.Error(utils.ErrAdminNotFound)
-			return models.Admin{}, errors.New(utils.ErrAdminNotFound)
+			log.Error(models.ErrAdminNotFound)
+			return models.Admin{}, errors.New(models.ErrAdminNotFound)
 		}
 		log.Error(err)
 		return models.Admin{}, err
@@ -76,8 +75,8 @@ func (s Services) AdminGetWithPasswordByIdService(id uuid.UUID) (models.Admin, e
 	admin, err := s.db.Admin.GetWithPasswordByID(s.ctx, id)
 	if err != nil {
 		if err.Error() == "admin not found" {
-			log.Error(utils.ErrAdminNotFound)
-			return models.Admin{}, errors.New(utils.ErrAdminNotFound)
+			log.Error(models.ErrAdminNotFound)
+			return models.Admin{}, errors.New(models.ErrAdminNotFound)
 		}
 		log.Error(err)
 		return models.Admin{}, err
@@ -92,8 +91,8 @@ func (s Services) AdminUpdateService(admin models.Admin, adminID uuid.UUID) erro
 	err := s.db.Admin.UpdateOne(s.ctx, admin)
 	if err != nil {
 		if err.Error() == "admin not found" {
-			log.Error(utils.ErrAdminNotFound)
-			return errors.New(utils.ErrAdminNotFound)
+			log.Error(models.ErrAdminNotFound)
+			return errors.New(models.ErrAdminNotFound)
 		}
 		log.Error(err)
 		return err

@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mksmstpck/restoracio/internal/models"
-	"github.com/mksmstpck/restoracio/utils"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -105,13 +104,13 @@ func (h *Handlers) menuUpdate(c *gin.Context) {
 	}
 	err := h.service.MenuUpdateService(m, admin)
 	if err != nil {
-		if err.Error() == utils.ErrMenuNotFound {
-			log.Info(utils.ErrMenuNotFound)
+		if err.Error() == models.ErrMenuNotFound {
+			log.Info(models.ErrMenuNotFound)
 			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == utils.ErrRestaurantNotFound {
-			log.Info(utils.ErrRestaurantNotFound)
+		if err.Error() == models.ErrRestaurantNotFound {
+			log.Info(models.ErrRestaurantNotFound)
 			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
 			return
 		}
@@ -138,13 +137,13 @@ func (h *Handlers) menuDelete(c *gin.Context) {
 	admin := c.MustGet("Admin").(models.Admin)
 	err := h.service.MenuDeleteService(admin)
 	if err != nil {
-		if err.Error() == utils.ErrMenuNotFound {
-			log.Info(utils.ErrMenuNotFound)
+		if err.Error() == models.ErrMenuNotFound {
+			log.Info(models.ErrMenuNotFound)
 			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == utils.ErrRestaurantNotFound {
-			log.Info(utils.ErrRestaurantNotFound)
+		if err.Error() == models.ErrRestaurantNotFound {
+			log.Info(models.ErrRestaurantNotFound)
 			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
 			return
 		}

@@ -4,15 +4,14 @@ import (
 	"errors"
 
 	"github.com/mksmstpck/restoracio/internal/models"
-	"github.com/mksmstpck/restoracio/utils"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
 func (s *Services) StaffCreateService(staff models.Staff, admin models.Admin) (models.Staff, error) {
 	if admin.Restaurant == nil {
-		log.Info(utils.ErrRestaurantNotFound)
-		return models.Staff{}, errors.New(utils.ErrRestaurantNotFound)
+		log.Info(models.ErrRestaurantNotFound)
+		return models.Staff{}, errors.New(models.ErrRestaurantNotFound)
 	}
 	staff.RestaurantID = admin.Restaurant.ID
 	staff.ID = uuid.NewUUID().String()
@@ -34,8 +33,8 @@ func (s *Services) StaffCreateService(staff models.Staff, admin models.Admin) (m
 
 func (s *Services) StaffGetByIDService(id uuid.UUID, admin models.Admin) (models.Staff, error) {
 	if admin.Restaurant == nil {
-		log.Info(utils.ErrRestaurantNotFound)
-		return models.Staff{}, errors.New(utils.ErrRestaurantNotFound)
+		log.Info(models.ErrRestaurantNotFound)
+		return models.Staff{}, errors.New(models.ErrRestaurantNotFound)
 	}
 
 	staff, err := s.cache.StaffGet(id)
@@ -58,8 +57,8 @@ func (s *Services) StaffGetByIDService(id uuid.UUID, admin models.Admin) (models
 
 func (s *Services) StaffGetAllInRestaurantService(admin models.Admin) ([]models.Staff, error) {
 	if admin.Restaurant == nil {
-		log.Info(utils.ErrRestaurantNotFound)
-		return nil, errors.New(utils.ErrRestaurantNotFound)
+		log.Info(models.ErrRestaurantNotFound)
+		return nil, errors.New(models.ErrRestaurantNotFound)
 	}
 	staff, err := s.db.Staff.GetAllInRestaurant(s.ctx, uuid.Parse(admin.Restaurant.ID))
 	if err != nil {
@@ -72,8 +71,8 @@ func (s *Services) StaffGetAllInRestaurantService(admin models.Admin) ([]models.
 
 func (s *Services) StaffUpdateService(staff models.Staff, admin models.Admin) error {
 	if admin.Restaurant == nil {
-		log.Info(utils.ErrRestaurantNotFound)
-		return errors.New(utils.ErrRestaurantNotFound)
+		log.Info(models.ErrRestaurantNotFound)
+		return errors.New(models.ErrRestaurantNotFound)
 	}
 	staff.RestaurantID = admin.Restaurant.ID
 	err := s.db.Staff.UpdateOne(s.ctx, staff)
@@ -90,8 +89,8 @@ func (s *Services) StaffUpdateService(staff models.Staff, admin models.Admin) er
 
 func (s *Services) StaffDeleteService(id uuid.UUID, admin models.Admin) error {
 	if admin.Restaurant == nil {
-		log.Info(utils.ErrRestaurantNotFound)
-		return errors.New(utils.ErrRestaurantNotFound)
+		log.Info(models.ErrRestaurantNotFound)
+		return errors.New(models.ErrRestaurantNotFound)
 	}
 	err := s.db.Staff.DeleteOne(s.ctx, id, uuid.Parse(admin.Restaurant.ID))
 	if err != nil {
@@ -107,8 +106,8 @@ func (s *Services) StaffDeleteService(id uuid.UUID, admin models.Admin) error {
 
 func (s *Services) StaffDeleteAllService(admin models.Admin) error {
 	if admin.Restaurant == nil {
-		log.Info(utils.ErrRestaurantNotFound)
-		return errors.New(utils.ErrRestaurantNotFound)
+		log.Info(models.ErrRestaurantNotFound)
+		return errors.New(models.ErrRestaurantNotFound)
 	}
 	err := s.db.Staff.DeleteAll(s.ctx, uuid.Parse(admin.Restaurant.ID))
 	if err != nil {

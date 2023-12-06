@@ -4,19 +4,18 @@ import (
 	"errors"
 
 	"github.com/mksmstpck/restoracio/internal/models"
-	"github.com/mksmstpck/restoracio/utils"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
 func (s *Services) DishCreateService(dish models.Dish, admin models.Admin) (models.Dish, error) {
 	if admin.Restaurant == nil {
-		log.Info(utils.ErrRestaurantNotFound)
-		return models.Dish{}, errors.New(utils.ErrRestaurantNotFound)
+		log.Info(models.ErrRestaurantNotFound)
+		return models.Dish{}, errors.New(models.ErrRestaurantNotFound)
 	}
 	if admin.Restaurant.Menu == nil {
-		log.Info(utils.ErrMenuNotFound)
-		return models.Dish{}, errors.New(utils.ErrMenuNotFound)
+		log.Info(models.ErrMenuNotFound)
+		return models.Dish{}, errors.New(models.ErrMenuNotFound)
 	}
 
 	dish.ID = uuid.NewUUID().String()
@@ -67,12 +66,12 @@ func (s *Services) DishGetAllInMenuService(id uuid.UUID) ([]models.Dish, error) 
 
 func (s *Services) DishUpdateService(dish models.Dish, admin models.Admin) error {
 	if admin.Restaurant == nil {
-		log.Info(utils.ErrRestaurantNotFound)
-		return errors.New(utils.ErrRestaurantNotFound)
+		log.Info(models.ErrRestaurantNotFound)
+		return errors.New(models.ErrRestaurantNotFound)
 	}
 	if admin.Restaurant.Menu == nil {
-		log.Info(utils.ErrMenuNotFound)
-		return errors.New(utils.ErrMenuNotFound)
+		log.Info(models.ErrMenuNotFound)
+		return errors.New(models.ErrMenuNotFound)
 	}
 
 	dish.MenuID = admin.Restaurant.Menu.ID
@@ -91,12 +90,12 @@ func (s *Services) DishUpdateService(dish models.Dish, admin models.Admin) error
 
 func (s *Services) DishDeleteService(id uuid.UUID, admin models.Admin) error {
 	if admin.Restaurant == nil {
-		log.Info(utils.ErrRestaurantNotFound)
-		return errors.New(utils.ErrRestaurantNotFound)
+		log.Info(models.ErrRestaurantNotFound)
+		return errors.New(models.ErrRestaurantNotFound)
 	}
 	if admin.Restaurant.Menu == nil {
-		log.Info(utils.ErrMenuNotFound)
-		return errors.New(utils.ErrMenuNotFound)
+		log.Info(models.ErrMenuNotFound)
+		return errors.New(models.ErrMenuNotFound)
 	}
 
 	err := s.db.Dish.DeleteOne(s.ctx, id, uuid.Parse(admin.Restaurant.Menu.ID))
@@ -113,12 +112,12 @@ func (s *Services) DishDeleteService(id uuid.UUID, admin models.Admin) error {
 
 func (s *Services) DishDeleteAllService(admin models.Admin) error {
 	if admin.Restaurant == nil {
-		log.Info(utils.ErrRestaurantNotFound)
-		return errors.New(utils.ErrRestaurantNotFound)
+		log.Info(models.ErrRestaurantNotFound)
+		return errors.New(models.ErrRestaurantNotFound)
 	}
 	if admin.Restaurant.Menu == nil {
-		log.Info(utils.ErrMenuNotFound)
-		return errors.New(utils.ErrMenuNotFound)
+		log.Info(models.ErrMenuNotFound)
+		return errors.New(models.ErrMenuNotFound)
 	}
 	err := s.db.Dish.DeleteAll(s.ctx, uuid.Parse(admin.Restaurant.Menu.ID))
 	if err != nil {

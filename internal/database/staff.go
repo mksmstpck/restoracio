@@ -6,7 +6,6 @@ import (
 	"errors"
 
 	"github.com/mksmstpck/restoracio/internal/models"
-	"github.com/mksmstpck/restoracio/utils"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -35,8 +34,8 @@ func (d *StaffDatabase) GetByID(ctx context.Context, id uuid.UUID, restaurantID 
 		Scan(ctx)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			log.Info(utils.ErrStaffNotFound)
-			return models.Staff{}, errors.New(utils.ErrStaffNotFound)
+			log.Info(models.ErrStaffNotFound)
+			return models.Staff{}, errors.New(models.ErrStaffNotFound)
 		}
 		log.Error(err)
 		return models.Staff{}, err
@@ -57,8 +56,8 @@ func (d *StaffDatabase) GetAllInRestaurant(ctx context.Context, id uuid.UUID) ([
 		return nil, err
 	}
 	if len(staff) == 0 {
-		log.Info(utils.ErrStaffNotFound)
-		return nil, errors.New(utils.ErrStaffNotFound)
+		log.Info(models.ErrStaffNotFound)
+		return nil, errors.New(models.ErrStaffNotFound)
 	}
 	log.Info("staffs found")
 	return staff, nil

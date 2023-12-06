@@ -14,11 +14,11 @@ import (
 
 func (s Services) MenuCreateService(menu models.Menu, admin models.Admin) (models.Menu, error) {
 	if admin.Restaurant.Menu != nil {
-		return models.Menu{}, errors.New(utils.ErrMenuAlreadyExists)
+		return models.Menu{}, errors.New(models.ErrMenuAlreadyExists)
 	}
 
 	if admin.Restaurant == nil {
-		return models.Menu{}, errors.New(utils.ErrRestaurantNotFound)
+		return models.Menu{}, errors.New(models.ErrRestaurantNotFound)
 	}
 	menu.RestaurantID = admin.Restaurant.ID
 	menu.ID = uuid.NewUUID().String()
@@ -106,10 +106,10 @@ func (s *Services) MenuGetByIDService(id uuid.UUID) (models.Menu, error) {
 
 func (s *Services) MenuUpdateService(menu models.Menu, admin models.Admin) error {
 	if admin.Restaurant == nil {
-		return errors.New(utils.ErrRestaurantNotFound)
+		return errors.New(models.ErrRestaurantNotFound)
 	}
 	if admin.Restaurant.Menu == nil {
-		return errors.New(utils.ErrMenuNotFound)
+		return errors.New(models.ErrMenuNotFound)
 	}
 
 	menu.RestaurantID = admin.Restaurant.ID
@@ -128,10 +128,10 @@ func (s *Services) MenuUpdateService(menu models.Menu, admin models.Admin) error
 
 func (s *Services) MenuDeleteService(admin models.Admin) error {
 	if admin.Restaurant == nil {
-		return errors.New(utils.ErrRestaurantNotFound)
+		return errors.New(models.ErrRestaurantNotFound)
 	}
 	if admin.Restaurant.Menu == nil {
-		return errors.New(utils.ErrMenuNotFound)
+		return errors.New(models.ErrMenuNotFound)
 	}
 
 	err := s.db.Menu.DeleteOne(s.ctx, *admin.Restaurant.Menu)

@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mksmstpck/restoracio/internal/models"
-	"github.com/mksmstpck/restoracio/utils"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -30,8 +29,8 @@ func (h *Handlers) reservCreate(c *gin.Context) {
 	}
 	reservDB, err := h.service.ReservCreateService(reserv, c.MustGet("Admin").(models.Admin))
 	if err != nil {
-		if err.Error() == utils.ErrRestaurantNotFound {
-			log.Info(utils.ErrRestaurantNotFound)
+		if err.Error() == models.ErrRestaurantNotFound {
+			log.Info(models.ErrRestaurantNotFound)
 			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
 			return
 		}
@@ -57,13 +56,13 @@ func (h *Handlers) reservGetByID(c *gin.Context) {
 	id := uuid.Parse(c.Param("id"))
 	reservDB, err := h.service.ReservGetByIDService(id, c.MustGet("Admin").(models.Admin))
 	if err != nil {
-		if err.Error() == utils.ErrReservationNotFound {
-			log.Info(utils.ErrReservationNotFound)
+		if err.Error() == models.ErrReservationNotFound {
+			log.Info(models.ErrReservationNotFound)
 			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == utils.ErrRestaurantNotFound {
-			log.Info(utils.ErrRestaurantNotFound)
+		if err.Error() == models.ErrRestaurantNotFound {
+			log.Info(models.ErrRestaurantNotFound)
 			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
 			return
 		}
@@ -88,8 +87,8 @@ func (h *Handlers) reservGetByID(c *gin.Context) {
 func (h *Handlers) reservGetAllInRestaurant(c *gin.Context) {
 	reservDB, err := h.service.ReservGetAllInRestaurantService(c.MustGet("Admin").(models.Admin))
 	if err != nil {
-		if err.Error() == utils.ErrRestaurantNotFound {
-			log.Info(utils.ErrRestaurantNotFound)
+		if err.Error() == models.ErrRestaurantNotFound {
+			log.Info(models.ErrRestaurantNotFound)
 			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
 			return
 		}
@@ -121,18 +120,18 @@ func (h *Handlers) reservUpdate(c *gin.Context) {
 	}
 	err := h.service.ReservUpdateService(reserv, c.MustGet("Admin").(models.Admin))
 	if err != nil {
-		if err.Error() == utils.ErrReservationNotFound {
-			log.Info(utils.ErrReservationNotFound)
+		if err.Error() == models.ErrReservationNotFound {
+			log.Info(models.ErrReservationNotFound)
 			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == utils.ErrRestaurantNotFound {
-			log.Info(utils.ErrRestaurantNotFound)
+		if err.Error() == models.ErrRestaurantNotFound {
+			log.Info(models.ErrRestaurantNotFound)
 			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == utils.ErrTableNotFound {
-			log.Info(utils.ErrTableNotFound)
+		if err.Error() == models.ErrTableNotFound {
+			log.Info(models.ErrTableNotFound)
 			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
 			return
 		}
@@ -160,13 +159,13 @@ func (h *Handlers) reservDelete(c *gin.Context) {
 	id := uuid.Parse(c.Param("id"))
 	err := h.service.ReservDeleteService(id, c.MustGet("Admin").(models.Admin))
 	if err != nil {
-		if err.Error() == utils.ErrReservationNotFound {
-			log.Info(utils.ErrReservationNotFound)
+		if err.Error() == models.ErrReservationNotFound {
+			log.Info(models.ErrReservationNotFound)
 			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == utils.ErrRestaurantNotFound {
-			log.Info(utils.ErrRestaurantNotFound)
+		if err.Error() == models.ErrRestaurantNotFound {
+			log.Info(models.ErrRestaurantNotFound)
 			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
 			return
 		}

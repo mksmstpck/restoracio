@@ -5,19 +5,18 @@ import (
 	"time"
 
 	"github.com/mksmstpck/restoracio/internal/models"
-	"github.com/mksmstpck/restoracio/utils"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
 func (s *Services) ReservCreateService(reserv models.ReservAPI, admin models.Admin) (models.ReservDB, error) {
 	if admin.Restaurant == nil {
-		log.Info(utils.ErrRestaurantNotFound)
-		return models.ReservDB{}, errors.New(utils.ErrRestaurantNotFound)
+		log.Info(models.ErrRestaurantNotFound)
+		return models.ReservDB{}, errors.New(models.ErrRestaurantNotFound)
 	}
 	if !TableExists(admin.Restaurant.Tables, reserv.TableID) {
-		log.Info(utils.ErrTableNotFound)
-		return models.ReservDB{}, errors.New(utils.ErrTableNotFound)
+		log.Info(models.ErrTableNotFound)
+		return models.ReservDB{}, errors.New(models.ErrTableNotFound)
 	}
 	var reservDB models.ReservDB
 	reservDB.ReservationTime = time.Date(
@@ -49,8 +48,8 @@ func (s *Services) ReservCreateService(reserv models.ReservAPI, admin models.Adm
 
 func (s *Services) ReservGetByIDService(id uuid.UUID, admin models.Admin) (models.ReservDB, error) {
 	if admin.Restaurant == nil {
-		log.Info(utils.ErrRestaurantNotFound)
-		return models.ReservDB{}, errors.New(utils.ErrRestaurantNotFound)
+		log.Info(models.ErrRestaurantNotFound)
+		return models.ReservDB{}, errors.New(models.ErrRestaurantNotFound)
 	}
 
 	reserv, err := s.cache.ReservGet(id)
@@ -74,8 +73,8 @@ func (s *Services) ReservGetByIDService(id uuid.UUID, admin models.Admin) (model
 
 func (s *Services) ReservGetAllInRestaurantService(admin models.Admin) ([]models.ReservDB, error) {
 	if admin.Restaurant == nil {
-		log.Info(utils.ErrRestaurantNotFound)
-		return nil, errors.New(utils.ErrRestaurantNotFound)
+		log.Info(models.ErrRestaurantNotFound)
+		return nil, errors.New(models.ErrRestaurantNotFound)
 	}
 	reservs, err := s.db.Reserv.GetAllInRestaurant(s.ctx, uuid.Parse(admin.Restaurant.ID))
 	if err != nil {
@@ -88,12 +87,12 @@ func (s *Services) ReservGetAllInRestaurantService(admin models.Admin) ([]models
 
 func (s *Services) ReservUpdateService(reserv models.ReservAPI, admin models.Admin) error {
 	if admin.Restaurant == nil {
-		log.Info(utils.ErrRestaurantNotFound)
-		return errors.New(utils.ErrRestaurantNotFound)
+		log.Info(models.ErrRestaurantNotFound)
+		return errors.New(models.ErrRestaurantNotFound)
 	}
 	if !TableExists(admin.Restaurant.Tables, reserv.TableID) {
-		log.Info(utils.ErrTableNotFound)
-		return errors.New(utils.ErrTableNotFound)
+		log.Info(models.ErrTableNotFound)
+		return errors.New(models.ErrTableNotFound)
 	}
 	var reservDB models.ReservDB
 	reservDB.RestaurantID = admin.Restaurant.ID
@@ -124,8 +123,8 @@ func (s *Services) ReservUpdateService(reserv models.ReservAPI, admin models.Adm
 
 func (s *Services) ReservDeleteService(id uuid.UUID, admin models.Admin) error {
 	if admin.Restaurant == nil {
-		log.Info(utils.ErrRestaurantNotFound)
-		return errors.New(utils.ErrRestaurantNotFound)
+		log.Info(models.ErrRestaurantNotFound)
+		return errors.New(models.ErrRestaurantNotFound)
 	}
 	log.Print(id)
 	log.Print(uuid.Parse(admin.Restaurant.ID))

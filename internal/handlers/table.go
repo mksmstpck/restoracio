@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mksmstpck/restoracio/internal/models"
-	"github.com/mksmstpck/restoracio/utils"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -106,12 +105,12 @@ func (h *Handlers) tableUpdate(c *gin.Context){
 	}
 	err := h.service.TableUpdateService(t, admin)
 	if err != nil{
-		if err.Error() == utils.ErrTableNotFound{
+		if err.Error() == models.ErrTableNotFound{
 			log.Info("table not found")
 			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == utils.ErrRestaurantNotFound{
+		if err.Error() == models.ErrRestaurantNotFound{
 			log.Info("restaurant not found")
 			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
 			return
@@ -140,12 +139,12 @@ func (h *Handlers) tableDelete(c *gin.Context){
 	admin := c.MustGet("Admin").(models.Admin)
 	err := h.service.TableDeleteService(id, admin)
 	if err != nil{
-		if err.Error() == utils.ErrTableNotFound{
+		if err.Error() == models.ErrTableNotFound{
 			log.Info("table not found")
 			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == utils.ErrRestaurantNotFound{
+		if err.Error() == models.ErrRestaurantNotFound{
 			log.Info("restaurant not found")
 			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
 			return

@@ -82,7 +82,7 @@ func (d *AdminDatabase) GetWithPasswordByID(ctx context.Context, id uuid.UUID) (
 			return models.Admin{}, errors.New("admin not found")
 		}
 		log.Error("database.AdminGetPasswordById: ", err)
-		return models.Admin{}, err
+		return models.Admin{},err
 	}
 	log.Info("admin found")
 	return admin, nil

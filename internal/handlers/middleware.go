@@ -14,13 +14,13 @@ func (h *Handlers) authMiddleware(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, models.Message{Message: "Token not found"})
 		return
 	}
-	admin_id, err := utils.ValidateJWT(token, h.accessSecret)
+	adminID, err := utils.ValidateJWT(token, h.accessSecret)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, models.Message{Message: err.Error()})
 		return
 	}
 
-	admin, err := h.service.AdminGetByIDService(admin_id)
+	admin, err := h.service.AdminGetByIDService(adminID)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, models.Message{Message: err.Error()})
 		return

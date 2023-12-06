@@ -6,7 +6,6 @@ import (
 	"errors"
 
 	"github.com/mksmstpck/restoracio/internal/models"
-	"github.com/mksmstpck/restoracio/utils"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -33,8 +32,8 @@ func (d *DishDatabase) GetByID(ctx context.Context, id uuid.UUID) (models.Dish, 
 		Scan(ctx)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			log.Error(utils.ErrDishNotFound)
-			return models.Dish{}, errors.New(utils.ErrDishNotFound)
+			log.Error(models.ErrDishNotFound)
+			return models.Dish{}, errors.New(models.ErrDishNotFound)
 		}
 		log.Error(err)
 		return models.Dish{}, err
@@ -76,8 +75,8 @@ func (d *DishDatabase) UpdateOne(ctx context.Context, dish models.Dish) error {
 		return err
 	}
 	if count == 0 {
-		log.Error(utils.ErrDishNotFound)
-		return errors.New(utils.ErrDishNotFound)
+		log.Error(models.ErrDishNotFound)
+		return errors.New(models.ErrDishNotFound)
 	}
 	log.Info("dish updated")
 	return nil
@@ -100,8 +99,8 @@ func (d *DishDatabase) DeleteOne(ctx context.Context, id uuid.UUID, menuID uuid.
 		return err
 	}
 	if count == 0 {
-		log.Error(utils.ErrDishNotFound)
-		return errors.New(utils.ErrDishNotFound)
+		log.Error(models.ErrDishNotFound)
+		return errors.New(models.ErrDishNotFound)
 	}
 	log.Info("dish deleted")
 	return nil
@@ -123,8 +122,8 @@ func (d *DishDatabase) DeleteAll(ctx context.Context, menuID uuid.UUID) (error) 
 		return err
 	}
 	if count == 0 {
-		log.Error(utils.ErrDishNotFound)
-		return errors.New(utils.ErrDishNotFound)
+		log.Error(models.ErrDishNotFound)
+		return errors.New(models.ErrDishNotFound)
 	}
 	log.Info("dish deleted")
 	return nil

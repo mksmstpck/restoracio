@@ -6,7 +6,6 @@ import (
 	"errors"
 
 	"github.com/mksmstpck/restoracio/internal/models"
-	"github.com/mksmstpck/restoracio/utils"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -35,7 +34,7 @@ func (d *MenuDatabase) GetByID(ctx context.Context, id uuid.UUID) (models.Menu, 
 	if err != nil {
 		if err == sql.ErrNoRows {
 			log.Error("menu not found")
-			return models.Menu{}, errors.New(utils.ErrMenuNotFound)
+			return models.Menu{}, errors.New(models.ErrMenuNotFound)
 		}
 		log.Error(err)
 		return models.Menu{}, err
@@ -61,8 +60,8 @@ func (d *MenuDatabase) UpdateOne(ctx context.Context, menu models.Menu) error {
 		return err
 	}
 	if count == 0 {
-		log.Error(utils.ErrMenuNotFound)
-		return errors.New(utils.ErrMenuNotFound)
+		log.Error(models.ErrMenuNotFound)
+		return errors.New(models.ErrMenuNotFound)
 	}
 	log.Info("menu updated")
 	return nil
@@ -84,8 +83,8 @@ func (d *MenuDatabase) DeleteOne(ctx context.Context, menu models.Menu) error {
 		return err
 	}
 	if count == 0 {
-		log.Error(utils.ErrMenuNotFound)
-		return errors.New(utils.ErrMenuNotFound)
+		log.Error(models.ErrMenuNotFound)
+		return errors.New(models.ErrMenuNotFound)
 	}
 	log.Info("menu deleted")
 	return nil

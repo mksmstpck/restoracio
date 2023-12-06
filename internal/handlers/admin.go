@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mksmstpck/restoracio/internal/models"
-	"github.com/mksmstpck/restoracio/utils"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -32,7 +31,7 @@ func (h *Handlers) adminCreate(c *gin.Context) {
 	}
 	admin, err := h.service.AdminCreateService(a)
 	if err != nil {
-		if err == errors.New(utils.ErrAdminAlreadyExists) {
+		if err == errors.New(models.ErrAdminAlreadyExists) {
 			c.JSON(http.StatusConflict, models.Message{Message: err.Error()})
 			return
 		}
@@ -67,7 +66,7 @@ func (h *Handlers) adminGetByID(c *gin.Context) {
 	id := uuid.Parse(c.Param("id"))
 	admin, err := h.service.AdminGetByIDService(id)
 	if err != nil {
-		if err == errors.New(utils.ErrAdminNotFound) {
+		if err == errors.New(models.ErrAdminNotFound) {
 			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
 			return
 		}
@@ -82,7 +81,7 @@ func (h *Handlers) adminGetByEmail(c *gin.Context) {
 	email := c.Param("email")
 	admin, err := h.service.AdminGetByEmailService(email)
 	if err != nil {
-		if err == errors.New(utils.ErrAdminNotFound) {
+		if err == errors.New(models.ErrAdminNotFound) {
 			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
 			return
 		}
@@ -116,7 +115,7 @@ func (h *Handlers) adminUpdate(c *gin.Context) {
 	}
 	authAdmin := c.MustGet("Admin").(models.Admin)
 	if err := h.service.AdminUpdateService(admin, uuid.Parse(authAdmin.ID)); err != nil {
-		if err == errors.New(utils.ErrAdminNotFound) {
+		if err == errors.New(models.ErrAdminNotFound) {
 			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
 			return
 		}
@@ -142,7 +141,7 @@ func (h *Handlers) adminUpdate(c *gin.Context) {
 func (h *Handlers) adminDelete(c *gin.Context) {
 	id := uuid.Parse(c.MustGet("Admin").(models.Admin).Restaurant.ID)
 	if err := h.service.AdminDeleteService(id); err != nil {
-		if err == errors.New(utils.ErrAdminNotFound) {
+		if err == errors.New(models.ErrAdminNotFound) {
 			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
 			return
 		}
