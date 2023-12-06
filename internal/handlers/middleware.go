@@ -33,7 +33,6 @@ func (h *Handlers) corsMiddleware(c *gin.Context) {
 	c.Header("Access-Control-Allow-Origin", "restoracio.fly.dev")
 	c.Header("Access-Control-Allow-Methods", "restoracio.fly.dev")
 	c.Header("Access-Control-Allow-Headers", "restoracio.fly.dev")
-	c.Header("Content-Type", "application/json")
   
 	if c.Request.Method != "OPTIONS" {
 		c.Next()

@@ -104,6 +104,10 @@ func main() {
 
 	// gin
 	router := gin.Default()
+	
+//	templ := template.Must(template.New("").ParseFS(, "templates/*"))
+//	router.SetHTMLTemplate(templ)
+
 	handlers.NewHandlers(
 		router,
 		service,
