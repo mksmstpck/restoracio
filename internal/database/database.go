@@ -12,7 +12,7 @@ type AdminDatabases interface {
 	CreateOne(ctx context.Context, user models.Admin) (models.Admin, error)
 	GetByID(ctx context.Context, id uuid.UUID) (models.Admin, error)
 	GetByEmail(ctx context.Context, email string) (models.Admin, error)
-	GetPasswordByID(ctx context.Context, id uuid.UUID) (string, error)
+	GetWithPasswordByID(ctx context.Context, id uuid.UUID) (models.Admin, error)
 	UpdateOne(ctx context.Context, user models.Admin) error
 	DeleteOne(ctx context.Context, id uuid.UUID) error
 }

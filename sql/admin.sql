@@ -5,5 +5,6 @@ create table if not exists admins (
     name varchar(255) not null,
     email varchar(255) not null,
     password varchar(255) not null,
+    salt varchar(255) not null,
     restaurant_id varchar(36)
     );

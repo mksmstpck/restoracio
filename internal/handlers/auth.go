@@ -39,14 +39,14 @@ func (h *Handlers) login(c *gin.Context) {
 		return
 	}
 
-	password, err := h.service.AdminGetPasswordByIdService(uuid.Parse(admin.ID))
+	admin, err = h.service.AdminGetWithPasswordByIdService(uuid.Parse(admin.ID))
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, models.Message{Message: err.Error()})
 		log.Error("handlers.LogInByUsername: ", err)
 		return
 	}
 
-	if ok := utils.CheckPasswordHash(creds.Password, password); ok != true {
+	if ok := utils.CheckPasswordHash(creds.Password, admin.Password, admin.Salt); ok != true {
 		c.JSON(http.StatusBadRequest, models.Message{Message: "invalid password"})
 		log.Info("handlers.LogInByEmail: invalid password")
 		return

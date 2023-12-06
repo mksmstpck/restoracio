@@ -13,7 +13,7 @@ import (
 )
 
 func (d *AdminDatabase) CreateOne(ctx context.Context, admin models.Admin) (models.Admin, error) {
-	admin.Password = utils.PasswordHash(admin.Password)
+	admin.Password, admin.Salt = utils.PasswordHash(admin.Password)
 	_, err := d.db.
 		NewInsert().
 		Model(&admin).
@@ -31,7 +31,7 @@ func (d *AdminDatabase) GetByID(ctx context.Context, id uuid.UUID) (models.Admin
 	err := d.db.
 		NewSelect().
 		Model(&admin).
-		ExcludeColumn("password").
+		ExcludeColumn("password", "salt").
 		Relation("Restaurant").
 		Relation("Restaurant.Tables").
 		Relation("Restaurant.Menu").
@@ -53,7 +53,7 @@ func (d *AdminDatabase) GetByEmail(ctx context.Context, email string) (models.Ad
 	var admin models.Admin
 	err := d.db.NewSelect().
 		Model(&admin).
-		ExcludeColumn("password").
+		ExcludeColumn("password", "salt").
 		Relation("Restaurant").
 		Relation("Restaurant.Tables").
 		Where("admin.email = ?", email).
@@ -70,7 +70,7 @@ func (d *AdminDatabase) GetByEmail(ctx context.Context, email string) (models.Ad
 	return admin, nil
 }
 
-func (d *AdminDatabase) GetPasswordByID(ctx context.Context, id uuid.UUID) (string, error) {
+func (d *AdminDatabase) GetWithPasswordByID(ctx context.Context, id uuid.UUID) (models.Admin, error) {
 	var admin models.Admin
 	err := d.db.NewSelect().
 		Model(&admin).
@@ -79,13 +79,13 @@ func (d *AdminDatabase) GetPasswordByID(ctx context.Context, id uuid.UUID) (stri
 	if err != nil {
 		if err == sql.ErrNoRows {
 			log.Error("admin not found")
-			return "", errors.New("admin not found")
+			return models.Admin{}, errors.New("admin not found")
 		}
 		log.Error("database.AdminGetPasswordById: ", err)
-		return "", err
+		return models.Admin{}, err
 	}
 	log.Info("admin found")
-	return admin.Password, nil
+	return admin, nil
 }
 
 func (d *AdminDatabase) UpdateOne(ctx context.Context, admin models.Admin) error {

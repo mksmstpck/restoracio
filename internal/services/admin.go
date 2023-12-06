@@ -72,18 +72,18 @@ func (s Services) AdminGetByEmailService(email string) (models.Admin, error) {
 	return admin, nil
 }
 
-func (s Services) AdminGetPasswordByIdService(id uuid.UUID) (string, error) {
-	password, err := s.db.Admin.GetPasswordByID(s.ctx, id)
+func (s Services) AdminGetWithPasswordByIdService(id uuid.UUID) (models.Admin, error) {
+	admin, err := s.db.Admin.GetWithPasswordByID(s.ctx, id)
 	if err != nil {
 		if err.Error() == "admin not found" {
 			log.Error(utils.ErrAdminNotFound)
-			return "", errors.New(utils.ErrAdminNotFound)
+			return models.Admin{}, errors.New(utils.ErrAdminNotFound)
 		}
 		log.Error(err)
-		return "", err
+		return models.Admin{}, err
 	}
 	log.Info("password found")
-	return password, nil
+	return admin, nil
 }
 
 func (s Services) AdminUpdateService(admin models.Admin, adminID uuid.UUID) error {

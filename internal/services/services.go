@@ -36,7 +36,7 @@ type Servicer interface {
 	AdminCreateService(models.Admin) (models.Admin, error)
 	AdminGetByIDService(id uuid.UUID) (models.Admin, error)
 	AdminGetByEmailService(email string) (models.Admin, error)
-	AdminGetPasswordByIdService(id uuid.UUID) (string, error)
+	AdminGetWithPasswordByIdService(id uuid.UUID) (models.Admin, error)
 	AdminUpdateService(admin models.Admin, adminID uuid.UUID) error
 	AdminDeleteService(id uuid.UUID) error
 	// restaurant
