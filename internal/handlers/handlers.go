@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/mksmstpck/restoracio/docs"
 	"github.com/mksmstpck/restoracio/internal/services"
+	"github.com/mksmstpck/restoracio/views"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -17,6 +18,7 @@ type Handlers struct {
 	refreshSecret []byte
 	accessExp     time.Duration
 	refreshExp    time.Duration
+	t 			  *views.Templates
 }
 
 func NewHandlers(gin *gin.Engine,
@@ -24,7 +26,8 @@ func NewHandlers(gin *gin.Engine,
 	accessSecret []byte,
 	refreshSecret []byte,
 	accessExp time.Duration,
-	refreshExp time.Duration) *Handlers {
+	refreshExp time.Duration,
+	) *Handlers {
 	return &Handlers{
 		gin:           gin,
 		service:       service,
@@ -32,6 +35,7 @@ func NewHandlers(gin *gin.Engine,
 		refreshSecret: refreshSecret,
 		accessExp:     accessExp,
 		refreshExp:    refreshExp,
+		t:			  nil,
 	}
 }
 
@@ -52,6 +56,9 @@ func (h *Handlers) HandleAll() {
 	staff.Use(h.authMiddleware)
 	reserv.Use(h.authMiddleware)
 
+	// index routes
+	h.gin.GET("/", h.index)
+
 	// admin
 	admin.POST("/", h.adminCreate)
 	admin.GET("/id/:id", h.adminGetByID)
@@ -61,7 +68,7 @@ func (h *Handlers) HandleAll() {
 	admin.DELETE("/", h.authMiddleware, h.adminDelete)
 
 	// auth
-	auth.POST("/login", h.login)
+	auth.Any("/login", h.login)
 	auth.POST("/refresh", h.refresh)
 
 	// restorant

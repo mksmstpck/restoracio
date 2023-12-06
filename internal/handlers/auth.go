@@ -11,65 +11,52 @@ import (
 	"github.com/pborman/uuid"
 )
 
-//	@Summary		Login
-//	@Tags			Auth
-//	@Description	logs in an admin
-//	@ID				login
-//	@Accept			json
-//	@Produce		json
-//	@Param			input	body		models.Login	true	"Login"
-//	@Success		204		{object}	nil
-//	@Failure		401		{object}	models.Message
-//	@Failure		500		{object}	models.Message
-//	@Failure		default	{object}	models.Message
-//	@Router			/auth/login [post]
 func (h *Handlers) login(c *gin.Context) {
-	var creds *models.Login
-
-	if err := c.ShouldBindJSON(&creds); err != nil {
-		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
-		log.Info("handlers.LogInByEmail: ", err)
-		return
+	if c.Request.Method != http.MethodPost {
+		err := h.t.Render(c.Writer, "login.html", nil)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+		c.Next()
 	}
+	creds := models.Login{
+		Email:    c.PostForm("email"),
+		Password: c.PostForm("password"),
+	}
+
+	log.Info(creds)
 
 	admin, err := h.service.AdminGetByEmailService(creds.Email)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, models.Message{Message: err.Error()})
-		log.Error("handlers.LogInByEmail: ", err)
+		h.t.Render(c.Writer, "login.html", models.Message{Success: false, Message: err.Error()})
+		log.Error(err)
 		return
 	}
 
 	password, err := h.service.AdminGetPasswordByIdService(uuid.Parse(admin.ID))
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, models.Message{Message: err.Error()})
-		log.Error("handlers.LogInByUsername: ", err)
+		h.t.Render(c.Writer, "login.html", models.Message{Success: false, Message: err.Error()})
+		log.Error(err)
 		return
 	}
 
 	if ok := utils.CheckPasswordHash(creds.Password, password); ok != true {
-		c.JSON(http.StatusBadRequest, models.Message{Message: "invalid password"})
-		log.Info("handlers.LogInByEmail: invalid password")
+		h.t.Render(c.Writer, "login.html", models.Message{Success: false, Message: "invalid password"})
+		log.Info("invalid password")
 		return
 	}
 
 	access, err := utils.CreateJWT(h.accessExp, h.accessSecret, uuid.Parse(admin.ID))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
-		log.Error("handlers.LogInByEmail: ", err)
+		h.t.Render(c.Writer, "login.html", models.Message{Success: false, Message: err.Error()})
+		log.Error(err)
 		return
 	}
 
-	refresh, err := utils.CreateJWT(h.refreshExp, h.refreshSecret, uuid.Parse(admin.ID))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
-		log.Error("handlers.LogInByEmail: ", err)
-		return
-	}
-	c.Header("access", access)
-	c.Header("refresh", refresh)
-	c.Set("Admin", admin)
+	c.SetCookie("access", access, int(h.accessExp.Seconds()), "/", "localhost:8080", false, true)
 
-	c.JSON(http.StatusNoContent, nil)
+	h.t.Render(c.Writer, "login.html", struct{Status bool}{Status: true})
 	log.Info("handlers.LogInByEmail: user logged in")
 }
 
