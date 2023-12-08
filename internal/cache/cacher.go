@@ -10,6 +10,24 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+func (r *Cache) Get(id uuid.UUID) (any, error) {
+	var res any
+	val, err := r.client.Get(context.TODO(), id.String()).Result()
+	if err == redis.Nil {
+		return models.Admin{}, nil
+	}
+	if err != nil {
+		log.Error(err)
+		return models.Admin{}, err
+	}
+	err = json.Unmarshal([]byte(val), &res)
+	if err != nil {
+		log.Error(err)
+		return models.Admin{}, err
+	}
+	return res, nil
+}
+
 func (r *Cache) AdminGet(id uuid.UUID) (models.Admin, error) {
 	var res models.Admin
 	val, err := r.client.Get(context.TODO(), id.String()).Result()

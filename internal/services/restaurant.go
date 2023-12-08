@@ -25,7 +25,8 @@ func (s *Services) RestaurantCreateService(rest models.Restaurant, admin models.
 }
 
 func (s *Services) RestaurantGetByIDService(id uuid.UUID) (models.Restaurant, error) {
-	res, err := s.cache.RestaurantGet(id)
+	resAny, err := s.cache.Get(id)
+	res := resAny.(models.Restaurant)
 	if res.ID != "" {
 		log.Info("restaurant found")
 		return res, nil

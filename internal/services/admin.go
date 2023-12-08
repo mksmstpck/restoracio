@@ -35,7 +35,8 @@ func (s Services) AdminCreateService(admin models.Admin) (models.Admin, error) {
 }
 
 func (s Services) AdminGetByIDService(id uuid.UUID) (models.Admin, error) {
-	admin, err := s.cache.AdminGet(id)
+	adminAny, err := s.cache.Get(id)
+	admin := adminAny.(models.Admin)
 	if admin.ID != "" {
 		log.Info("admin found")
 		return admin, nil

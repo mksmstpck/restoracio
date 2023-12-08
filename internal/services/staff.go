@@ -37,7 +37,8 @@ func (s *Services) StaffGetByIDService(id uuid.UUID, admin models.Admin) (models
 		return models.Staff{}, errors.New(models.ErrRestaurantNotFound)
 	}
 
-	staff, err := s.cache.StaffGet(id)
+	staffAny, err := s.cache.Get(id)
+	staff := staffAny.(models.Staff)
 	if staff.ID != "" {
 		log.Info("staff found")
 		return staff, nil

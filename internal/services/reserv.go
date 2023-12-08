@@ -52,7 +52,8 @@ func (s *Services) ReservGetByIDService(id uuid.UUID, admin models.Admin) (model
 		return models.ReservDB{}, errors.New(models.ErrRestaurantNotFound)
 	}
 
-	reserv, err := s.cache.ReservGet(id)
+	reservAny, err := s.cache.Get(id)
+	reserv := reservAny.(models.ReservDB)
 	if reserv.ID != "" {
 		log.Info("reservation found")
 		return reserv, nil

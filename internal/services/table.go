@@ -25,7 +25,8 @@ func (s *Services) TableCreateService(table models.Table, admin models.Admin) (m
 }
 
 func (s *Services) TableGetByIDService(id uuid.UUID) (models.Table, error) {
-	table, err := s.cache.TableGet(id)
+	tableAny, err := s.cache.Get(id)
+	table := tableAny.(models.Table)
 	if table.ID != "" {
 		log.Info("table found")
 		return table, nil
