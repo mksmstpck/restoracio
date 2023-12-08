@@ -20,7 +20,7 @@ func PasswordHash(password string) (string, string) {
 	hashObj.Write([]byte(password))
 	passwordHash := hashObj.Sum(nil)
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(string(passwordHash) + papper + string(salt)), 10)
+	hash, err := bcrypt.GenerateFromPassword([]byte(string(passwordHash) + papper + string(salt)), 6)
 	if err != nil {
 		panic(err)
 	}
