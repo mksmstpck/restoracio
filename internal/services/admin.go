@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/mksmstpck/restoracio/internal/models"
+	"github.com/mksmstpck/restoracio/utils"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -22,6 +23,7 @@ func (s Services) AdminCreateService(admin models.Admin) (models.Admin, error) {
 		return models.Admin{}, errors.New(models.ErrAdminAlreadyExists)
 	}
 	admin.ID = uuid.NewUUID().String()
+	admin.Password, admin.Salt = utils.PasswordHash(admin.Password)
 	admin, err = s.db.Admin.CreateOne(s.ctx, admin)
 	if err != nil {
 		log.Error(err)

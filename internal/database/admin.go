@@ -8,12 +8,10 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/mksmstpck/restoracio/internal/models"
-	"github.com/mksmstpck/restoracio/utils"
 	"github.com/pborman/uuid"
 )
 
 func (d *AdminDatabase) CreateOne(ctx context.Context, admin models.Admin) (models.Admin, error) {
-	admin.Password, admin.Salt = utils.PasswordHash(admin.Password)
 	_, err := d.db.
 		NewInsert().
 		Model(&admin).
