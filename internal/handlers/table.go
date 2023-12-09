@@ -57,7 +57,7 @@ func (h *Handlers) tableGetByID(c *gin.Context){
 		log.Info("handlers.tableGetByID: ", err)
 		return
 	}
-	log.Info("tableGetByID: ", t)
+	log.Info("Got table")
 	c.JSON(http.StatusOK, t)
 }
 

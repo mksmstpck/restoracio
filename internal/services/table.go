@@ -40,6 +40,7 @@ func (s *Services) TableGetByIDService(id uuid.UUID) (models.Table, error) {
 		log.Info("TableGetByID: ", err)
 		return models.Table{}, err
 	}
+	s.cache.Set(uuid.Parse(table.ID), table)
 	return table, nil
 }
 
