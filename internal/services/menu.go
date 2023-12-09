@@ -52,8 +52,8 @@ func (s Services) MenuCreateService(menu models.Menu, admin models.Admin) (model
 
 func (s *Services) MenuGetWithQrcodeService(id uuid.UUID) (models.Menu, error) {
 	menuAny, err := s.cache.Get(id)
-	menu := menuAny.(models.Menu)
-	if menu.ID != "" {
+	if menuAny != nil {
+		menu := menuAny.(models.Menu)
 		log.Info("menu found")
 		return menu, nil
 	}
@@ -61,7 +61,7 @@ func (s *Services) MenuGetWithQrcodeService(id uuid.UUID) (models.Menu, error) {
 		log.Error(err)
 		return models.Menu{}, err
 	}
-	menu, err = s.db.Menu.GetByID(s.ctx, id)
+	menu, err := s.db.Menu.GetByID(s.ctx, id)
 	if err != nil {
 		log.Error(err)
 		return models.Menu{}, err
@@ -85,16 +85,15 @@ func (s *Services) MenuGetWithQrcodeService(id uuid.UUID) (models.Menu, error) {
 
 func (s *Services) MenuGetByIDService(id uuid.UUID) (models.Menu, error) {
 	menuAny, err := s.cache.Get(id)
-	menu := menuAny.(models.Menu)
-	if menu.ID != "" {
+	if menuAny != nil {
 		log.Info("menu found")
-		return menu, nil
+		return menuAny.(models.Menu), nil
 	}
 	if err != nil {
 		log.Error(err)
 		return models.Menu{}, err
 	}
-	menu, err = s.db.Menu.GetByID(s.ctx, id)
+	menu, err := s.db.Menu.GetByID(s.ctx, id)
 	if err != nil {
 		log.Error(err)
 		return models.Menu{}, err

@@ -34,16 +34,15 @@ func (s *Services) DishCreateService(dish models.Dish, admin models.Admin) (mode
 
 func (s *Services) DishGetByIDService(id uuid.UUID) (models.Dish, error) {
 	dishAny, err := s.cache.Get(id)
-	dish := dishAny.(models.Dish)
-	if dish.ID != "" {
+	if dishAny != nil {
 		log.Info("dish found")
-		return dish, nil
+		return dishAny.(models.Dish), nil
 	}
 	if err != nil {
 		log.Error(err)
 		return models.Dish{}, err
 	}
-	dish, err = s.db.Dish.GetByID(s.ctx, id)
+	dish, err := s.db.Dish.GetByID(s.ctx, id)
 	if err != nil {
 		log.Error(err)
 		return models.Dish{}, err

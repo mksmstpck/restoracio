@@ -26,17 +26,16 @@ func (s *Services) TableCreateService(table models.Table, admin models.Admin) (m
 
 func (s *Services) TableGetByIDService(id uuid.UUID) (models.Table, error) {
 	tableAny, err := s.cache.Get(id)
-	table := tableAny.(models.Table)
-	if table.ID != "" {
+	if tableAny != nil{
 		log.Info("table found")
-		return table, nil
+		return tableAny.(models.Table), nil
 	}
 	if err != nil {
 		log.Info("TableGetByID: ", err)
 		return models.Table{}, err
 	}
 
-	table, err = s.db.Table.GetByID(s.ctx, id)
+	table, err := s.db.Table.GetByID(s.ctx, id)
 	if err != nil {
 		log.Info("TableGetByID: ", err)
 		return models.Table{}, err

@@ -26,17 +26,16 @@ func (s *Services) RestaurantCreateService(rest models.Restaurant, admin models.
 
 func (s *Services) RestaurantGetByIDService(id uuid.UUID) (models.Restaurant, error) {
 	resAny, err := s.cache.Get(id)
-	res := resAny.(models.Restaurant)
-	if res.ID != "" {
+	if resAny != nil {
 		log.Info("restaurant found")
-		return res, nil
+		return resAny.(models.Restaurant), nil
 	}
 	if err != nil {
 		log.Info(err)
 		return models.Restaurant{}, err
 	}
 
-	res, err = s.db.Rest.GetByID(s.ctx, id)
+	res, err := s.db.Rest.GetByID(s.ctx, id)
 	if err != nil {
 		log.Info(err)
 		return models.Restaurant{}, err

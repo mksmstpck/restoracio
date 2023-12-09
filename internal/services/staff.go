@@ -38,17 +38,16 @@ func (s *Services) StaffGetByIDService(id uuid.UUID, admin models.Admin) (models
 	}
 
 	staffAny, err := s.cache.Get(id)
-	staff := staffAny.(models.Staff)
-	if staff.ID != "" {
+	if staffAny != nil {
 		log.Info("staff found")
-		return staff, nil
+		return staffAny.(models.Staff), nil
 	}
 	if err != nil {
 		log.Info(err)
 		return models.Staff{}, err
 	}
 
-	staff, err = s.db.Staff.GetByID(s.ctx, id, uuid.Parse(admin.Restaurant.ID))
+	staff, err := s.db.Staff.GetByID(s.ctx, id, uuid.Parse(admin.Restaurant.ID))
 	if err != nil {
 		log.Info(err)
 		return models.Staff{}, err

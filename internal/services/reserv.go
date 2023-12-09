@@ -53,17 +53,16 @@ func (s *Services) ReservGetByIDService(id uuid.UUID, admin models.Admin) (model
 	}
 
 	reservAny, err := s.cache.Get(id)
-	reserv := reservAny.(models.ReservDB)
-	if reserv.ID != "" {
+	if reservAny != nil {
 		log.Info("reservation found")
-		return reserv, nil
+		return reservAny.(models.ReservDB), nil
 	}
 	if err != nil {
 		log.Error(err)
 		return models.ReservDB{}, err
 	}
 
-	reserv, err = s.db.Reserv.GetByID(s.ctx, id, uuid.Parse(admin.Restaurant.ID))
+	reserv, err := s.db.Reserv.GetByID(s.ctx, id, uuid.Parse(admin.Restaurant.ID))
 	if err != nil {
 		log.Error(err)
 		return models.ReservDB{}, err

@@ -41,10 +41,8 @@ func (s Services) AdminCreateService(admin models.Admin) (models.Admin, error) {
 func (s Services) AdminGetByIDService(id uuid.UUID) (models.Admin, error) {
 	adminAny, err := s.cache.Get(id)
 	if adminAny != nil {
-		admin := adminAny.(models.Admin)
-		s.cache.Set(uuid.Parse(admin.ID), admin)
 		log.Info("admin found")
-		return admin, nil
+		return adminAny.(models.Admin), nil
 	}
 	if err != nil {
 		log.Error(err)
