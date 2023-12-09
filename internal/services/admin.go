@@ -29,6 +29,10 @@ func (s Services) AdminCreateService(admin models.Admin) (models.Admin, error) {
 		log.Error(err)
 		return models.Admin{}, err
 	}
+
+	admin.Password = ""
+	admin.Salt = ""
+
 	s.cache.Set(uuid.Parse(admin.ID), admin)
 	log.Info("admin created")
 	return admin, nil
@@ -36,8 +40,9 @@ func (s Services) AdminCreateService(admin models.Admin) (models.Admin, error) {
 
 func (s Services) AdminGetByIDService(id uuid.UUID) (models.Admin, error) {
 	adminAny, err := s.cache.Get(id)
-	admin := adminAny.(models.Admin)
-	if admin.ID != "" {
+	if adminAny != nil {
+		admin := adminAny.(models.Admin)
+		s.cache.Set(uuid.Parse(admin.ID), admin)
 		log.Info("admin found")
 		return admin, nil
 	}
@@ -45,7 +50,7 @@ func (s Services) AdminGetByIDService(id uuid.UUID) (models.Admin, error) {
 		log.Error(err)
 		return models.Admin{}, err
 	}
-	admin, err = s.db.Admin.GetByID(s.ctx, id)
+	admin, err := s.db.Admin.GetByID(s.ctx, id)
 	if err != nil {
 		if err.Error() == "admin not found" {
 			log.Error(models.ErrAdminNotFound)

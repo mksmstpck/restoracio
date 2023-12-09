@@ -29,6 +29,7 @@ func (h *Handlers) adminCreate(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
 		return
 	}
+	
 	admin, err := h.service.AdminCreateService(a)
 	if err != nil {
 		if err == errors.New(models.ErrAdminAlreadyExists) {
@@ -39,7 +40,6 @@ func (h *Handlers) adminCreate(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
 		return
 	}
-	admin.Password = ""
 	c.JSON(http.StatusCreated, admin)
 }
 
