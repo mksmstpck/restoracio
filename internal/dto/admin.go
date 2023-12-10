@@ -1,4 +1,4 @@
-package models
+package dto
 
 type Admin struct {
 	ID         string      `json:"id" bun:"id,pk"`

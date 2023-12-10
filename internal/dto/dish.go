@@ -1,4 +1,4 @@
-package models
+package dto
 
 type Dish struct {
 	ID          string   `bun:",pk" json:"id"`

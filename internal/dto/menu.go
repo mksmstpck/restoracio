@@ -1,4 +1,4 @@
-package models
+package dto
 
 type Menu struct {
 	ID           string  `json:"id" bun:"id,pk"`

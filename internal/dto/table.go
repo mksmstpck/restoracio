@@ -1,4 +1,4 @@
-package models
+package dto
 
 type Table struct {
 	ID           string       `json:"id" bun:",pk"`

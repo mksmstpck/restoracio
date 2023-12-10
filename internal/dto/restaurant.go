@@ -1,4 +1,4 @@
-package models
+package dto
 
 type Restaurant struct {
 	ID       string   `json:"id" bun:",pk"`
