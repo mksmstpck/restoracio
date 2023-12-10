@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mksmstpck/restoracio/internal/models"
+	"github.com/mksmstpck/restoracio/internal/dto"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -16,22 +16,22 @@ import (
 //	@ID				menu-create
 //	@Accept			json
 //	@Produce		json
-//	@Param			input	body		models.Menu	true	"Menu"
-//	@Success		201		{object}	models.Menu
-//	@Failure		default	{object}	models.Message
+//	@Param			input	body		dto.Menu	true	"Menu"
+//	@Success		201		{object}	dto.Menu
+//	@Failure		default	{object}	dto.Message
 //	@Router			/menu [post]
 func (h *Handlers) menuCreate(c *gin.Context) {
 	admin := c.MustGet("Admin")
 
-	var m models.Menu
+	var m dto.Menu
 	if err := c.ShouldBindJSON(&m); err != nil {
-		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
+		c.JSON(http.StatusBadRequest, dto.Message{Message: err.Error()})
 		log.Info(err)
 		return
 	}
-	m, err := h.service.MenuCreateService(m, admin.(models.Admin))
+	m, err := h.service.MenuCreateService(m, admin.(dto.Admin))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
+		c.JSON(http.StatusInternalServerError, dto.Message{Message: err.Error()})
 		log.Info(err)
 		return
 	}
@@ -45,8 +45,8 @@ func (h *Handlers) menuCreate(c *gin.Context) {
 //	@ID				menu-get-by-id-with-qrcode
 //	@Accept			json
 //	@Produce		json
-//	@Success		200		{object}	models.Menu
-//	@Failure		default	{object}	models.Message
+//	@Success		200		{object}	dto.Menu
+//	@Failure		default	{object}	dto.Message
 //	@Router			/menu/qr/{id} [get]
 //	@Param			id	path	string	true	"Menu ID"
 func (h *Handlers) menuGetWithQrcode(c *gin.Context) {
@@ -54,7 +54,7 @@ func (h *Handlers) menuGetWithQrcode(c *gin.Context) {
 	menu, err := h.service.MenuGetWithQrcodeService(id)
 	if err != nil {
 		log.Info(err)
-		c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
+		c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, menu)
@@ -67,8 +67,8 @@ func (h *Handlers) menuGetWithQrcode(c *gin.Context) {
 //	@ID				menu-get-by-id
 //	@Accept			json
 //	@Produce		json
-//	@Success		200		{object}	models.Menu
-//	@Failure		default	{object}	models.Message
+//	@Success		200		{object}	dto.Menu
+//	@Failure		default	{object}	dto.Message
 //	@Router			/menu/{id} [get]
 //	@Param			id	path	string	true	"Menu ID"
 func (h *Handlers) menuGetByID(c *gin.Context) {
@@ -76,7 +76,7 @@ func (h *Handlers) menuGetByID(c *gin.Context) {
 	menu, err := h.service.MenuGetByIDService(id)
 	if err != nil {
 		log.Info(err)
-		c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
+		c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, menu)
@@ -90,31 +90,31 @@ func (h *Handlers) menuGetByID(c *gin.Context) {
 //	@ID				menu-update
 //	@Accept			json
 //	@Produce		json
-//	@Param			input	body		models.Menu	true	"Menu"
+//	@Param			input	body		dto.Menu	true	"Menu"
 //	@Success		204		{object}	nil
-//	@Failure		default	{object}	models.Message
+//	@Failure		default	{object}	dto.Message
 //	@Router			/menu [put]
 func (h *Handlers) menuUpdate(c *gin.Context) {
-	admin := c.MustGet("Admin").(models.Admin)
-	var m models.Menu
+	admin := c.MustGet("Admin").(dto.Admin)
+	var m dto.Menu
 	if err := c.ShouldBindJSON(&m); err != nil {
-		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
+		c.JSON(http.StatusBadRequest, dto.Message{Message: err.Error()})
 		log.Info(err)
 		return
 	}
 	err := h.service.MenuUpdateService(m, admin)
 	if err != nil {
-		if err.Error() == models.ErrMenuNotFound {
-			log.Info(models.ErrMenuNotFound)
-			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
+		if err.Error() == dto.ErrMenuNotFound {
+			log.Info(dto.ErrMenuNotFound)
+			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == models.ErrRestaurantNotFound {
-			log.Info(models.ErrRestaurantNotFound)
-			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
+		if err.Error() == dto.ErrRestaurantNotFound {
+			log.Info(dto.ErrRestaurantNotFound)
+			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
+		c.JSON(http.StatusInternalServerError, dto.Message{Message: err.Error()})
 		log.Info(err)
 		return
 	}
@@ -129,25 +129,25 @@ func (h *Handlers) menuUpdate(c *gin.Context) {
 //	@ID				menu delete
 //	@Accept			json
 //	@Produce		json
-//	@Success		201		{object}	models.Menu
-//	@Failure		default	{object}	models.Message
+//	@Success		201		{object}	dto.Menu
+//	@Failure		default	{object}	dto.Message
 //	@Router			/menu{id} [delete]
 //	@Param			id	path	string	true	"Menu ID"
 func (h *Handlers) menuDelete(c *gin.Context) {
-	admin := c.MustGet("Admin").(models.Admin)
+	admin := c.MustGet("Admin").(dto.Admin)
 	err := h.service.MenuDeleteService(admin)
 	if err != nil {
-		if err.Error() == models.ErrMenuNotFound {
-			log.Info(models.ErrMenuNotFound)
-			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
+		if err.Error() == dto.ErrMenuNotFound {
+			log.Info(dto.ErrMenuNotFound)
+			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == models.ErrRestaurantNotFound {
-			log.Info(models.ErrRestaurantNotFound)
-			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
+		if err.Error() == dto.ErrRestaurantNotFound {
+			log.Info(dto.ErrRestaurantNotFound)
+			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
+		c.JSON(http.StatusInternalServerError, dto.Message{Message: err.Error()})
 		log.Info(err)
 		return
 	}

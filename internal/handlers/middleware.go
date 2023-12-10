@@ -4,25 +4,25 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mksmstpck/restoracio/internal/models"
+	"github.com/mksmstpck/restoracio/internal/dto"
 	"github.com/mksmstpck/restoracio/utils"
 )
 
 func (h *Handlers) authMiddleware(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	if token == "" {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, models.Message{Message: "Token not found"})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, dto.Message{Message: "Token not found"})
 		return
 	}
 	adminID, err := utils.ValidateJWT(token, h.accessSecret)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, models.Message{Message: err.Error()})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, dto.Message{Message: err.Error()})
 		return
 	}
 
 	admin, err := h.service.AdminGetByIDService(adminID)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, models.Message{Message: err.Error()})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, dto.Message{Message: err.Error()})
 		return
 	}
 	c.Set("Admin", admin)

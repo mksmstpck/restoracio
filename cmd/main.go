@@ -12,8 +12,8 @@ import (
 	"github.com/mksmstpck/restoracio/internal/cache"
 	"github.com/mksmstpck/restoracio/internal/config"
 	"github.com/mksmstpck/restoracio/internal/database"
+	"github.com/mksmstpck/restoracio/internal/dto"
 	"github.com/mksmstpck/restoracio/internal/handlers"
-	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/mksmstpck/restoracio/internal/services"
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
@@ -114,10 +114,10 @@ func main() {
 		).HandleAll()
 
 	router.NoMethod(func(c *gin.Context) {
-		c.AbortWithStatusJSON(http.StatusNotFound, models.Message{Message: "method not allowed"})
+		c.AbortWithStatusJSON(http.StatusNotFound, dto.Message{Message: "method not allowed"})
 	})
 	router.NoRoute(func(c *gin.Context) {
-		c.AbortWithStatusJSON(http.StatusNotFound, models.Message{Message: "route not found"})
+		c.AbortWithStatusJSON(http.StatusNotFound, dto.Message{Message: "route not found"})
 	})
 	
 	if err := router.Run(config.GinUrl); err != nil {

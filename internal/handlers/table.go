@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mksmstpck/restoracio/internal/models"
+	"github.com/mksmstpck/restoracio/internal/dto"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -16,21 +16,21 @@ import (
 //	@ID				table-create
 //	@Accept			json
 //	@Produce		json
-//	@Param			input	body		models.Table	true	"Table"
-//	@Success		201		{object}	models.Table
-//	@Failure		default	{object}	models.Message
+//	@Param			input	body		dto.Table	true	"Table"
+//	@Success		201		{object}	dto.Table
+//	@Failure		default	{object}	dto.Message
 //	@Router			/table [post]
 func (h *Handlers) tableCreate(c *gin.Context){
 	admin := c.MustGet("Admin")
-	var t models.Table
+	var t dto.Table
 	if err := c.ShouldBindJSON(&t); err != nil{
-		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
+		c.JSON(http.StatusBadRequest, dto.Message{Message: err.Error()})
 		log.Info("handlers.tableCreate: ", err)
 		return
 	}
-	t, err := h.service.TableCreateService(t, admin.(models.Admin))
+	t, err := h.service.TableCreateService(t, admin.(dto.Admin))
 	if err != nil{
-		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
+		c.JSON(http.StatusInternalServerError, dto.Message{Message: err.Error()})
 		log.Info("handlers.tableCreate: ", err)
 		return
 	}
@@ -45,15 +45,15 @@ func (h *Handlers) tableCreate(c *gin.Context){
 //	@ID				table-get-by-id
 //	@Accept			json
 //	@Produce		json
-//	@Success		200		{object}	models.Table
-//	@Failure		default	{object}	models.Message
+//	@Success		200		{object}	dto.Table
+//	@Failure		default	{object}	dto.Message
 //	@Router			/table/{id} [get]
 //	@Param			id	path	string	true	"Table ID"
 func (h *Handlers) tableGetByID(c *gin.Context){
 	id := uuid.Parse(c.Param("id"))
 	t, err := h.service.TableGetByIDService(id)
 	if err != nil{
-		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
+		c.JSON(http.StatusInternalServerError, dto.Message{Message: err.Error()})
 		log.Info("handlers.tableGetByID: ", err)
 		return
 	}
@@ -68,15 +68,15 @@ func (h *Handlers) tableGetByID(c *gin.Context){
 //	@ID				table-get-all-in-restaurant
 //	@Accept			json
 //	@Produce		json
-//	@Success		200		{object}	models.Table
-//	@Failure		default	{object}	models.Message
+//	@Success		200		{object}	dto.Table
+//	@Failure		default	{object}	dto.Message
 //	@Router			/table/all/{id} [get]
 //	@Param			id	path	string	true	"Table ID"
 func (h *Handlers) tableGetAllInRestaurant(c *gin.Context){
 	id := uuid.Parse(c.Param("id"))
 	t, err := h.service.TableGetAllInRestaurantService(id)
 	if err != nil{
-		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
+		c.JSON(http.StatusInternalServerError, dto.Message{Message: err.Error()})
 		log.Info(err)
 		return
 	}
@@ -91,31 +91,31 @@ func (h *Handlers) tableGetAllInRestaurant(c *gin.Context){
 //	@ID				table update
 //	@Accept			json
 //	@Produce		json
-//	@Param			input	body		models.Table	true	"Table"
+//	@Param			input	body		dto.Table	true	"Table"
 //	@Success		204		{object}	nil
-//	@Failure		default	{object}	models.Message
+//	@Failure		default	{object}	dto.Message
 //	@Router			/table [put]
 func (h *Handlers) tableUpdate(c *gin.Context){
-	admin := c.MustGet("Admin").(models.Admin)
-	var t models.Table
+	admin := c.MustGet("Admin").(dto.Admin)
+	var t dto.Table
 	if err := c.ShouldBindJSON(&t); err != nil{
-		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
+		c.JSON(http.StatusBadRequest, dto.Message{Message: err.Error()})
 		log.Info(err)
 		return
 	}
 	err := h.service.TableUpdateService(t, admin)
 	if err != nil{
-		if err.Error() == models.ErrTableNotFound{
+		if err.Error() == dto.ErrTableNotFound{
 			log.Info("table not found")
-			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
+			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == models.ErrRestaurantNotFound{
+		if err.Error() == dto.ErrRestaurantNotFound{
 			log.Info("restaurant not found")
-			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
+			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
+		c.JSON(http.StatusInternalServerError, dto.Message{Message: err.Error()})
 		log.Info(err)
 		return
 	}
@@ -131,25 +131,25 @@ func (h *Handlers) tableUpdate(c *gin.Context){
 //	@Accept			json
 //	@Produce		json
 //	@Success		204		{object}	nil
-//	@Failure		default	{object}	models.Message
+//	@Failure		default	{object}	dto.Message
 //	@Router			/table/{id} [delete]
 //	@Param			id	path	string	true	"Table ID"
 func (h *Handlers) tableDelete(c *gin.Context){
 	id := uuid.Parse(c.Param("id"))
-	admin := c.MustGet("Admin").(models.Admin)
+	admin := c.MustGet("Admin").(dto.Admin)
 	err := h.service.TableDeleteService(id, admin)
 	if err != nil{
-		if err.Error() == models.ErrTableNotFound{
+		if err.Error() == dto.ErrTableNotFound{
 			log.Info("table not found")
-			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
+			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == models.ErrRestaurantNotFound{
+		if err.Error() == dto.ErrRestaurantNotFound{
 			log.Info("restaurant not found")
-			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
+			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
+		c.JSON(http.StatusInternalServerError, dto.Message{Message: err.Error()})
 		log.Info("handlers.tableDelete: ", err)
 		return
 	}

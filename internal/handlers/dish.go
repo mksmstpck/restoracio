@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mksmstpck/restoracio/internal/models"
+	"github.com/mksmstpck/restoracio/internal/dto"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -16,31 +16,31 @@ import (
 //	@ID				dish-create
 //	@Accept			json
 //	@Produce		json
-//	@Param			input	body		models.Dish	true	"Dish"
-//	@Success		201		{object}	models.Dish
-//	@Failure		default	{object}	models.Message
+//	@Param			input	body		dto.Dish	true	"Dish"
+//	@Success		201		{object}	dto.Dish
+//	@Failure		default	{object}	dto.Message
 //	@Router			/dish [post]
 func (h *Handlers) dishCreate(c *gin.Context) {
 	admin := c.MustGet("Admin")
-	var m models.Dish
+	var m dto.Dish
 	if err := c.ShouldBindJSON(&m); err != nil {
-		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
+		c.JSON(http.StatusBadRequest, dto.Message{Message: err.Error()})
 		log.Info(err)
 		return
 	}
-	m, err := h.service.DishCreateService(m, admin.(models.Admin))
+	m, err := h.service.DishCreateService(m, admin.(dto.Admin))
 	if err != nil {
-		if err.Error() == models.ErrRestaurantNotFound {
-			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
+		if err.Error() == dto.ErrRestaurantNotFound {
+			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			log.Info(err)
 			return
 		}
-		if err.Error() == models.ErrMenuNotFound {
-			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
+		if err.Error() == dto.ErrMenuNotFound {
+			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			log.Info(err)
 			return
 		}
-		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
+		c.JSON(http.StatusInternalServerError, dto.Message{Message: err.Error()})
 		log.Info(err)
 		return
 	}
@@ -54,15 +54,15 @@ func (h *Handlers) dishCreate(c *gin.Context) {
 //	@ID				dish-get-by-id
 //	@Accept			json
 //	@Produce		json
-//	@Success		200		{object}	models.Dish
-//	@Failure		default	{object}	models.Message
+//	@Success		200		{object}	dto.Dish
+//	@Failure		default	{object}	dto.Message
 //	@Router			/dish$id [get]
 func (h *Handlers) dishGetByID(c *gin.Context) {
 	id := uuid.Parse(c.Param("id"))
 	dish, err := h.service.DishGetByIDService(id)
 	if err != nil {
 		log.Info(err)
-		c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
+		c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, dish)
@@ -75,8 +75,8 @@ func (h *Handlers) dishGetByID(c *gin.Context) {
 //	@ID				dish-get-all-in-menu
 //	@Accept			json
 //	@Produce		json
-//	@Success		200		{object}	[]models.Dish
-//	@Failure		default	{object}	models.Message
+//	@Success		200		{object}	[]dto.Dish
+//	@Failure		default	{object}	dto.Message
 //	@Router			/dish/all/{id} [get]
 //	@Param			id	path	string	true	"Menu ID"
 func (h *Handlers) dishGetAllInMenu(c *gin.Context) {
@@ -84,7 +84,7 @@ func (h *Handlers) dishGetAllInMenu(c *gin.Context) {
 	dishes, err := h.service.DishGetAllInMenuService(id)
 	if err != nil {
 		log.Info(err)
-		c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
+		c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, dishes)
@@ -98,37 +98,37 @@ func (h *Handlers) dishGetAllInMenu(c *gin.Context) {
 //	@ID				dish-update
 //	@Accept			json
 //	@Produce		json
-//	@Param			input	body		models.Dish	true	"Dish"
+//	@Param			input	body		dto.Dish	true	"Dish"
 //	@Success		204		{object}	nil
-//	@Failure		default	{object}	models.Message
+//	@Failure		default	{object}	dto.Message
 //	@Router			/dish [put]
 func (h *Handlers) dishUpdate(c *gin.Context) {
 	admin := c.MustGet("Admin")
-	var m models.Dish
+	var m dto.Dish
 	if err := c.ShouldBindJSON(&m); err != nil {
-		c.JSON(http.StatusBadRequest, models.Message{Message: err.Error()})
+		c.JSON(http.StatusBadRequest, dto.Message{Message: err.Error()})
 		log.Info(err)
 		return
 	}
 
-	err := h.service.DishUpdateService(m, admin.(models.Admin))
+	err := h.service.DishUpdateService(m, admin.(dto.Admin))
 	if err != nil {
-		if err.Error() == models.ErrDishNotFound {
-			log.Info(models.ErrDishNotFound)
-			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
+		if err.Error() == dto.ErrDishNotFound {
+			log.Info(dto.ErrDishNotFound)
+			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == models.ErrRestaurantNotFound {
-			log.Info(models.ErrRestaurantNotFound)
-			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
+		if err.Error() == dto.ErrRestaurantNotFound {
+			log.Info(dto.ErrRestaurantNotFound)
+			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == models.ErrMenuNotFound {
-			log.Info(models.ErrMenuNotFound)
-			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
+		if err.Error() == dto.ErrMenuNotFound {
+			log.Info(dto.ErrMenuNotFound)
+			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
+		c.JSON(http.StatusInternalServerError, dto.Message{Message: err.Error()})
 		log.Info(err)
 		return
 	}
@@ -144,30 +144,30 @@ func (h *Handlers) dishUpdate(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Success		204		{object}	nil
-//	@Failure		default	{object}	models.Message
+//	@Failure		default	{object}	dto.Message
 //	@Router			/dish/{id} [delete]
 //	@Param			id	path	string	true	"Dish ID"
 func (h *Handlers) dishDelete(c *gin.Context) {
 	admin := c.MustGet("Admin")
 	id := uuid.Parse(c.Param("id"))
-	err := h.service.DishDeleteService(id, admin.(models.Admin))
+	err := h.service.DishDeleteService(id, admin.(dto.Admin))
 	if err != nil {
-		if err.Error() == models.ErrDishNotFound {
-			log.Info(models.ErrDishNotFound)
-			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
+		if err.Error() == dto.ErrDishNotFound {
+			log.Info(dto.ErrDishNotFound)
+			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == models.ErrRestaurantNotFound {
-			log.Info(models.ErrRestaurantNotFound)
-			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
+		if err.Error() == dto.ErrRestaurantNotFound {
+			log.Info(dto.ErrRestaurantNotFound)
+			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == models.ErrMenuNotFound {
-			log.Info(models.ErrMenuNotFound)
-			c.JSON(http.StatusNotFound, models.Message{Message: err.Error()})
+		if err.Error() == dto.ErrMenuNotFound {
+			log.Info(dto.ErrMenuNotFound)
+			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, models.Message{Message: err.Error()})
+		c.JSON(http.StatusInternalServerError, dto.Message{Message: err.Error()})
 		log.Info(err)
 		return
 	}

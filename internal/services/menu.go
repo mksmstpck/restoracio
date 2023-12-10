@@ -5,20 +5,20 @@ import (
 	"errors"
 	"io"
 
-	"github.com/mksmstpck/restoracio/internal/models"
+	"github.com/mksmstpck/restoracio/internal/dto"
 	"github.com/mksmstpck/restoracio/utils"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (s Services) MenuCreateService(menu models.Menu, admin models.Admin) (models.Menu, error) {
+func (s Services) MenuCreateService(menu dto.Menu, admin dto.Admin) (dto.Menu, error) {
 	if admin.Restaurant.Menu != nil {
-		return models.Menu{}, errors.New(models.ErrMenuAlreadyExists)
+		return dto.Menu{}, errors.New(dto.ErrMenuAlreadyExists)
 	}
 
 	if admin.Restaurant == nil {
-		return models.Menu{}, errors.New(models.ErrRestaurantNotFound)
+		return dto.Menu{}, errors.New(dto.ErrRestaurantNotFound)
 	}
 	menu.RestaurantID = admin.Restaurant.ID
 	menu.ID = uuid.NewUUID().String()
@@ -26,13 +26,13 @@ func (s Services) MenuCreateService(menu models.Menu, admin models.Admin) (model
 	qrcode, err := utils.QrGenerate("/menu/"+menu.ID)
 	if err != nil {
 		log.Error(err)
-		return models.Menu{}, err
+		return dto.Menu{}, err
 	}
 
 	qrcodeID, err := s.bucket.UploadFromStream(menu.ID, io.Reader(bytes.NewReader(qrcode)))
 	if err != nil {
 		log.Error(err)
-		return models.Menu{}, err
+		return dto.Menu{}, err
 	}
 
 	menu.QRCodeID = qrcodeID.Hex()
@@ -41,7 +41,7 @@ func (s Services) MenuCreateService(menu models.Menu, admin models.Admin) (model
 	menu, err = s.db.Menu.CreateOne(s.ctx, menu)
 	if err != nil {
 		log.Error(err)
-		return models.Menu{}, err
+		return dto.Menu{}, err
 	}
 
 	s.cache.Set(uuid.Parse(menu.ID), menu)
@@ -50,31 +50,31 @@ func (s Services) MenuCreateService(menu models.Menu, admin models.Admin) (model
 	return menu, nil
 }
 
-func (s *Services) MenuGetWithQrcodeService(id uuid.UUID) (models.Menu, error) {
+func (s *Services) MenuGetWithQrcodeService(id uuid.UUID) (dto.Menu, error) {
 	menuAny, err := s.cache.Get(id)
 	if menuAny != nil {
-		menu := menuAny.(models.Menu)
+		menu := menuAny.(dto.Menu)
 		log.Info("menu found")
 		return menu, nil
 	}
 	if err != nil {
 		log.Error(err)
-		return models.Menu{}, err
+		return dto.Menu{}, err
 	}
 	menu, err := s.db.Menu.GetByID(s.ctx, id)
 	if err != nil {
 		log.Error(err)
-		return models.Menu{}, err
+		return dto.Menu{}, err
 	}
 	fileBuffer := bytes.NewBuffer(nil)
 	qrID, err := primitive.ObjectIDFromHex(menu.QRCodeID)
 	if err != nil {
 		log.Error(err)
-		return models.Menu{}, err
+		return dto.Menu{}, err
 	}
 	if _, err := s.bucket.DownloadToStream(qrID, fileBuffer); err != nil {
 		log.Error(err)
-		return models.Menu{}, err
+		return dto.Menu{}, err
 	}
 	menu.QRCodeBytes = fileBuffer.Bytes()
 
@@ -83,20 +83,20 @@ func (s *Services) MenuGetWithQrcodeService(id uuid.UUID) (models.Menu, error) {
 	return menu, nil
 }
 
-func (s *Services) MenuGetByIDService(id uuid.UUID) (models.Menu, error) {
+func (s *Services) MenuGetByIDService(id uuid.UUID) (dto.Menu, error) {
 	menuAny, err := s.cache.Get(id)
 	if menuAny != nil {
 		log.Info("menu found")
-		return menuAny.(models.Menu), nil
+		return menuAny.(dto.Menu), nil
 	}
 	if err != nil {
 		log.Error(err)
-		return models.Menu{}, err
+		return dto.Menu{}, err
 	}
 	menu, err := s.db.Menu.GetByID(s.ctx, id)
 	if err != nil {
 		log.Error(err)
-		return models.Menu{}, err
+		return dto.Menu{}, err
 	}
 
 	s.cache.Set(uuid.Parse(menu.ID), menu)
@@ -105,12 +105,12 @@ func (s *Services) MenuGetByIDService(id uuid.UUID) (models.Menu, error) {
 	return menu, nil
 }
 
-func (s *Services) MenuUpdateService(menu models.Menu, admin models.Admin) error {
+func (s *Services) MenuUpdateService(menu dto.Menu, admin dto.Admin) error {
 	if admin.Restaurant == nil {
-		return errors.New(models.ErrRestaurantNotFound)
+		return errors.New(dto.ErrRestaurantNotFound)
 	}
 	if admin.Restaurant.Menu == nil {
-		return errors.New(models.ErrMenuNotFound)
+		return errors.New(dto.ErrMenuNotFound)
 	}
 
 	menu.RestaurantID = admin.Restaurant.ID
@@ -127,12 +127,12 @@ func (s *Services) MenuUpdateService(menu models.Menu, admin models.Admin) error
 	return nil
 }
 
-func (s *Services) MenuDeleteService(admin models.Admin) error {
+func (s *Services) MenuDeleteService(admin dto.Admin) error {
 	if admin.Restaurant == nil {
-		return errors.New(models.ErrRestaurantNotFound)
+		return errors.New(dto.ErrRestaurantNotFound)
 	}
 	if admin.Restaurant.Menu == nil {
-		return errors.New(models.ErrMenuNotFound)
+		return errors.New(dto.ErrMenuNotFound)
 	}
 
 	err := s.db.Menu.DeleteOne(s.ctx, *admin.Restaurant.Menu)
