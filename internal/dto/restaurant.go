@@ -1,6 +1,9 @@
 package dto
 
+import "github.com/uptrace/bun"
+
 type RestaurantDB struct {
+	bun.BaseModel 		`bun:"table:restaurant"`
 	ID       string   	`json:"id" bun:",pk"`
 	Name     string   	`json:"name" binding:"required" bun:"name"`
 	Location string   	`json:"location" binding:"required" bun:"location"`

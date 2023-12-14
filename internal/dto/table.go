@@ -1,6 +1,9 @@
 package dto
 
+import "github.com/uptrace/bun"
+
 type TableDB struct {
+	bun.BaseModel 			  `bun:"table:table"`
 	ID           string       `json:"id" bun:",pk"`
 	Number       int          `json:"number" binding:"required" bun:"number"`
 	Placement    string       `json:"placement" binding:"required" bun:"placement"`

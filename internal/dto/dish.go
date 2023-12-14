@@ -1,6 +1,9 @@
 package dto
 
+import "github.com/uptrace/bun"
+
 type DishDB struct {
+	bun.BaseModel 		 `bun:"table:dish"`
 	ID          string   `bun:",pk" json:"id"`
 	Name        string   `json:"name" binding:"required"`
 	Type        string   `json:"type" binding:"required"`
