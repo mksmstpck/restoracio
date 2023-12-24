@@ -5,9 +5,24 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mksmstpck/restoracio/internal/dto"
+	"github.com/mksmstpck/restoracio/models"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
+
+type MenuRequest struct {
+	Name         string  `json:"name" binding:"required"`
+	Description  string  `json:"description" binding:"required"`
+}
+
+type MenuResponse struct {
+	ID           string  	`json:"id"`
+	Name         string  	`json:"name"`
+	Description  string  	`json:"description"`
+	Dishes       []*Dish    `json:"dish"`
+	QRCodeBytes  []byte 	`json:"qrcode"`
+	RestaurantID string  	`json:"restaurant_id"`
+}
 
 //	@Summary		MenuCreate
 //	@Security		JWTAuth
@@ -104,13 +119,13 @@ func (h *Handlers) menuUpdate(c *gin.Context) {
 	}
 	err := h.service.MenuUpdateService(m, admin)
 	if err != nil {
-		if err.Error() == dto.ErrMenuNotFound {
-			log.Info(dto.ErrMenuNotFound)
+		if err.Error() == models.ErrMenuNotFound {
+			log.Info(models.ErrMenuNotFound)
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == dto.ErrRestaurantNotFound {
-			log.Info(dto.ErrRestaurantNotFound)
+		if err.Error() == models.ErrRestaurantNotFound {
+			log.Info(models.ErrRestaurantNotFound)
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
@@ -137,13 +152,13 @@ func (h *Handlers) menuDelete(c *gin.Context) {
 	admin := c.MustGet("Admin").(dto.Admin)
 	err := h.service.MenuDeleteService(admin)
 	if err != nil {
-		if err.Error() == dto.ErrMenuNotFound {
-			log.Info(dto.ErrMenuNotFound)
+		if err.Error() == models.ErrMenuNotFound {
+			log.Info(models.ErrMenuNotFound)
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == dto.ErrRestaurantNotFound {
-			log.Info(dto.ErrRestaurantNotFound)
+		if err.Error() == models.ErrRestaurantNotFound {
+			log.Info(models.ErrRestaurantNotFound)
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}

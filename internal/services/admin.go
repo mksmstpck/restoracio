@@ -4,105 +4,116 @@ import (
 	"errors"
 
 	"github.com/mksmstpck/restoracio/internal/dto"
-	"github.com/mksmstpck/restoracio/utils"
+	"github.com/mksmstpck/restoracio/models"
+	"github.com/mksmstpck/restoracio/utils/convertors"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
 
-func (s Services) AdminCreateService(admin dto.Admin) (dto.Admin, error) {
+func (s Services) AdminCreateService(admin dto.AdminRequest) error {
 	adminExists, err := s.db.Admin.GetByEmail(s.ctx, admin.Email)
 	if err != nil {
-		if err.Error() != "admin not found" {
+		if err.Error() != models.ErrAdminNotFound {
 			log.Error(err)
-			return dto.Admin{}, err
+			return err
 		}
 	}
 	if adminExists.ID != "" {
-		log.Error(dto.ErrAdminAlreadyExists)
-		return dto.Admin{}, errors.New(dto.ErrAdminAlreadyExists)
+		log.Error(models.ErrAdminAlreadyExists)
+		return errors.New(models.ErrAdminAlreadyExists)
 	}
-	admin.ID = uuid.NewUUID().String()
-	admin.Password, admin.Salt = utils.PasswordHash(admin.Password)
-	admin, err = s.db.Admin.CreateOne(s.ctx, admin)
+
+	adminDB := convertors.AdminRequestToDB(admin)
+
+	_, err = s.db.Admin.CreateOne(s.ctx, adminDB)
 	if err != nil {
 		log.Error(err)
-		return dto.Admin{}, err
+		return err
 	}
 
-	admin.Password = ""
-	admin.Salt = ""
-
-	s.cache.Set(uuid.Parse(admin.ID), admin)
+	s.cache.Set(uuid.Parse(adminDB.ID), convertors.AdminDBToResponse(adminDB))
 	log.Info("admin created")
-	return admin, nil
+	return nil
 }
 
-func (s Services) AdminGetByIDService(id uuid.UUID) (dto.Admin, error) {
+func (s Services) AdminGetByIDService(id uuid.UUID) (*dto.AdminResponse, error) {
 	adminAny, err := s.cache.Get(id)
 	if adminAny != nil {
 		log.Info("admin found")
-		return adminAny.(dto.Admin), nil
+		return adminAny.(*dto.AdminResponse), nil
 	}
 	if err != nil {
 		log.Error(err)
-		return dto.Admin{}, err
+		return nil, err
 	}
-	admin, err := s.db.Admin.GetByID(s.ctx, id)
+	adminDB, err := s.db.Admin.GetByID(s.ctx, id)
 	if err != nil {
-		if err.Error() == "admin not found" {
-			log.Error(dto.ErrAdminNotFound)
-			return dto.Admin{}, errors.New(dto.ErrAdminNotFound)
+		if err.Error() == models.ErrAdminNotFound {
+			log.Error(models.ErrAdminNotFound)
+			return nil, errors.New(models.ErrAdminNotFound)
 		}
 		log.Error(err)
-		return dto.Admin{}, err
+		return nil, err
 	}
-	s.cache.Set(uuid.Parse(admin.ID), admin)
+
+	adminResponse := convertors.AdminDBToResponse(adminDB)
+
+	s.cache.Set(uuid.Parse(adminResponse.ID), adminResponse)
 	log.Info("admin found")
-	return admin, nil
+	return &adminResponse, nil
 }
 
-func (s Services) AdminGetByEmailService(email string) (dto.Admin, error) {
-	admin, err := s.db.Admin.GetByEmail(s.ctx, email)
+func (s Services) AdminGetByEmailService(email string) (*dto.AdminResponse, error) {
+	adminDB, err := s.db.Admin.GetByEmail(s.ctx, email)
 	if err != nil {
-		if err.Error() == "admin not found" {
-			log.Error(dto.ErrAdminNotFound)
-			return dto.Admin{}, errors.New(dto.ErrAdminNotFound)
+		if err.Error() == models.ErrAdminNotFound {
+			log.Error(models.ErrAdminNotFound)
+			return nil, errors.New(models.ErrAdminNotFound)
 		}
 		log.Error(err)
-		return dto.Admin{}, err
+		return nil, err
 	}
-	s.cache.Set(uuid.Parse(admin.ID), admin)
+
+	adminResponse := convertors.AdminDBToResponse(adminDB)
+
+	s.cache.Set(uuid.Parse(adminResponse.ID), adminResponse)
 	log.Info("admin found")
-	return admin, nil
+	return &adminResponse, nil
 }
 
-func (s Services) AdminGetWithPasswordByIdService(id uuid.UUID) (dto.Admin, error) {
-	admin, err := s.db.Admin.GetWithPasswordByID(s.ctx, id)
+func (s Services) AdminGetWithPasswordByIdService(id uuid.UUID) (*dto.AdminResponseWishPass, error) {
+	adminDB, err := s.db.Admin.GetWithPasswordByID(s.ctx, id)
 	if err != nil {
-		if err.Error() == "admin not found" {
-			log.Error(dto.ErrAdminNotFound)
-			return dto.Admin{}, errors.New(dto.ErrAdminNotFound)
+		if err.Error() == models.ErrAdminNotFound {
+			log.Error(models.ErrAdminNotFound)
+			return nil, errors.New(models.ErrAdminNotFound)
 		}
 		log.Error(err)
-		return dto.Admin{}, err
+		return nil, err
 	}
+
+	adminResponse := convertors.AdminDBToResponseWishPass(adminDB)
+
 	log.Info("password found")
-	return admin, nil
+	return &adminResponse,nil
 }
 
-func (s Services) AdminUpdateService(admin dto.Admin, adminID uuid.UUID) error {
-	admin.ID = adminID.String()
-	s.cache.Set(uuid.Parse(admin.ID), admin)
-	err := s.db.Admin.UpdateOne(s.ctx, admin)
+func (s Services) AdminUpdateService(AdminRequest dto.AdminRequest, adminID uuid.UUID) error {
+	adminDB := convertors.AdminRequestToDB(AdminRequest)
+
+	adminDB.ID = adminID.String()
+	s.cache.Set(uuid.Parse(adminDB.ID), convertors.AdminDBToResponse(adminDB))
+	err := s.db.Admin.UpdateOne(s.ctx, adminDB)
 	if err != nil {
-		if err.Error() == "admin not found" {
-			log.Error(dto.ErrAdminNotFound)
-			return errors.New(dto.ErrAdminNotFound)
+		if err.Error() == models.ErrAdminNotFound {
+			log.Error(models.ErrAdminNotFound)
+			return errors.New(models.ErrAdminNotFound)
 		}
 		log.Error(err)
 		return err
 	}
+
 	log.Info("admin updated")
 	return nil
 }

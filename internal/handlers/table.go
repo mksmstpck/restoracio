@@ -5,9 +5,29 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mksmstpck/restoracio/internal/dto"
+	"github.com/mksmstpck/restoracio/models"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
+
+type TableRequest struct {
+	Number       int          `json:"number" binding:"required"`
+	Placement    string       `json:"placement" binding:"required"`
+	MaxPeople    int          `json:"max_people" binding:"required"`
+	IsReserved   bool         `json:"is_reserved" binding:"required"`
+	IsOccupied   bool         `json:"is_occupied" binding:"required"`
+}
+
+type TableResponse struct {
+	ID           string       	 `json:"id"`
+	Number       int          	 `json:"number"`
+	Placement    string       	 `json:"placement"`
+	MaxPeople    int             `json:"max_people"`
+	IsReserved   bool            `json:"is_reserved"`
+	IsOccupied   bool            `json:"is_occupied"`
+	RestaurantID string          `json:"restaurant_id"`
+	Reservation  *ReservResponse `json:"reservation"`
+}
 
 //	@Summary		TableCreate
 //	@Security		JWTAuth
@@ -105,13 +125,13 @@ func (h *Handlers) tableUpdate(c *gin.Context){
 	}
 	err := h.service.TableUpdateService(t, admin)
 	if err != nil{
-		if err.Error() == dto.ErrTableNotFound{
-			log.Info("table not found")
+		if err.Error() == models.ErrTableNotFound{
+			log.Info(models.ErrTableNotFound)
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == dto.ErrRestaurantNotFound{
-			log.Info("restaurant not found")
+		if err.Error() == models.ErrRestaurantNotFound{
+			log.Info(models.ErrRestaurantNotFound)
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
@@ -139,13 +159,13 @@ func (h *Handlers) tableDelete(c *gin.Context){
 	admin := c.MustGet("Admin").(dto.Admin)
 	err := h.service.TableDeleteService(id, admin)
 	if err != nil{
-		if err.Error() == dto.ErrTableNotFound{
-			log.Info("table not found")
+		if err.Error() == models.ErrTableNotFound{
+			log.Info(models.ErrTableNotFound)
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == dto.ErrRestaurantNotFound{
-			log.Info("restaurant not found")
+		if err.Error() == models.ErrRestaurantNotFound{
+			log.Info(models.ErrRestaurantNotFound)
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}

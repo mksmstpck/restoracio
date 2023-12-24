@@ -5,9 +5,30 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mksmstpck/restoracio/internal/dto"
+	"github.com/mksmstpck/restoracio/models"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
+
+type StaffRequest struct {
+	Name     string	`json:"name" binding:"required"`
+	Age      int    `json:"age" binding:"required"`
+	Gender   string `json:"gender" binding:"required"`
+	Email    string `json:"email" binding:"required"`
+	Phone    string `json:"phone" binding:"required"`
+	Position string `json:"position" binding:"required"`
+}
+
+type StaffResponse struct {
+	ID           string `json:"id"`
+	Name         string `json:"name"`
+	Age          int    `json:"age"`
+	Gender       string `json:"gender"`
+	Email        string `json:"email"`
+	Phone        string `json:"phone"`
+	Position     string `json:"position"`
+	RestaurantID string `json:"restaurant_id"`
+}
 
 //	@Summary		StaffCreate
 //	@Security		JWTAuth
@@ -29,8 +50,8 @@ func (h *Handlers) staffCreate(c *gin.Context) {
 	}
 	staff, err := h.service.StaffCreateService(staff, c.MustGet("Admin").(dto.Admin))
 	if err != nil {
-		if err.Error() == dto.ErrRestaurantNotFound {
-			log.Info(dto.ErrRestaurantNotFound)
+		if err.Error() == models.ErrRestaurantNotFound {
+			log.Info(models.ErrRestaurantNotFound)
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
@@ -57,13 +78,13 @@ func (h *Handlers) staffGetByID(c *gin.Context) {
 	admin := c.MustGet("Admin").(dto.Admin)
 	staff, err := h.service.StaffGetByIDService(id, admin)
 	if err != nil {
-		if err.Error() == dto.ErrStaffNotFound {
-			log.Info(dto.ErrStaffNotFound)
+		if err.Error() == models.ErrStaffNotFound {
+			log.Info(models.ErrStaffNotFound)
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == dto.ErrRestaurantNotFound {
-			log.Info(dto.ErrRestaurantNotFound)
+		if err.Error() == models.ErrRestaurantNotFound {
+			log.Info(models.ErrRestaurantNotFound)
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
@@ -88,13 +109,13 @@ func (h *Handlers) staffGetInRestaurant(c *gin.Context) {
 	admin := c.MustGet("Admin").(dto.Admin)
 	staff, err := h.service.StaffGetAllInRestaurantService(admin)
 	if err != nil {
-		if err.Error() == dto.ErrRestaurantNotFound {
-			log.Info(dto.ErrRestaurantNotFound)
+		if err.Error() == models.ErrRestaurantNotFound {
+			log.Info(models.ErrRestaurantNotFound)
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == dto.ErrStaffNotFound {
-			log.Info(dto.ErrStaffNotFound)
+		if err.Error() == models.ErrStaffNotFound {
+			log.Info(models.ErrStaffNotFound)
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
@@ -126,13 +147,13 @@ func (h *Handlers) staffUpdate(c *gin.Context) {
 	}
 	err := h.service.StaffUpdateService(staff, admin)
 	if err != nil {
-		if err.Error() == dto.ErrRestaurantNotFound {
-			log.Info(dto.ErrRestaurantNotFound)
+		if err.Error() == models.ErrRestaurantNotFound {
+			log.Info(models.ErrRestaurantNotFound)
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == dto.ErrStaffNotFound {
-			log.Info(dto.ErrStaffNotFound)
+		if err.Error() == models.ErrStaffNotFound {
+			log.Info(models.ErrStaffNotFound)
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
@@ -159,8 +180,8 @@ func (h *Handlers) staffDelete(c *gin.Context) {
 	admin := c.MustGet("Admin").(dto.Admin)
 	err := h.service.StaffDeleteService(uuid.Parse(id), admin)
 	if err != nil {
-		if err.Error() == dto.ErrRestaurantNotFound {
-			log.Info(dto.ErrRestaurantNotFound)
+		if err.Error() == models.ErrRestaurantNotFound {
+			log.Info(models.ErrRestaurantNotFound)
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}

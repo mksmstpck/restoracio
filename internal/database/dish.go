@@ -6,25 +6,26 @@ import (
 	"errors"
 
 	"github.com/mksmstpck/restoracio/internal/dto"
+	"github.com/mksmstpck/restoracio/models"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
-func (d *DishDatabase) CreateOne(ctx context.Context, dish dto.Dish) (dto.Dish, error) {
+func (d *DishDatabase) CreateOne(ctx context.Context, dish dto.DishDB) (dto.DishDB, error) {
 	_, err := d.db.
 		NewInsert().
 		Model(&dish).
 		Exec(ctx)
 	if err != nil {
 		log.Error(err)
-		return dto.Dish{}, err
+		return dto.DishDB{}, err
 	}
 	log.Info("dish created")
 	return dish, nil
 }
 
-func (d *DishDatabase) GetByID(ctx context.Context, id uuid.UUID) (dto.Dish, error) {
-	var dish dto.Dish
+func (d *DishDatabase) GetByID(ctx context.Context, id uuid.UUID) (dto.DishDB, error) {
+	var dish dto.DishDB
 	err := d.db.
 		NewSelect().
 		Model(&dish).
@@ -32,18 +33,18 @@ func (d *DishDatabase) GetByID(ctx context.Context, id uuid.UUID) (dto.Dish, err
 		Scan(ctx)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			log.Error(dto.ErrDishNotFound)
-			return dto.Dish{}, errors.New(dto.ErrDishNotFound)
+			log.Error(models.ErrDishNotFound)
+			return dto.DishDB{}, errors.New(models.ErrDishNotFound)
 		}
 		log.Error(err)
-		return dto.Dish{}, err
+		return dto.DishDB{}, err
 	}
 	log.Info("dish found")
 	return dish, nil
 }
 
-func (d *DishDatabase) GetAllInMenu(ctx context.Context, id uuid.UUID) ([]dto.Dish, error) {
-	var dishes []dto.Dish
+func (d *DishDatabase) GetAllInMenu(ctx context.Context, id uuid.UUID) ([]dto.DishDB, error) {
+	var dishes []dto.DishDB
 	err := d.db.
 		NewSelect().
 		Model(&dishes).
@@ -57,7 +58,7 @@ func (d *DishDatabase) GetAllInMenu(ctx context.Context, id uuid.UUID) ([]dto.Di
 	return dishes, nil
 }
 
-func (d *DishDatabase) UpdateOne(ctx context.Context, dish dto.Dish) error {
+func (d *DishDatabase) UpdateOne(ctx context.Context, dish dto.DishDB) error {
 	res, err := d.db.
 		NewUpdate().
 		Model(&dish).
@@ -75,8 +76,8 @@ func (d *DishDatabase) UpdateOne(ctx context.Context, dish dto.Dish) error {
 		return err
 	}
 	if count == 0 {
-		log.Error(dto.ErrDishNotFound)
-		return errors.New(dto.ErrDishNotFound)
+		log.Error(models.ErrDishNotFound)
+		return errors.New(models.ErrDishNotFound)
 	}
 	log.Info("dish updated")
 	return nil
@@ -85,7 +86,7 @@ func (d *DishDatabase) UpdateOne(ctx context.Context, dish dto.Dish) error {
 func (d *DishDatabase) DeleteOne(ctx context.Context, id uuid.UUID, menuID uuid.UUID) error {
 	res, err := d.db.
 		NewDelete().
-		Model(&dto.Dish{ID: id.String()}).
+		Model(&dto.DishDB{ID: id.String()}).
 		Where("id = ?", id).
 		Where("menu_id = ?", menuID).
 		Exec(ctx)
@@ -99,8 +100,8 @@ func (d *DishDatabase) DeleteOne(ctx context.Context, id uuid.UUID, menuID uuid.
 		return err
 	}
 	if count == 0 {
-		log.Error(dto.ErrDishNotFound)
-		return errors.New(dto.ErrDishNotFound)
+		log.Error(models.ErrDishNotFound)
+		return errors.New(models.ErrDishNotFound)
 	}
 	log.Info("dish deleted")
 	return nil
@@ -109,7 +110,7 @@ func (d *DishDatabase) DeleteOne(ctx context.Context, id uuid.UUID, menuID uuid.
 func (d *DishDatabase) DeleteAll(ctx context.Context, menuID uuid.UUID) (error) {
 	res, err := d.db.
 	NewDelete().
-	Model(&dto.Dish{MenuID: menuID.String()}).
+	Model(&dto.DishDB{MenuID: menuID.String()}).
 	Where("menu_id = ?", menuID).
 	Exec(ctx)
 	if err != nil {
@@ -122,8 +123,8 @@ func (d *DishDatabase) DeleteAll(ctx context.Context, menuID uuid.UUID) (error) 
 		return err
 	}
 	if count == 0 {
-		log.Error(dto.ErrDishNotFound)
-		return errors.New(dto.ErrDishNotFound)
+		log.Error(models.ErrDishNotFound)
+		return errors.New(models.ErrDishNotFound)
 	}
 	log.Info("dish deleted")
 	return nil

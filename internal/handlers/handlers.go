@@ -19,6 +19,11 @@ type Handlers struct {
 	refreshExp    time.Duration
 }
 
+type AdminLogin struct {
+	Email    	string `json:"email" binding:"required"`
+	Password	string `json:"password" binding:"required"`
+}
+
 func NewHandlers(gin *gin.Engine,
 	service services.Servicer,
 	accessSecret []byte,

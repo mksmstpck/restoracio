@@ -4,11 +4,12 @@ import (
 	"errors"
 
 	"github.com/mksmstpck/restoracio/internal/dto"
+	"github.com/mksmstpck/restoracio/models"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
-func (s *Services) RestaurantCreateService(rest dto.Restaurant, admin dto.Admin) (dto.Restaurant, error) {
+func (s *Services) RestaurantCreateService(rest dto.RestaurantRequest, admin dto.AdminResponse)  error {
 	rest.AdminID = admin.ID
 	rest.ID = uuid.NewUUID().String()
 	res, err := s.db.Rest.CreateOne(s.ctx, rest)
@@ -63,8 +64,8 @@ func (s *Services) RestaurantUpdateService(rest dto.Restaurant, restID uuid.UUID
 
 func (s *Services) RestaurantDeleteService(rest *dto.Restaurant) error {
 	if rest == nil {
-		log.Info("restaurant not found")
-		return errors.New("restaurant not found")
+		log.Info(models.ErrRestaurantNotFound)
+		return errors.New(models.ErrRestaurantNotFound)
 	}
 	err := s.db.Rest.DeleteOne(s.ctx, uuid.Parse(rest.ID))
 	if err != nil {

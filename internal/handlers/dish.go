@@ -5,9 +5,34 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mksmstpck/restoracio/internal/dto"
+	"github.com/mksmstpck/restoracio/models"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
+
+type dishRequest struct {
+	Name        string   `json:"name" binding:"required"`
+	Type        string   `json:"type" binding:"required"`
+	Category    string   `json:"category" binding:"required"`
+	Price       int      `json:"price" binding:"required"`
+	Curency     string   `json:"currency" binding:"required"`
+	MassGrams   int      `json:"mass_grams" binding:"required"`
+	Ingredients []string `json:"ingredients" binding:"required"`
+	Description string   `json:"description" binding:"required"`
+}
+
+type dishResponse struct {
+	ID          string   `json:"id"`
+	Name        string   `json:"name"`
+	Type        string   `json:"type"`
+	Category    string   `json:"category"`
+	Price       int      `json:"price"`
+	Curency     string   `json:"currency"`
+	MassGrams   int      `json:"mass_grams"`
+	Ingredients []string `json:"ingredients"`
+	Description string   `json:"description"`
+	MenuID      string   `json:"menu_id"`
+}
 
 //	@Summary		DishCreate
 //	@Security		JWTAuth
@@ -30,12 +55,12 @@ func (h *Handlers) dishCreate(c *gin.Context) {
 	}
 	m, err := h.service.DishCreateService(m, admin.(dto.Admin))
 	if err != nil {
-		if err.Error() == dto.ErrRestaurantNotFound {
+		if err.Error() == models.ErrRestaurantNotFound {
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			log.Info(err)
 			return
 		}
-		if err.Error() == dto.ErrMenuNotFound {
+		if err.Error() == models.ErrMenuNotFound {
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			log.Info(err)
 			return
@@ -113,18 +138,18 @@ func (h *Handlers) dishUpdate(c *gin.Context) {
 
 	err := h.service.DishUpdateService(m, admin.(dto.Admin))
 	if err != nil {
-		if err.Error() == dto.ErrDishNotFound {
-			log.Info(dto.ErrDishNotFound)
+		if err.Error() == models.ErrDishNotFound {
+			log.Info(models.ErrDishNotFound)
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == dto.ErrRestaurantNotFound {
-			log.Info(dto.ErrRestaurantNotFound)
+		if err.Error() == models.ErrRestaurantNotFound {
+			log.Info(models.ErrRestaurantNotFound)
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == dto.ErrMenuNotFound {
-			log.Info(dto.ErrMenuNotFound)
+		if err.Error() == models.ErrMenuNotFound {
+			log.Info(models.ErrMenuNotFound)
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
@@ -152,18 +177,18 @@ func (h *Handlers) dishDelete(c *gin.Context) {
 	id := uuid.Parse(c.Param("id"))
 	err := h.service.DishDeleteService(id, admin.(dto.Admin))
 	if err != nil {
-		if err.Error() == dto.ErrDishNotFound {
-			log.Info(dto.ErrDishNotFound)
+		if err.Error() == models.ErrDishNotFound {
+			log.Info(models.ErrDishNotFound)
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == dto.ErrRestaurantNotFound {
-			log.Info(dto.ErrRestaurantNotFound)
+		if err.Error() == models.ErrRestaurantNotFound {
+			log.Info(models.ErrRestaurantNotFound)
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}
-		if err.Error() == dto.ErrMenuNotFound {
-			log.Info(dto.ErrMenuNotFound)
+		if err.Error() == models.ErrMenuNotFound {
+			log.Info(models.ErrMenuNotFound)
 			c.JSON(http.StatusNotFound, dto.Message{Message: err.Error()})
 			return
 		}

@@ -9,6 +9,21 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type RestaurantRequest struct {
+	Name     string   `json:"name" binding:"required"`
+	Location string   `json:"location" binding:"required"`
+}
+
+type RestaurantResponse struct {
+	ID       string   	`json:"id"`
+	Name     string   	`json:"name"`
+	Location string   	`json:"location"`
+	AdminID  string   	`json:"admin_id"`
+	Staff    []*StaffDB `json:"staff"`
+	Menu     *MenuDB  	`json:"menu"`
+	Tables   []*TableDB `json:"table"`
+}
+
 //	@Summary		RestaurantCreate
 //	@Security		JWTAuth
 //	@Tags			Restaurant

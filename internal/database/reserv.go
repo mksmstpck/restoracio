@@ -6,6 +6,7 @@ import (
 	"errors"
 
 	"github.com/mksmstpck/restoracio/internal/dto"
+	"github.com/mksmstpck/restoracio/models"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -33,8 +34,8 @@ func (d ReservDB) GetByID(ctx context.Context, id uuid.UUID, restaurantID uuid.U
 		Scan(ctx)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			log.Error(dto.ErrReservationNotFound)
-			return dto.ReservDB{}, errors.New(dto.ErrReservationNotFound)
+			log.Error(models.ErrReservationNotFound)
+			return dto.ReservDB{}, errors.New(models.ErrReservationNotFound)
 		}
 		log.Error(err)
 		return dto.ReservDB{}, err
@@ -76,8 +77,8 @@ func (d ReservDB) UpdateOne(ctx context.Context, reserv dto.ReservDB) error {
 		return err
 	}
 	if count == 0 {
-		log.Error(dto.ErrReservationNotFound)
-		return errors.New(dto.ErrReservationNotFound)
+		log.Error(models.ErrReservationNotFound)
+		return errors.New(models.ErrReservationNotFound)
 	}
 	log.Info("reservation updated")
 	return nil
@@ -99,8 +100,8 @@ func (d ReservDB) DeleteOne(ctx context.Context, id uuid.UUID, restaurantID uuid
 		return err
 	}
 	if count == 0 {
-		log.Error(dto.ErrReservationNotFound)
-		return errors.New(dto.ErrReservationNotFound)
+		log.Error(models.ErrReservationNotFound)
+		return errors.New(models.ErrReservationNotFound)
 	}
 	log.Info("reservation deleted")
 	return nil
@@ -122,8 +123,8 @@ func (d ReservDB) DeleteAllByRestaurant(ctx context.Context, restaurantID uuid.U
 		return err
 	}
 	if count == 0 {
-		log.Error(dto.ErrReservationNotFound)
-		return errors.New(dto.ErrReservationNotFound)
+		log.Error(models.ErrReservationNotFound)
+		return errors.New(models.ErrReservationNotFound)
 	}
 	log.Info("reservation deleted")
 	return nil
