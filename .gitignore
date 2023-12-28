@@ -2,3 +2,4 @@ dev.env
 Taskfile.yml
 .dockerignore
 fly.toml
+prod.env
