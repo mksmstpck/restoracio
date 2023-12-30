@@ -5,6 +5,7 @@ type Admin struct {
 	Name         string
 	Email        string
 	PasswordHash string
+	Password     string
 	Salt         string
 	Restaurant   *Restaurant
 }
