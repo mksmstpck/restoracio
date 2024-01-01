@@ -4,15 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"net/http"
 	"runtime"
 	"strings"
 
-	"github.com/gin-gonic/gin"
 	"github.com/mksmstpck/restoracio/internal/cache"
 	"github.com/mksmstpck/restoracio/internal/config"
 	"github.com/mksmstpck/restoracio/internal/database"
-	"github.com/mksmstpck/restoracio/internal/dto"
 	"github.com/mksmstpck/restoracio/internal/handlers"
 	"github.com/mksmstpck/restoracio/internal/services"
 	"github.com/redis/go-redis/v9"
@@ -79,19 +76,19 @@ func main() {
 	opts := options.Client().ApplyURI(config.MongoURL).SetServerAPIOptions(serverAPI)
 	client, err := mongo.Connect(context.TODO(), opts)
 	if err != nil {
-	  log.Fatal(err)
+		log.Fatal(err)
 	}
 	defer func() {
-	  if err = client.Disconnect(context.TODO()); err != nil {
-		log.Fatal(err)
-	  }
+		if err = client.Disconnect(context.TODO()); err != nil {
+			log.Fatal(err)
+		}
 	}()
 	mdb := client.Database("restoracio")
 	bucketOpts := options.GridFSBucket().SetName("qrcodes")
 	bucket, err := gridfs.NewBucket(mdb, bucketOpts)
 
 	if err != nil {
-	  log.Fatal(err)
+		log.Fatal(err)
 	}
 
 	// services
@@ -103,24 +100,11 @@ func main() {
 	)
 
 	// gin
-	router := gin.Default()
 	handlers.NewHandlers(
-		router,
 		service,
 		config.AccessSecret,
 		config.RefreshSecret,
 		config.AccessExp,
 		config.RefreshExp,
-		).HandleAll()
-
-	router.NoMethod(func(c *gin.Context) {
-		c.AbortWithStatusJSON(http.StatusNotFound, dto.Message{Message: "method not allowed"})
-	})
-	router.NoRoute(func(c *gin.Context) {
-		c.AbortWithStatusJSON(http.StatusNotFound, dto.Message{Message: "route not found"})
-	})
-	
-	if err := router.Run(config.GinUrl); err != nil {
-		log.Fatal(err)
-	}
+	).HandleAll()
 }
