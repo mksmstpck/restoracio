@@ -1,17 +1,21 @@
 package handlers
 
 import (
+	"log"
+	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/mksmstpck/restoracio/docs"
+	apimodels "github.com/mksmstpck/restoracio/internal/APImodels"
+	"github.com/mksmstpck/restoracio/internal/config"
+	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/mksmstpck/restoracio/internal/services"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Handlers struct {
-	gin           *gin.Engine
 	service       services.Servicer
 	accessSecret  []byte
 	refreshSecret []byte
@@ -19,19 +23,13 @@ type Handlers struct {
 	refreshExp    time.Duration
 }
 
-type AdminLogin struct {
-	Email    	string `json:"email" binding:"required"`
-	Password	string `json:"password" binding:"required"`
-}
-
-func NewHandlers(gin *gin.Engine,
+func NewHandlers(
 	service services.Servicer,
 	accessSecret []byte,
 	refreshSecret []byte,
 	accessExp time.Duration,
 	refreshExp time.Duration) *Handlers {
 	return &Handlers{
-		gin:           gin,
 		service:       service,
 		accessSecret:  accessSecret,
 		refreshSecret: refreshSecret,
@@ -41,18 +39,19 @@ func NewHandlers(gin *gin.Engine,
 }
 
 func (h *Handlers) HandleAll() {
+	r := gin.Default()
 	// groups
-	admin := h.gin.Group("/admin")
-	auth := h.gin.Group("/auth")
-	rest := h.gin.Group("/restaurant")
-	table := h.gin.Group("/table")
-	menu := h.gin.Group("/menu")
-	dish := h.gin.Group("/dish")
-	staff := h.gin.Group("/staff")
-	reserv := h.gin.Group("/reserv")
+	admin := r.Group("/admin")
+	auth := r.Group("/auth")
+	rest := r.Group("/restaurant")
+	table := r.Group("/table")
+	menu := r.Group("/menu")
+	dish := r.Group("/dish")
+	staff := r.Group("/staff")
+	reserv := r.Group("/reserv")
 
 	// middleware
-	h.gin.Use(h.corsMiddleware)
+	r.Use(h.corsMiddleware)
 	rest.Use(h.authMiddleware)
 	staff.Use(h.authMiddleware)
 	reserv.Use(h.authMiddleware)
@@ -77,7 +76,7 @@ func (h *Handlers) HandleAll() {
 	rest.DELETE("/", h.restaurantDelete)
 
 	// table
-	table.POST("/", h.authMiddleware,  h.tableCreate)
+	table.POST("/", h.authMiddleware, h.tableCreate)
 	table.GET("/:id", h.tableGetByID)
 	table.GET("/all/:id", h.tableGetAllInRestaurant)
 	table.PUT("/", h.authMiddleware, h.tableUpdate)
@@ -112,5 +111,41 @@ func (h *Handlers) HandleAll() {
 	reserv.DELETE("/:id", h.reservDelete)
 
 	// swagger
-	h.gin.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	r.NoMethod(func(c *gin.Context) {
+		c.AbortWithStatusJSON(http.StatusNotFound, apimodels.Message{Message: "method not allowed"})
+	})
+	r.NoRoute(func(c *gin.Context) {
+		c.AbortWithStatusJSON(http.StatusNotFound, apimodels.Message{Message: "route not found"})
+	})
+
+	if err := r.Run(config.NewConfig().GinUrl); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func checkStatus(err string) int {
+	switch err {
+	case models.ErrAdminNotFound:
+		return http.StatusNotFound
+	case models.ErrAdminAlreadyExists:
+		return http.StatusConflict
+	case models.ErrRestaurantNotFound:
+		return http.StatusNotFound
+	case models.ErrMenuAlreadyExists:
+		return http.StatusConflict
+	case models.ErrDishNotFound:
+		return http.StatusNotFound
+	case models.ErrDishAlreadyExists:
+		return http.StatusConflict
+	case models.ErrStaffNotFound:
+		return http.StatusNotFound
+	case models.ErrReservationNotFound:
+		return http.StatusNotFound
+	case models.ErrReservationAlreadyExists:
+		return http.StatusConflict
+	default:
+		return http.StatusInternalServerError
+	}
 }
