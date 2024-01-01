@@ -5,25 +5,28 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/mksmstpck/restoracio/internal/convertors"
+	"github.com/mksmstpck/restoracio/internal/dto"
 	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
-func (d *TableDatabase) CreateOne(ctx context.Context, table models.Table) (models.Table, error) {
+func (d *TableDatabase) CreateOne(ctx context.Context, table dto.Table) error {
+	tableDB := convertors.TableDTOToDB(&table)
 	_, err := d.db.
 		NewInsert().
-		Model(&table).
+		Model(&tableDB).
 		Exec(ctx)
 	if err != nil {
 		log.Error(err)
-		return models.Table{}, err
+		return err
 	}
 	log.Info("table created")
-	return table, nil
+	return nil
 }
 
-func (d *TableDatabase) GetByID(ctx context.Context, id uuid.UUID) (models.Table, error) {
+func (d *TableDatabase) GetByID(ctx context.Context, id uuid.UUID) (dto.Table, error) {
 	var table models.Table
 	err := d.db.
 		NewSelect().
@@ -32,17 +35,17 @@ func (d *TableDatabase) GetByID(ctx context.Context, id uuid.UUID) (models.Table
 		Scan(ctx)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			log.Error("table not found")
-			return models.Table{}, errors.New("table not found")
+			log.Error(models.ErrTableNotFound)
+			return dto.Table{}, errors.New(models.ErrTableNotFound)
 		}
 		log.Error(err)
-		return models.Table{}, err
+		return dto.Table{}, err
 	}
 	log.Info("table found")
-	return table, nil
+	return convertors.TableDBToDTO(&table), nil
 }
 
-func (d *TableDatabase) GetAllInRestaurant(ctx context.Context, id uuid.UUID) ([]models.Table, error) {
+func (d *TableDatabase) GetAllInRestaurant(ctx context.Context, id uuid.UUID) ([]dto.Table, error) {
 	var tables []models.Table
 	err := d.db.
 		NewSelect().
@@ -53,14 +56,19 @@ func (d *TableDatabase) GetAllInRestaurant(ctx context.Context, id uuid.UUID) ([
 		log.Error(err)
 		return nil, err
 	}
+	tablesDTO := make([]dto.Table, len(tables))
+	for i, tableDB := range tables {
+		tablesDTO[i] = convertors.TableDBToDTO(&tableDB)
+	}
 	log.Info("tables found")
-	return tables, nil
+	return tablesDTO, nil
 }
 
-func (d *TableDatabase) UpdateOne(ctx context.Context, table models.Table) error {
+func (d *TableDatabase) UpdateOne(ctx context.Context, table dto.Table) error {
+	tableDB := convertors.TableDTOToDB(&table)
 	_, err := d.db.
 		NewUpdate().
-		Model(&table).
+		Model(&tableDB).
 		ExcludeColumn("restaurant_id", "id").
 		Where("id = ?", table.ID).
 		Exec(ctx)

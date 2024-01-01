@@ -5,28 +5,28 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/mksmstpck/restoracio/internal/convertors"
+	"github.com/mksmstpck/restoracio/internal/dto"
 	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
-func (d *RestDatabase) CreateOne(
-	ctx context.Context,
-	restaurant models.Restaurant,
-	) (models.Restaurant, error) {
+func (d *RestDatabase) CreateOne(ctx context.Context, restaurant dto.Restaurant) error {
+	rest := convertors.RestaurantDTOToDB(&restaurant)
 	_, err := d.db.
 		NewInsert().
-		Model(&restaurant).
+		Model(&rest).
 		Exec(ctx)
 	if err != nil {
-		log.Error("database.RestaurantCreate: ", err)
-		return models.Restaurant{}, err
+		log.Error(err)
+		return err
 	}
 	log.Info("restaurant created")
-	return restaurant, nil
+	return nil
 }
 
-func (d *RestDatabase) GetByID(ctx context.Context, id uuid.UUID) (models.Restaurant, error) {
+func (d *RestDatabase) GetByID(ctx context.Context, id uuid.UUID) (dto.Restaurant, error) {
 	var restaurant models.Restaurant
 	err := d.db.
 		NewSelect().
@@ -36,25 +36,26 @@ func (d *RestDatabase) GetByID(ctx context.Context, id uuid.UUID) (models.Restau
 		Scan(ctx)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			log.Error("restaurant not found")
-			return models.Restaurant{}, errors.New("restaurant not found")
+			log.Error(models.ErrRestaurantNotFound)
+			return dto.Restaurant{}, errors.New(models.ErrRestaurantNotFound)
 		}
-		log.Error("database.RestaurantGetByID: ", err)
-		return models.Restaurant{}, err
+		log.Error(err)
+		return dto.Restaurant{}, err
 	}
 	log.Info("restaurant found")
-	return restaurant, nil
+	return convertors.RestaurantDBToDTO(&restaurant), nil
 }
 
-func (d *RestDatabase) UpdateOne(ctx context.Context, restaurant models.Restaurant) error {
+func (d *RestDatabase) UpdateOne(ctx context.Context, restaurant dto.Restaurant) error {
+	rest := convertors.RestaurantDTOToDB(&restaurant)
 	_, err := d.db.
 		NewUpdate().
-		Model(&restaurant).
-		ExcludeColumn("admin_id", "id").
+		Model(&rest).
+		ExcludeColumn("admin_id", "id", "staff", "menu", "tables").
 		Where("id = ?", restaurant.ID).
 		Exec(ctx)
 	if err != nil {
-		log.Error("database.RestaurantUpdate: ", err)
+		log.Error(err)
 		return err
 	}
 	log.Info("restaurant updated")
@@ -68,7 +69,7 @@ func (d *RestDatabase) DeleteOne(ctx context.Context, id uuid.UUID) error {
 		Where("id = ?", id.String()).
 		Exec(ctx)
 	if err != nil {
-		log.Error("database.RestaurantDelete: ", err)
+		log.Error(err)
 		return err
 	}
 	log.Info("restaurant deleted")

@@ -3,75 +3,77 @@ package services
 import (
 	"errors"
 
+	"github.com/mksmstpck/restoracio/internal/dto"
 	"github.com/mksmstpck/restoracio/internal/models"
-	"github.com/mksmstpck/restoracio/utils"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
-func (s *Services) TableCreateService(table models.Table, admin models.Admin) (models.Table, error) {
-	table.ID = uuid.NewUUID().String()
+func (s *Services) TableCreateService(table dto.Table, admin dto.Admin) error {
 	if admin.Restaurant == nil {
-		return models.Table{}, errors.New("create restaurant first")
+		return errors.New("create restaurant first")
 	}
+
+	table.ID = uuid.NewUUID().String()
 	table.RestaurantID = admin.Restaurant.ID
-	res, err := s.db.Table.CreateOne(s.ctx, table)
+
+	err := s.db.Table.CreateOne(s.ctx, table)
 	if err != nil {
-		log.Info("TableCreate: ", err)
-		return models.Table{}, err
+		log.Info(err)
+		return err
 	}
-	s.cache.Set(uuid.Parse(res.ID), res)
 	log.Info("table created")
-	return res, nil
+	return nil
 }
 
-func (s *Services) TableGetByIDService(id uuid.UUID) (models.Table, error) {
-	table, err := s.cache.TableGet(id)
-	if table.ID != "" {
+func (s *Services) TableGetByIDService(id uuid.UUID) (dto.Table, error) {
+	tableAny, err := s.cache.Get(id)
+	if tableAny != nil {
 		log.Info("table found")
-		return table, nil
+		return tableAny.(dto.Table), nil
 	}
 	if err != nil {
-		log.Info("TableGetByID: ", err)
-		return models.Table{}, err
+		log.Info(err)
+		return dto.Table{}, err
 	}
 
-	table, err = s.db.Table.GetByID(s.ctx, id)
+	table, err := s.db.Table.GetByID(s.ctx, id)
 	if err != nil {
-		log.Info("TableGetByID: ", err)
-		return models.Table{}, err
+		log.Info(err)
+		return dto.Table{}, err
 	}
+	s.cache.Set(uuid.Parse(table.ID), &table)
 	return table, nil
 }
 
-func (s *Services) TableGetAllInRestaurantService(id uuid.UUID) ([]models.Table, error) {
+func (s *Services) TableGetAllInRestaurantService(id uuid.UUID) ([]dto.Table, error) {
 	tables, err := s.db.Table.GetAllInRestaurant(s.ctx, id)
 	if err != nil {
-		log.Info("TableGetAllInRestaurant: ", err)
+		log.Info(err)
 		return nil, err
 	}
 	return tables, nil
 }
 
-func (s *Services) TableUpdateService(table models.Table, admin models.Admin) error {
+func (s *Services) TableUpdateService(table dto.Table, admin dto.Admin) error {
 	if admin.Restaurant == nil {
 		log.Info("create restaurant first")
-		return errors.New(utils.ErrRestaurantNotFound)
+		return errors.New(models.ErrRestaurantNotFound)
 	}
 	if admin.Restaurant.Tables == nil {
 		log.Info("create tables first")
-		return errors.New(utils.ErrTableNotFound)
+		return errors.New(models.ErrTableNotFound)
 	}
 	table.RestaurantID = admin.Restaurant.ID
 
 	if !TableExists(admin.Restaurant.Tables, table.ID) {
-		log.Info("table not found")
-		return errors.New("table not found")
+		log.Info(models.ErrTableNotFound)
+		return errors.New(models.ErrTableNotFound)
 	}
 
 	err := s.db.Table.UpdateOne(s.ctx, table)
 	if err != nil {
-		log.Info("TableUpdate: ", err)
+		log.Info(err)
 		return err
 	}
 
@@ -81,22 +83,22 @@ func (s *Services) TableUpdateService(table models.Table, admin models.Admin) er
 	return nil
 }
 
-func (s *Services) TableDeleteService(id uuid.UUID, admin models.Admin) error {
+func (s *Services) TableDeleteService(id uuid.UUID, admin dto.Admin) error {
 	if admin.Restaurant == nil {
 		log.Info("create restaurant first")
-		return errors.New(utils.ErrRestaurantNotFound)
+		return errors.New(models.ErrRestaurantNotFound)
 	}
 	if admin.Restaurant.Tables == nil {
 		log.Info("create tables first")
-		return errors.New(utils.ErrTableNotFound)
+		return errors.New(models.ErrTableNotFound)
 	}
 	if !TableExists(admin.Restaurant.Tables, id.String()) {
-		log.Info("table not found")
-		return errors.New("table not found")
+		log.Info(models.ErrTableNotFound)
+		return errors.New(models.ErrTableNotFound)
 	}
 	err := s.db.Table.DeleteOne(s.ctx, id)
 	if err != nil {
-		log.Info("TableDelete: ", err)
+		log.Info(err)
 		return err
 	}
 
@@ -106,14 +108,14 @@ func (s *Services) TableDeleteService(id uuid.UUID, admin models.Admin) error {
 	return nil
 }
 
-func (s *Services) TableDeleteAllService(admin models.Admin) error {
+func (s *Services) TableDeleteAllService(admin dto.Admin) error {
 	if admin.Restaurant == nil {
 		log.Info("create restaurant first")
-		return errors.New(utils.ErrRestaurantNotFound)
+		return errors.New(models.ErrRestaurantNotFound)
 	}
 	if admin.Restaurant.Tables == nil {
 		log.Info("create tables first")
-		return errors.New(utils.ErrTableNotFound)
+		return errors.New(models.ErrTableNotFound)
 	}
 	err := s.db.Table.DeleteAll(s.ctx, uuid.Parse(admin.Restaurant.ID))
 	if err != nil {
@@ -123,7 +125,7 @@ func (s *Services) TableDeleteAllService(admin models.Admin) error {
 	return nil
 }
 
-func TableExists(tables []*models.Table, id string) bool {
+func TableExists(tables []*dto.Table, id string) bool {
 	for _, table := range tables {
 		if table.ID == id {
 			return true

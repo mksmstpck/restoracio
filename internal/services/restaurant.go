@@ -3,76 +3,75 @@ package services
 import (
 	"errors"
 
+	"github.com/mksmstpck/restoracio/internal/dto"
 	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
-func (s *Services) RestaurantCreateService(rest models.Restaurant, admin models.Admin) (models.Restaurant, error) {
-	rest.AdminID = admin.ID
+func (s *Services) RestaurantCreateService(rest dto.Restaurant, admin dto.Admin) error {
 	rest.ID = uuid.NewUUID().String()
-	res, err := s.db.Rest.CreateOne(s.ctx, rest)
+	rest.AdminID = admin.ID
+
+	err := s.db.Rest.CreateOne(s.ctx, rest)
 	if err != nil {
 		log.Info(err)
-		return models.Restaurant{}, err
+		return err
 	}
-
-	s.cache.Set(uuid.Parse(res.ID), res)
-	s.cache.Set(uuid.Parse(admin.ID), admin)
 
 	log.Info("restaurant created")
-	return res, nil
+	return nil
 }
 
-func (s *Services) RestaurantGetByIDService(id uuid.UUID) (models.Restaurant, error) {
-	res, err := s.cache.RestaurantGet(id)
-	if res.ID != "" {
+func (s *Services) RestaurantGetByIDService(id uuid.UUID) (dto.Restaurant, error) {
+	resAny, err := s.cache.Get(id)
+	if resAny != nil {
 		log.Info("restaurant found")
-		return res, nil
+		return resAny.(dto.Restaurant), nil
 	}
 	if err != nil {
 		log.Info(err)
-		return models.Restaurant{}, err
+		return dto.Restaurant{}, err
 	}
 
-	res, err = s.db.Rest.GetByID(s.ctx, id)
+	res, err := s.db.Rest.GetByID(s.ctx, id)
 	if err != nil {
 		log.Info(err)
-		return models.Restaurant{}, err
+		return dto.Restaurant{}, err
 	}
 
-	s.cache.Set(uuid.Parse(res.ID), res)
+	s.cache.Set(uuid.Parse(res.ID), &res)
 
 	log.Info("restaurant found")
 	return res, nil
 }
 
-func (s *Services) RestaurantUpdateService(rest models.Restaurant, restID uuid.UUID) error {
-	rest.ID = restID.String()
+func (s *Services) RestaurantUpdateService(rest dto.Restaurant, admin dto.Admin) error {
+	rest.ID = admin.Restaurant.ID
 	err := s.db.Rest.UpdateOne(s.ctx, rest)
 	if err != nil {
 		log.Info(err)
 		return err
 	}
 
-	s.cache.Set(uuid.Parse(rest.ID), rest)
+	s.cache.Set(uuid.Parse(rest.ID), &rest)
 
 	log.Info("restaurant updated")
 	return nil
 }
 
-func (s *Services) RestaurantDeleteService(rest *models.Restaurant) error {
+func (s *Services) RestaurantDeleteService(rest *dto.Restaurant) error {
 	if rest == nil {
-		log.Info("restaurant not found")
-		return errors.New("restaurant not found")
+		log.Info(models.ErrRestaurantNotFound)
+		return errors.New(models.ErrRestaurantNotFound)
 	}
 	err := s.db.Rest.DeleteOne(s.ctx, uuid.Parse(rest.ID))
 	if err != nil {
 		log.Info(err)
 		return err
 	}
-	
-	admin := models.Admin{ID: rest.AdminID,Restaurant: rest}
+
+	admin := dto.Admin{ID: rest.AdminID, Restaurant: rest}
 	err = s.MenuDeleteService(admin)
 	if err != nil {
 		log.Info(err)

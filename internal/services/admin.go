@@ -3,101 +3,107 @@ package services
 import (
 	"errors"
 
+	"github.com/mksmstpck/restoracio/internal/dto"
 	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/mksmstpck/restoracio/utils"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
-
-func (s Services) AdminCreateService(admin models.Admin) (models.Admin, error) {
+func (s Services) AdminCreateService(admin dto.Admin) error {
 	adminExists, err := s.db.Admin.GetByEmail(s.ctx, admin.Email)
 	if err != nil {
-		if err.Error() != "admin not found" {
+		if err.Error() != models.ErrAdminNotFound {
 			log.Error(err)
-			return models.Admin{}, err
+			return err
 		}
 	}
 	if adminExists.ID != "" {
-		log.Error(utils.ErrAdminAlreadyExists)
-		return models.Admin{}, errors.New(utils.ErrAdminAlreadyExists)
+		log.Error(models.ErrAdminAlreadyExists)
+		return errors.New(models.ErrAdminAlreadyExists)
 	}
+
 	admin.ID = uuid.NewUUID().String()
-	admin, err = s.db.Admin.CreateOne(s.ctx, admin)
+	admin.PasswordHash, admin.Salt = utils.PasswordHash(admin.Password)
+
+	err = s.db.Admin.CreateOne(s.ctx, admin)
 	if err != nil {
 		log.Error(err)
-		return models.Admin{}, err
+		return err
 	}
-	s.cache.Set(uuid.Parse(admin.ID), admin)
+
 	log.Info("admin created")
-	return admin, nil
+	return nil
 }
 
-func (s Services) AdminGetByIDService(id uuid.UUID) (models.Admin, error) {
-	admin, err := s.cache.AdminGet(id)
-	if admin.ID != "" {
+func (s Services) AdminGetByIDService(id uuid.UUID) (dto.Admin, error) {
+	adminAny, err := s.cache.Get(id)
+	if adminAny != nil {
 		log.Info("admin found")
-		return admin, nil
+		return adminAny.(dto.Admin), nil
 	}
 	if err != nil {
 		log.Error(err)
-		return models.Admin{}, err
+		return dto.Admin{}, err
 	}
-	admin, err = s.db.Admin.GetByID(s.ctx, id)
+	admin, err := s.db.Admin.GetByID(s.ctx, id)
 	if err != nil {
-		if err.Error() == "admin not found" {
-			log.Error(utils.ErrAdminNotFound)
-			return models.Admin{}, errors.New(utils.ErrAdminNotFound)
+		if err.Error() == models.ErrAdminNotFound {
+			log.Error(models.ErrAdminNotFound)
+			return dto.Admin{}, errors.New(models.ErrAdminNotFound)
 		}
 		log.Error(err)
-		return models.Admin{}, err
+		return dto.Admin{}, err
 	}
+
 	s.cache.Set(uuid.Parse(admin.ID), admin)
 	log.Info("admin found")
 	return admin, nil
 }
 
-func (s Services) AdminGetByEmailService(email string) (models.Admin, error) {
+func (s Services) AdminGetByEmailService(email string) (dto.Admin, error) {
 	admin, err := s.db.Admin.GetByEmail(s.ctx, email)
 	if err != nil {
-		if err.Error() == "admin not found" {
-			log.Error(utils.ErrAdminNotFound)
-			return models.Admin{}, errors.New(utils.ErrAdminNotFound)
+		if err.Error() == models.ErrAdminNotFound {
+			log.Error(models.ErrAdminNotFound)
+			return dto.Admin{}, errors.New(models.ErrAdminNotFound)
 		}
 		log.Error(err)
-		return models.Admin{}, err
+		return dto.Admin{}, err
 	}
+
 	s.cache.Set(uuid.Parse(admin.ID), admin)
 	log.Info("admin found")
 	return admin, nil
 }
 
-func (s Services) AdminGetPasswordByIdService(id uuid.UUID) (string, error) {
-	password, err := s.db.Admin.GetPasswordByID(s.ctx, id)
+func (s Services) AdminGetWithPasswordByIdService(id uuid.UUID) (dto.Admin, error) {
+	admin, err := s.db.Admin.GetWithPasswordByID(s.ctx, id)
 	if err != nil {
-		if err.Error() == "admin not found" {
-			log.Error(utils.ErrAdminNotFound)
-			return "", errors.New(utils.ErrAdminNotFound)
+		if err.Error() == models.ErrAdminNotFound {
+			log.Error(models.ErrAdminNotFound)
+			return dto.Admin{}, errors.New(models.ErrAdminNotFound)
 		}
 		log.Error(err)
-		return "", err
+		return dto.Admin{}, err
 	}
+
 	log.Info("password found")
-	return password, nil
+	return admin, nil
 }
 
-func (s Services) AdminUpdateService(admin models.Admin, adminID uuid.UUID) error {
+func (s Services) AdminUpdateService(admin dto.Admin, adminID uuid.UUID) error {
 	admin.ID = adminID.String()
-	s.cache.Set(uuid.Parse(admin.ID), admin)
 	err := s.db.Admin.UpdateOne(s.ctx, admin)
 	if err != nil {
-		if err.Error() == "admin not found" {
-			log.Error(utils.ErrAdminNotFound)
-			return errors.New(utils.ErrAdminNotFound)
+		if err.Error() == models.ErrAdminNotFound {
+			log.Error(models.ErrAdminNotFound)
+			return errors.New(models.ErrAdminNotFound)
 		}
 		log.Error(err)
 		return err
 	}
+	s.cache.Set(uuid.Parse(admin.ID), admin)
 	log.Info("admin updated")
 	return nil
 }

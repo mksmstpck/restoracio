@@ -1,11 +1,10 @@
 package models
 
 type Menu struct {
-	ID           string  `json:"id" bun:"id,pk"`
-	Name         string  `json:"name" binding:"required"`
-	Description  string  `json:"description" binding:"required"`
-	Dishes       []*Dish `json:"dish" bun:"rel:has-many,join:id=menu_id"`
-	QRCodeID     string  `json:"qrcodeID" bun:"qrcode"`
-	QRCodeBytes  []byte `json:"qrcode" bun:"-"`
-	RestaurantID string  `json:"restaurant_id" bun:"restaurant_id"`
+	ID           string    `bun:"id,pk"`
+	Name         string    `bun:"name"`
+	Description  string    `bun:"description"`
+	Dishes       []*Dish   `bun:"rel:has-many,join:id=menu_id"`
+	QRCodeID     string    `bun:"qrcode"`
+	RestaurantID string    `bun:"restaurant_id"`
 }

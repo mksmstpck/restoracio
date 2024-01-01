@@ -5,27 +5,28 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/mksmstpck/restoracio/internal/convertors"
+	"github.com/mksmstpck/restoracio/internal/dto"
 	"github.com/mksmstpck/restoracio/internal/models"
-	"github.com/mksmstpck/restoracio/utils"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
-func (d *StaffDatabase) CreateOne(ctx context.Context, staff models.Staff) (models.Staff, error) {
+func (d *StaffDatabase) CreateOne(ctx context.Context, staff dto.Staff) error {
 	_, err := d.db.
 		NewInsert().
-		Model(&staff).
+		Model(convertors.StaffDTOToDB(&staff)).
 		Exec(ctx)
 	if err != nil {
 		log.Error(err)
-		return models.Staff{}, err
+		return err
 	}
 	log.Print(staff)
 	log.Info("staff created")
-	return staff, nil
+	return nil
 }
 
-func (d *StaffDatabase) GetByID(ctx context.Context, id uuid.UUID, restaurantID uuid.UUID) (models.Staff, error) {
+func (d *StaffDatabase) GetByID(ctx context.Context, id uuid.UUID, restaurantID uuid.UUID) (dto.Staff, error) {
 	var staff models.Staff
 	err := d.db.
 		NewSelect().
@@ -35,17 +36,17 @@ func (d *StaffDatabase) GetByID(ctx context.Context, id uuid.UUID, restaurantID 
 		Scan(ctx)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			log.Info(utils.ErrStaffNotFound)
-			return models.Staff{}, errors.New(utils.ErrStaffNotFound)
+			log.Info(models.ErrStaffNotFound)
+			return dto.Staff{}, errors.New(models.ErrStaffNotFound)
 		}
 		log.Error(err)
-		return models.Staff{}, err
+		return dto.Staff{}, err
 	}
 	log.Info("staff found")
-	return staff, nil
+	return convertors.StaffDBToDTO(&staff), nil
 }
 
-func (d *StaffDatabase) GetAllInRestaurant(ctx context.Context, id uuid.UUID) ([]models.Staff, error) {
+func (d *StaffDatabase) GetAllInRestaurant(ctx context.Context, id uuid.UUID) ([]dto.Staff, error) {
 	var staff []models.Staff
 	err := d.db.
 		NewSelect().
@@ -57,21 +58,24 @@ func (d *StaffDatabase) GetAllInRestaurant(ctx context.Context, id uuid.UUID) ([
 		return nil, err
 	}
 	if len(staff) == 0 {
-		log.Info(utils.ErrStaffNotFound)
-		return nil, errors.New(utils.ErrStaffNotFound)
+		log.Info(models.ErrStaffNotFound)
+		return nil, errors.New(models.ErrStaffNotFound)
+	}
+	staffDTO := make([]dto.Staff, len(staff))
+	for i, staffDB := range staff {
+		staffDTO[i] = convertors.StaffDBToDTO(&staffDB)
 	}
 	log.Info("staffs found")
-	return staff, nil
+	return staffDTO, nil
 }
 
-func (d *StaffDatabase) UpdateOne(ctx context.Context, staff models.Staff) error {
-	log.Print(staff.ID)
-	log.Print(staff.RestaurantID)
+func (d *StaffDatabase) UpdateOne(ctx context.Context, staff dto.Staff) error {
+	staffDB := convertors.StaffDTOToDB(&staff)
 	res, err := d.db.NewUpdate().
-	Model(&staff).
-	Where("id = ? AND restaurant_id = ?", staff.ID, staff.RestaurantID).
-	ExcludeColumn("id", "restaurant_id").
-	Exec(ctx)
+		Model(&staffDB).
+		Where("id = ? AND restaurant_id = ?", staff.ID, staff.RestaurantID).
+		ExcludeColumn("id", "restaurant_id").
+		Exec(ctx)
 	if err != nil {
 		log.Error(err)
 		return err
@@ -82,8 +86,8 @@ func (d *StaffDatabase) UpdateOne(ctx context.Context, staff models.Staff) error
 		return err
 	}
 	if count == 0 {
-		log.Error("staff not found")
-		return errors.New("staff not found")
+		log.Error(models.ErrStaffNotFound)
+		return errors.New(models.ErrStaffNotFound)
 	}
 	log.Info("staff updated")
 	return nil
@@ -105,8 +109,8 @@ func (d *StaffDatabase) DeleteOne(ctx context.Context, id uuid.UUID, restaurantI
 		return err
 	}
 	if count == 0 {
-		log.Error("staff not found")
-		return errors.New("staff not found")
+		log.Error(models.ErrStaffNotFound)
+		return errors.New(models.ErrStaffNotFound)
 	}
 	log.Info("staff deleted")
 	return nil
@@ -128,8 +132,8 @@ func (d *StaffDatabase) DeleteAll(ctx context.Context, restaurantID uuid.UUID) e
 		return err
 	}
 	if count == 0 {
-		log.Error("staff not found")
-		return errors.New("staff not found")
+		log.Error(models.ErrStaffNotFound)
+		return errors.New(models.ErrStaffNotFound)
 	}
 	log.Info("staff deleted")
 	return nil

@@ -82,9 +82,9 @@ definitions:
     - description
     - name
     type: object
-  models.Message:
+  models.apimodels.Message:
     properties:
-      message:
+      apimodels.Message:
         type: string
     type: object
   models.ReservAPI:
@@ -229,15 +229,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: AdminDelete
@@ -265,15 +265,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       summary: AdminCreate
       tags:
       - Admin
@@ -299,19 +299,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: AdminUpdate
@@ -333,23 +333,23 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
         "501":
           description: Not Implemented
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: AdminGetMe
@@ -376,15 +376,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       summary: Login
       tags:
       - Auth
@@ -408,15 +408,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       summary: Refresh
       tags:
       - Auth
@@ -443,7 +443,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: DishCreate
@@ -469,7 +469,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: DishUpdate
@@ -491,7 +491,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       summary: DishGetByID
       tags:
       - Dish
@@ -515,7 +515,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: DishDelete
@@ -545,7 +545,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       summary: DishGetAllInMenu
       tags:
       - Dish
@@ -572,7 +572,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: MenuCreate
@@ -598,7 +598,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: MenuUpdate
@@ -626,7 +626,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       summary: MenuGetByID
       tags:
       - Menu
@@ -652,7 +652,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       summary: MenuGetWithQrcode
       tags:
       - Menu
@@ -678,7 +678,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: MenuDelete
@@ -702,7 +702,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: ReservationGetAllInRestaurant
@@ -730,7 +730,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: ReservationCreate
@@ -756,7 +756,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: ReservationUpdate
@@ -782,7 +782,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: ReservationDelete
@@ -809,7 +809,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: ReservationGetByID
@@ -829,7 +829,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: RestaurantDelete
@@ -850,7 +850,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: RestaurantGetMine
@@ -878,7 +878,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: RestaurantCreate
@@ -904,7 +904,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: RestaurantUpdate
@@ -932,7 +932,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: RestaurantGetByID
@@ -954,7 +954,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: StaffGetAllInRestaurant
@@ -982,7 +982,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: StaffCreate
@@ -1010,7 +1010,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: StaffUpdate
@@ -1038,7 +1038,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: StaffDelete
@@ -1065,7 +1065,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: StaffGetByID
@@ -1094,7 +1094,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: TableCreate
@@ -1120,7 +1120,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: TableUpdate
@@ -1146,7 +1146,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: TableDelete
@@ -1173,7 +1173,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: TableGetByID
@@ -1201,7 +1201,7 @@ paths:
         default:
           description: ""
           schema:
-            $ref: '#/definitions/models.Message'
+            $ref: '#/definitions/models.apimodels.Message'
       security:
       - JWTAuth: []
       summary: TableGetAllInRestaurant

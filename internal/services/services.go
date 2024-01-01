@@ -5,16 +5,16 @@ import (
 
 	"github.com/mksmstpck/restoracio/internal/cache"
 	"github.com/mksmstpck/restoracio/internal/database"
-	"github.com/mksmstpck/restoracio/internal/models"
+	"github.com/mksmstpck/restoracio/internal/dto"
 	"github.com/pborman/uuid"
 	"go.mongodb.org/mongo-driver/mongo/gridfs"
 )
 
 type Services struct {
-	db      *database.Database
-	cache cache.Cacher
+	db     *database.Database
+	cache  cache.Cacher
 	bucket *gridfs.Bucket
-	ctx context.Context
+	ctx    context.Context
 }
 
 func NewServices(
@@ -24,56 +24,55 @@ func NewServices(
 	bucket *gridfs.Bucket,
 ) Servicer {
 	return &Services{
-		db:      db,
-		cache:   cache,
-		bucket:  bucket,
-		ctx:     ctx,
+		db:     db,
+		cache:  cache,
+		bucket: bucket,
+		ctx:    ctx,
 	}
 }
 
 type Servicer interface {
 	// admin
-	AdminCreateService(models.Admin) (models.Admin, error)
-	AdminGetByIDService(id uuid.UUID) (models.Admin, error)
-	AdminGetByEmailService(email string) (models.Admin, error)
-	AdminGetPasswordByIdService(id uuid.UUID) (string, error)
-	AdminUpdateService(admin models.Admin, adminID uuid.UUID) error
+	AdminCreateService(dto.Admin) error
+	AdminGetByIDService(id uuid.UUID) (dto.Admin, error)
+	AdminGetByEmailService(email string) (dto.Admin, error)
+	AdminGetWithPasswordByIdService(id uuid.UUID) (dto.Admin, error)
+	AdminUpdateService(admin dto.Admin, adminID uuid.UUID) error
 	AdminDeleteService(id uuid.UUID) error
 	// restaurant
-	RestaurantCreateService(rest models.Restaurant, admin models.Admin) (models.Restaurant, error)
-	RestaurantGetByIDService(id uuid.UUID) (models.Restaurant, error)
-	RestaurantUpdateService(rest models.Restaurant, restID uuid.UUID) error
-	RestaurantDeleteService(rest *models.Restaurant) error
+	RestaurantCreateService(rest dto.Restaurant, admin dto.Admin) error
+	RestaurantGetByIDService(id uuid.UUID) (dto.Restaurant, error)
+	RestaurantUpdateService(rest dto.Restaurant, admin dto.Admin) error
+	RestaurantDeleteService(rest *dto.Restaurant) error
 	// table
-	TableCreateService(table models.Table, admin models.Admin) (models.Table, error)
-	TableGetByIDService(id uuid.UUID) (models.Table, error)
-	TableGetAllInRestaurantService(id uuid.UUID) ([]models.Table, error)
-	TableUpdateService(table models.Table, admin models.Admin) error
-	TableDeleteService(id uuid.UUID, admin models.Admin) error
+	TableCreateService(table dto.Table, admin dto.Admin) error
+	TableGetByIDService(id uuid.UUID) (dto.Table, error)
+	TableGetAllInRestaurantService(id uuid.UUID) ([]dto.Table, error)
+	TableUpdateService(table dto.Table, admin dto.Admin) error
+	TableDeleteService(id uuid.UUID, admin dto.Admin) error
 	// menu
-	MenuCreateService(menu models.Menu, admin models.Admin) (models.Menu, error)
-	MenuGetWithQrcodeService(id uuid.UUID) (models.Menu, error)
-	MenuGetByIDService(id uuid.UUID) (models.Menu, error)
-	MenuUpdateService(menu models.Menu, admin models.Admin) error
-	MenuDeleteService(admin models.Admin) error
+	MenuCreateService(menu dto.Menu, admin dto.Admin) error
+	MenuGetWithQrcodeService(id uuid.UUID) (dto.Menu, error)
+	MenuGetByIDService(id uuid.UUID) (dto.Menu, error)
+	MenuUpdateService(menu dto.Menu, admin dto.Admin) error
+	MenuDeleteService(admin dto.Admin) error
 	// dish
-	DishCreateService(dish models.Dish, admin models.Admin) (models.Dish, error)
-	DishGetByIDService(id uuid.UUID) (models.Dish, error)
-	DishGetAllInMenuService(id uuid.UUID) ([]models.Dish, error)
-	DishUpdateService(dish models.Dish, admin models.Admin) error
-	DishDeleteService(id uuid.UUID, admin models.Admin) error
-	DishDeleteAllService(admin models.Admin) error
+	DishCreateService(dish dto.Dish, admin dto.Admin) error
+	DishGetByIDService(id uuid.UUID) (dto.Dish, error)
+	DishGetAllInMenuService(id uuid.UUID) ([]dto.Dish, error)
+	DishUpdateService(dish dto.Dish, admin dto.Admin) error
+	DishDeleteService(id uuid.UUID, admin dto.Admin) error
+	DishDeleteAllService(admin dto.Admin) error
 	// staff
-	StaffCreateService(staff models.Staff, admin models.Admin) (models.Staff, error)
-	StaffGetByIDService(id uuid.UUID, admin models.Admin) (models.Staff, error)
-	StaffGetAllInRestaurantService(admin models.Admin) ([]models.Staff, error)
-	StaffUpdateService(staff models.Staff, admin models.Admin) error
-	StaffDeleteService(id uuid.UUID, admin models.Admin) error
+	StaffCreateService(staff dto.Staff, admin dto.Admin) error
+	StaffGetByIDService(id uuid.UUID, admin dto.Admin) (dto.Staff, error)
+	StaffGetAllInRestaurantService(admin dto.Admin) ([]dto.Staff, error)
+	StaffUpdateService(staff dto.Staff, admin dto.Admin) error
+	StaffDeleteService(id uuid.UUID, admin dto.Admin) error
 	// reservation
-	ReservCreateService(reserv models.ReservAPI, admin models.Admin) (models.ReservDB, error)
-	ReservGetByIDService(id uuid.UUID, admin models.Admin) (models.ReservDB, error)
-	ReservGetAllInRestaurantService(admin models.Admin) ([]models.ReservDB, error)
-	ReservUpdateService(reserv models.ReservAPI, admin models.Admin) error
-	ReservDeleteService(id uuid.UUID, admin models.Admin) error
-
+	ReservCreateService(reserv dto.Reserv, admin dto.Admin) error
+	ReservGetByIDService(id uuid.UUID, admin dto.Admin) (dto.Reserv, error)
+	ReservGetAllInRestaurantService(admin dto.Admin) ([]dto.Reserv, error)
+	ReservUpdateService(reserv dto.Reserv, admin dto.Admin) error
+	ReservDeleteService(id uuid.UUID, admin dto.Admin) error
 }
