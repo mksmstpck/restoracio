@@ -4,8 +4,8 @@ type TableRequest struct {
 	Number     int    `json:"number" binding:"required"`
 	Placement  string `json:"placement" binding:"required"`
 	MaxPeople  int    `json:"max_people" binding:"required"`
-	IsReserved bool   `json:"is_reserved" binding:"required"`
-	IsOccupied bool   `json:"is_occupied" binding:"required"`
+	IsReserved bool   `json:"is_reserved"`
+	IsOccupied bool   `json:"is_occupied"`
 }
 
 type TableResponse struct {
