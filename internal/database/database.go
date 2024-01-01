@@ -10,23 +10,23 @@ import (
 
 type AdminDatabases interface {
 	CreateOne(ctx context.Context, user dto.Admin) error
-	GetByID(ctx context.Context, id uuid.UUID) (*dto.Admin, error)
-	GetByEmail(ctx context.Context, email string) (*dto.Admin, error)
-	GetWithPasswordByID(ctx context.Context, id uuid.UUID) (*dto.Admin, error)
+	GetByID(ctx context.Context, id uuid.UUID) (dto.Admin, error)
+	GetByEmail(ctx context.Context, email string) (dto.Admin, error)
+	GetWithPasswordByID(ctx context.Context, id uuid.UUID) (dto.Admin, error)
 	UpdateOne(ctx context.Context, user dto.Admin) error
 	DeleteOne(ctx context.Context, id uuid.UUID) error
 }
 
 type RestaurantDatabases interface {
-	CreateOne(ctx context.Context, restaurant dto.Restaurant) (*dto.Restaurant, error)
-	GetByID(ctx context.Context, id uuid.UUID) (*dto.Restaurant, error)
+	CreateOne(ctx context.Context, restaurant dto.Restaurant) error
+	GetByID(ctx context.Context, id uuid.UUID) (dto.Restaurant, error)
 	UpdateOne(ctx context.Context, restaurant dto.Restaurant) error
 	DeleteOne(ctx context.Context, id uuid.UUID) error
 }
 
 type TableDatabases interface {
-	CreateOne(ctx context.Context, table dto.Table) (*dto.Table, error)
-	GetByID(ctx context.Context, id uuid.UUID) (*dto.Table, error)
+	CreateOne(ctx context.Context, table dto.Table) error
+	GetByID(ctx context.Context, id uuid.UUID) (dto.Table, error)
 	GetAllInRestaurant(ctx context.Context, id uuid.UUID) ([]dto.Table, error)
 	UpdateOne(ctx context.Context, table dto.Table) error
 	DeleteOne(ctx context.Context, id uuid.UUID) error
@@ -34,15 +34,15 @@ type TableDatabases interface {
 }
 
 type MenuDatabases interface {
-	CreateOne(ctx context.Context, menu dto.Menu) (*dto.Menu, error)
-	GetByID(ctx context.Context, id uuid.UUID) (*dto.Menu, error)
+	CreateOne(ctx context.Context, menu dto.Menu) error
+	GetByID(ctx context.Context, id uuid.UUID) (dto.Menu, error)
 	UpdateOne(ctx context.Context, menu dto.Menu) error
 	DeleteOne(ctx context.Context, menu dto.Menu) error
 }
 
 type DishDatabases interface {
-	CreateOne(ctx context.Context, dish dto.Dish) (*dto.Dish, error)
-	GetByID(ctx context.Context, id uuid.UUID) (*dto.Dish, error)
+	CreateOne(ctx context.Context, dish dto.Dish) error
+	GetByID(ctx context.Context, id uuid.UUID) (dto.Dish, error)
 	GetAllInMenu(ctx context.Context, id uuid.UUID) ([]dto.Dish, error)
 	UpdateOne(ctx context.Context, dish dto.Dish) error
 	DeleteOne(ctx context.Context, id uuid.UUID, menuID uuid.UUID) error
@@ -50,8 +50,8 @@ type DishDatabases interface {
 }
 
 type StaffDatabases interface {
-	CreateOne(ctx context.Context, staff dto.Staff) (*dto.Staff, error)
-	GetByID(ctx context.Context, id uuid.UUID, restaurantID uuid.UUID) (*dto.Staff, error)
+	CreateOne(ctx context.Context, staff dto.Staff) error
+	GetByID(ctx context.Context, id uuid.UUID, restaurantID uuid.UUID) (dto.Staff, error)
 	GetAllInRestaurant(ctx context.Context, id uuid.UUID) ([]dto.Staff, error)
 	UpdateOne(ctx context.Context, staff dto.Staff) error
 	DeleteOne(ctx context.Context, id uuid.UUID, restaurantID uuid.UUID) error
@@ -59,8 +59,8 @@ type StaffDatabases interface {
 }
 
 type ReservationDatabases interface {
-	CreateOne(ctx context.Context, reserv dto.Reserv) (*dto.Reserv, error)
-	GetByID(ctx context.Context, id uuid.UUID, restaurantID uuid.UUID) (*dto.Reserv, error)
+	CreateOne(ctx context.Context, reserv dto.Reserv) error
+	GetByID(ctx context.Context, id uuid.UUID, restaurantID uuid.UUID) (dto.Reserv, error)
 	GetAllInRestaurant(ctx context.Context, id uuid.UUID) ([]dto.Reserv, error)
 	UpdateOne(ctx context.Context, reserv dto.Reserv) error
 	DeleteOne(ctx context.Context, id uuid.UUID, restaurantID uuid.UUID) error
@@ -123,23 +123,23 @@ func NewReservationDatabase(db *bun.DB) ReservationDatabases {
 }
 
 type Database struct {
-	Admin AdminDatabases
-	Rest  RestaurantDatabases
-	Table TableDatabases
-	Menu  MenuDatabases
-	Dish  DishDatabases
-	Staff StaffDatabases
+	Admin  AdminDatabases
+	Rest   RestaurantDatabases
+	Table  TableDatabases
+	Menu   MenuDatabases
+	Dish   DishDatabases
+	Staff  StaffDatabases
 	Reserv ReservationDatabases
 }
 
 func NewDatabase(db *bun.DB) *Database {
 	return &Database{
-		Admin: NewAdminDatabase(db),
-		Rest:  NewRestaurantDatabase(db),
-		Table: NewTableDatabase(db),
-		Menu:  NewMenuDatabase(db),
-		Dish:  NewDishDatabase(db),
-		Staff: NewStaffDatabase(db),
+		Admin:  NewAdminDatabase(db),
+		Rest:   NewRestaurantDatabase(db),
+		Table:  NewTableDatabase(db),
+		Menu:   NewMenuDatabase(db),
+		Dish:   NewDishDatabase(db),
+		Staff:  NewStaffDatabase(db),
 		Reserv: NewReservationDatabase(db),
 	}
 }

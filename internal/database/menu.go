@@ -5,27 +5,29 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/mksmstpck/restoracio/internal/convertors"
 	"github.com/mksmstpck/restoracio/internal/dto"
-	"github.com/mksmstpck/restoracio/models"
+	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
-func (d *MenuDatabase) CreateOne(ctx context.Context, menu dto.MenuDB) (dto.MenuDB, error) {
+func (d *MenuDatabase) CreateOne(ctx context.Context, menu dto.Menu) error {
+	menuDB := convertors.MenuDTOToDB(&menu)
 	_, err := d.db.
 		NewInsert().
-		Model(&menu).
+		Model(menuDB).
 		Exec(ctx)
 	if err != nil {
 		log.Error(err)
-		return dto.MenuDB{}, err
+		return err
 	}
 	log.Info("menu created")
-	return menu, nil
+	return nil
 }
 
-func (d *MenuDatabase) GetByID(ctx context.Context, id uuid.UUID) (dto.MenuDB, error) {
-	var menu dto.MenuDB
+func (d *MenuDatabase) GetByID(ctx context.Context, id uuid.UUID) (dto.Menu, error) {
+	var menu models.Menu
 	err := d.db.
 		NewSelect().
 		Model(&menu).
@@ -35,19 +37,20 @@ func (d *MenuDatabase) GetByID(ctx context.Context, id uuid.UUID) (dto.MenuDB, e
 	if err != nil {
 		if err == sql.ErrNoRows {
 			log.Error(models.ErrMenuNotFound)
-			return dto.MenuDB{}, errors.New(models.ErrMenuNotFound)
+			return dto.Menu{}, errors.New(models.ErrMenuNotFound)
 		}
 		log.Error(err)
-		return dto.MenuDB{}, err
+		return dto.Menu{}, err
 	}
 	log.Info("menu found")
-	return menu, nil
+	return convertors.MenuDBToDTO(&menu), nil
 }
 
-func (d *MenuDatabase) UpdateOne(ctx context.Context, menu dto.MenuDB) error {
+func (d *MenuDatabase) UpdateOne(ctx context.Context, menu dto.Menu) error {
+	menuDB := convertors.MenuDTOToDB(&menu)
 	res, err := d.db.
 		NewUpdate().
-		Model(&menu).
+		Model(&menuDB).
 		ExcludeColumn("restaurant_id", "id", "qrcode").
 		Where("id = ?", menu.ID).
 		Exec(ctx)
@@ -68,10 +71,11 @@ func (d *MenuDatabase) UpdateOne(ctx context.Context, menu dto.MenuDB) error {
 	return nil
 }
 
-func (d *MenuDatabase) DeleteOne(ctx context.Context, menu dto.MenuDB) error {
+func (d *MenuDatabase) DeleteOne(ctx context.Context, menu dto.Menu) error {
+	menuDB := convertors.MenuDTOToDB(&menu)
 	res, err := d.db.
 		NewDelete().
-		Model(&menu).
+		Model(&menuDB).
 		Where("id = ?", menu.ID).
 		Exec(ctx)
 	if err != nil {

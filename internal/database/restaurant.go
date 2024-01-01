@@ -5,30 +5,29 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/mksmstpck/restoracio/internal/convertors"
 	"github.com/mksmstpck/restoracio/internal/dto"
-	"github.com/mksmstpck/restoracio/models"
+	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
-func (d *RestDatabase) CreateOne(
-	ctx context.Context,
-	restaurant dto.RestaurantDB,
-	) (dto.RestaurantDB, error) {
+func (d *RestDatabase) CreateOne(ctx context.Context, restaurant dto.Restaurant) error {
+	rest := convertors.RestaurantDTOToDB(&restaurant)
 	_, err := d.db.
 		NewInsert().
-		Model(&restaurant).
+		Model(&rest).
 		Exec(ctx)
 	if err != nil {
 		log.Error(err)
-		return dto.RestaurantDB{}, err
+		return err
 	}
 	log.Info("restaurant created")
-	return restaurant, nil
+	return nil
 }
 
-func (d *RestDatabase) GetByID(ctx context.Context, id uuid.UUID) (dto.RestaurantDB, error) {
-	var restaurant dto.RestaurantDB
+func (d *RestDatabase) GetByID(ctx context.Context, id uuid.UUID) (dto.Restaurant, error) {
+	var restaurant models.Restaurant
 	err := d.db.
 		NewSelect().
 		Model(&restaurant).
@@ -38,19 +37,20 @@ func (d *RestDatabase) GetByID(ctx context.Context, id uuid.UUID) (dto.Restauran
 	if err != nil {
 		if err == sql.ErrNoRows {
 			log.Error(models.ErrRestaurantNotFound)
-			return dto.RestaurantDB{}, errors.New(models.ErrRestaurantNotFound)
+			return dto.Restaurant{}, errors.New(models.ErrRestaurantNotFound)
 		}
 		log.Error(err)
-		return dto.RestaurantDB{}, err
+		return dto.Restaurant{}, err
 	}
 	log.Info("restaurant found")
-	return restaurant, nil
+	return convertors.RestaurantDBToDTO(&restaurant), nil
 }
 
-func (d *RestDatabase) UpdateOne(ctx context.Context, restaurant dto.RestaurantDB) error {
+func (d *RestDatabase) UpdateOne(ctx context.Context, restaurant dto.Restaurant) error {
+	rest := convertors.RestaurantDTOToDB(&restaurant)
 	_, err := d.db.
 		NewUpdate().
-		Model(&restaurant).
+		Model(&rest).
 		ExcludeColumn("admin_id", "id", "staff", "menu", "tables").
 		Where("id = ?", restaurant.ID).
 		Exec(ctx)
@@ -65,7 +65,7 @@ func (d *RestDatabase) UpdateOne(ctx context.Context, restaurant dto.RestaurantD
 func (d *RestDatabase) DeleteOne(ctx context.Context, id uuid.UUID) error {
 	_, err := d.db.
 		NewDelete().
-		Model(&dto.RestaurantDB{}).
+		Model(&models.Restaurant{}).
 		Where("id = ?", id.String()).
 		Exec(ctx)
 	if err != nil {
