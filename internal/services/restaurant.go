@@ -4,25 +4,23 @@ import (
 	"errors"
 
 	"github.com/mksmstpck/restoracio/internal/dto"
-	"github.com/mksmstpck/restoracio/models"
+	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
-func (s *Services) RestaurantCreateService(rest dto.RestaurantRequest, admin dto.AdminResponse)  error {
-	rest.AdminID = admin.ID
+func (s *Services) RestaurantCreateService(rest dto.Restaurant, admin dto.Admin) error {
 	rest.ID = uuid.NewUUID().String()
-	res, err := s.db.Rest.CreateOne(s.ctx, rest)
+	rest.AdminID = admin.ID
+
+	err := s.db.Rest.CreateOne(s.ctx, rest)
 	if err != nil {
 		log.Info(err)
-		return dto.Restaurant{}, err
+		return err
 	}
 
-	s.cache.Set(uuid.Parse(res.ID), res)
-	s.cache.Set(uuid.Parse(admin.ID), admin)
-
 	log.Info("restaurant created")
-	return res, nil
+	return nil
 }
 
 func (s *Services) RestaurantGetByIDService(id uuid.UUID) (dto.Restaurant, error) {
@@ -42,21 +40,21 @@ func (s *Services) RestaurantGetByIDService(id uuid.UUID) (dto.Restaurant, error
 		return dto.Restaurant{}, err
 	}
 
-	s.cache.Set(uuid.Parse(res.ID), res)
+	s.cache.Set(uuid.Parse(res.ID), &res)
 
 	log.Info("restaurant found")
 	return res, nil
 }
 
-func (s *Services) RestaurantUpdateService(rest dto.Restaurant, restID uuid.UUID) error {
-	rest.ID = restID.String()
+func (s *Services) RestaurantUpdateService(rest dto.Restaurant, admin dto.Admin) error {
+	rest.ID = admin.Restaurant.ID
 	err := s.db.Rest.UpdateOne(s.ctx, rest)
 	if err != nil {
 		log.Info(err)
 		return err
 	}
 
-	s.cache.Set(uuid.Parse(rest.ID), rest)
+	s.cache.Set(uuid.Parse(rest.ID), &rest)
 
 	log.Info("restaurant updated")
 	return nil
@@ -72,8 +70,8 @@ func (s *Services) RestaurantDeleteService(rest *dto.Restaurant) error {
 		log.Info(err)
 		return err
 	}
-	
-	admin := dto.Admin{ID: rest.AdminID,Restaurant: rest}
+
+	admin := dto.Admin{ID: rest.AdminID, Restaurant: rest}
 	err = s.MenuDeleteService(admin)
 	if err != nil {
 		log.Info(err)

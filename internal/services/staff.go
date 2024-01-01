@@ -4,32 +4,28 @@ import (
 	"errors"
 
 	"github.com/mksmstpck/restoracio/internal/dto"
-	"github.com/mksmstpck/restoracio/models"
+	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
-func (s *Services) StaffCreateService(staff dto.Staff, admin dto.Admin) (dto.Staff, error) {
+func (s *Services) StaffCreateService(staff dto.Staff, admin dto.Admin) error {
 	if admin.Restaurant == nil {
 		log.Info(models.ErrRestaurantNotFound)
-		return dto.Staff{}, errors.New(models.ErrRestaurantNotFound)
-	}
-	staff.RestaurantID = admin.Restaurant.ID
-	staff.ID = uuid.NewUUID().String()
-	res, err := s.db.Staff.CreateOne(s.ctx, staff)
-	if err != nil {
-		log.Info(err)
-		return dto.Staff{}, err
+		return errors.New(models.ErrRestaurantNotFound)
 	}
 
-	err = s.cache.Set(uuid.Parse(res.ID), res)
+	staff.ID = uuid.NewUUID().String()
+	staff.RestaurantID = admin.Restaurant.ID
+
+	err := s.db.Staff.CreateOne(s.ctx, staff)
 	if err != nil {
 		log.Info(err)
-		return dto.Staff{}, err
+		return err
 	}
 
 	log.Info("staff created")
-	return res, nil
+	return nil
 }
 
 func (s *Services) StaffGetByIDService(id uuid.UUID, admin dto.Admin) (dto.Staff, error) {

@@ -4,51 +4,52 @@ import (
 	"errors"
 
 	"github.com/mksmstpck/restoracio/internal/dto"
-	"github.com/mksmstpck/restoracio/models"
+	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
-func (s *Services) TableCreateService(table dto.Table, admin dto.Admin) (dto.Table, error) {
-	table.ID = uuid.NewUUID().String()
+func (s *Services) TableCreateService(table dto.Table, admin dto.Admin) error {
 	if admin.Restaurant == nil {
-		return dto.Table{}, errors.New("create restaurant first")
+		return errors.New("create restaurant first")
 	}
+
+	table.ID = uuid.NewUUID().String()
 	table.RestaurantID = admin.Restaurant.ID
-	res, err := s.db.Table.CreateOne(s.ctx, table)
+
+	err := s.db.Table.CreateOne(s.ctx, table)
 	if err != nil {
-		log.Info("TableCreate: ", err)
-		return dto.Table{}, err
+		log.Info(err)
+		return err
 	}
-	s.cache.Set(uuid.Parse(res.ID), res)
 	log.Info("table created")
-	return res, nil
+	return nil
 }
 
 func (s *Services) TableGetByIDService(id uuid.UUID) (dto.Table, error) {
 	tableAny, err := s.cache.Get(id)
-	if tableAny != nil{
+	if tableAny != nil {
 		log.Info("table found")
 		return tableAny.(dto.Table), nil
 	}
 	if err != nil {
-		log.Info("TableGetByID: ", err)
+		log.Info(err)
 		return dto.Table{}, err
 	}
 
 	table, err := s.db.Table.GetByID(s.ctx, id)
 	if err != nil {
-		log.Info("TableGetByID: ", err)
+		log.Info(err)
 		return dto.Table{}, err
 	}
-	s.cache.Set(uuid.Parse(table.ID), table)
+	s.cache.Set(uuid.Parse(table.ID), &table)
 	return table, nil
 }
 
 func (s *Services) TableGetAllInRestaurantService(id uuid.UUID) ([]dto.Table, error) {
 	tables, err := s.db.Table.GetAllInRestaurant(s.ctx, id)
 	if err != nil {
-		log.Info("TableGetAllInRestaurant: ", err)
+		log.Info(err)
 		return nil, err
 	}
 	return tables, nil
@@ -72,7 +73,7 @@ func (s *Services) TableUpdateService(table dto.Table, admin dto.Admin) error {
 
 	err := s.db.Table.UpdateOne(s.ctx, table)
 	if err != nil {
-		log.Info("TableUpdate: ", err)
+		log.Info(err)
 		return err
 	}
 
@@ -97,7 +98,7 @@ func (s *Services) TableDeleteService(id uuid.UUID, admin dto.Admin) error {
 	}
 	err := s.db.Table.DeleteOne(s.ctx, id)
 	if err != nil {
-		log.Info("TableDelete: ", err)
+		log.Info(err)
 		return err
 	}
 

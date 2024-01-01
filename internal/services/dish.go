@@ -4,13 +4,12 @@ import (
 	"errors"
 
 	"github.com/mksmstpck/restoracio/internal/dto"
-	"github.com/mksmstpck/restoracio/models"
-	"github.com/mksmstpck/restoracio/utils/convertors"
+	"github.com/mksmstpck/restoracio/internal/models"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
-func (s *Services) DishCreateService(dishRequest dto.DishRequest, admin dto.AdminResponse) error {
+func (s *Services) DishCreateService(dish dto.Dish, admin dto.Admin) error {
 	if admin.Restaurant == nil {
 		log.Info(models.ErrRestaurantNotFound)
 		return errors.New(models.ErrRestaurantNotFound)
@@ -20,54 +19,52 @@ func (s *Services) DishCreateService(dishRequest dto.DishRequest, admin dto.Admi
 		return errors.New(models.ErrMenuNotFound)
 	}
 
-	dishDB := convertors.DishRequestToDB(dishRequest, admin.Restaurant.Menu.ID)
+	dish.ID = uuid.NewUUID().String()
+	dish.MenuID = admin.Restaurant.Menu.ID
 
-	dish, err := s.db.Dish.CreateOne(s.ctx, dishDB)
+	err := s.db.Dish.CreateOne(s.ctx, dish)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
-	s.cache.Set(uuid.Parse(dish.ID), convertors.DishDBToResponse(dishDB))
 
 	log.Info("dish created")
 	return nil
 }
 
-func (s *Services) DishGetByIDService(id uuid.UUID) (*dto.DishResponse, error) {
+func (s *Services) DishGetByIDService(id uuid.UUID) (dto.Dish, error) {
 	dishAny, err := s.cache.Get(id)
 	if dishAny != nil {
 		log.Info("dish found")
-		return dishAny.(*dto.DishResponse), nil
+		return dishAny.(dto.Dish), nil
 	}
 	if err != nil {
 		log.Error(err)
-		return nil, err
+		return dto.Dish{}, err
 	}
 	dish, err := s.db.Dish.GetByID(s.ctx, id)
 	if err != nil {
 		log.Error(err)
-		return nil, err
+		return dto.Dish{}, err
 	}
 
-	dishResponse := convertors.DishDBToResponse(dish)
-
-	s.cache.Set(uuid.Parse(dish.ID), dishResponse)
+	s.cache.Set(uuid.Parse(dish.ID), dish)
 
 	log.Info("dish found")
-	return &dishResponse, nil
+	return dish, nil
 }
 
-func (s *Services) DishGetAllInMenuService(id uuid.UUID) ([]dto.DishResponse, error) {
+func (s *Services) DishGetAllInMenuService(id uuid.UUID) ([]dto.Dish, error) {
 	dishes, err := s.db.Dish.GetAllInMenu(s.ctx, id)
 	if err != nil {
 		log.Error(err)
 		return nil, err
 	}
 	log.Info("dishes found")
-	return convertors.DishDBSliceToResponseSlice(dishes), nil
+	return dishes, nil
 }
 
-func (s *Services) DishUpdateService(dish dto.DishRequest, dishID uuid.UUID, admin dto.AdminResponse) error {
+func (s *Services) DishUpdateService(dish dto.Dish, admin dto.Admin) error {
 	if admin.Restaurant == nil {
 		log.Info(models.ErrRestaurantNotFound)
 		return errors.New(models.ErrRestaurantNotFound)
@@ -77,22 +74,19 @@ func (s *Services) DishUpdateService(dish dto.DishRequest, dishID uuid.UUID, adm
 		return errors.New(models.ErrMenuNotFound)
 	}
 
-	dishDB := convertors.DishRequestToDB(dish, admin.Restaurant.Menu.ID)
-	dishDB.ID = dishID.String()
-
-	err := s.db.Dish.UpdateOne(s.ctx, dishDB)
+	err := s.db.Dish.UpdateOne(s.ctx, dish)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
 
-	s.cache.Set(uuid.Parse(dishDB.ID), convertors.DishDBToResponse(dishDB))
+	s.cache.Set(uuid.Parse(dish.ID), dish)
 
 	log.Info("dish updated")
 	return nil
 }
 
-func (s *Services) DishDeleteService(id uuid.UUID, admin dto.AdminResponse) error {
+func (s *Services) DishDeleteService(id uuid.UUID, admin dto.Admin) error {
 	if admin.Restaurant == nil {
 		log.Info(models.ErrRestaurantNotFound)
 		return errors.New(models.ErrRestaurantNotFound)
@@ -114,7 +108,7 @@ func (s *Services) DishDeleteService(id uuid.UUID, admin dto.AdminResponse) erro
 	return nil
 }
 
-func (s *Services) DishDeleteAllService(admin dto.AdminResponse) error {
+func (s *Services) DishDeleteAllService(admin dto.Admin) error {
 	if admin.Restaurant == nil {
 		log.Info(models.ErrRestaurantNotFound)
 		return errors.New(models.ErrRestaurantNotFound)
